@@ -26,10 +26,26 @@ export class SolanaTransactionManager {
 
   /**
    * Send SOL to another address
+   *
+   * ⚠️ DEMO MODE: Currently returns mock signatures
+   *
+   * TODO for production:
+   * 1. Sign the transaction using the wallet adapter
+   * 2. Send the signed transaction to the network
+   * 3. Confirm the transaction
+   * 4. Return the real transaction signature
+   *
+   * Example production implementation:
+   * ```
+   * const signedTx = await this.walletManager.signTransaction(transaction);
+   * const signature = await this.connection.sendRawTransaction(signedTx.serialize());
+   * await this.connection.confirmTransaction(signature);
+   * return { signature, success: true };
+   * ```
    */
   async sendSol(params: SendTransactionParams): Promise<TransactionResult> {
     const walletState = this.walletManager.getState();
-    
+
     if (!walletState.connected || !walletState.publicKey) {
       throw new Error('Wallet not connected');
     }
@@ -40,14 +56,14 @@ export class SolanaTransactionManager {
 
       // Create transaction
       const transaction = new Transaction();
-      
+
       // Add transfer instruction
       const transferInstruction = SystemProgram.transfer({
         fromPubkey: senderPubkey,
         toPubkey: recipientPubkey,
         lamports: params.amount,
       });
-      
+
       transaction.add(transferInstruction);
 
       // Add memo if provided
@@ -65,8 +81,9 @@ export class SolanaTransactionManager {
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = senderPubkey;
 
-      // For demo purposes, we'll simulate a successful transaction
-      // In a real implementation, you would sign and send the transaction
+      // ⚠️ DEMO MODE: Simulating a successful transaction
+      // TODO: Implement actual transaction signing and sending for production
+      console.warn('⚠️ DEMO MODE: Transaction not actually sent. Returning mock signature.');
       const signature = this.generateMockSignature();
 
       return {
@@ -179,7 +196,11 @@ export class SolanaTransactionManager {
   }
 
   /**
-   * Generate a mock transaction signature for demo purposes
+   * ⚠️ DEMO ONLY: Generate a mock transaction signature for demo purposes
+   *
+   * SECURITY WARNING: This generates FAKE signatures for development/testing only.
+   * These signatures are NOT real blockchain transactions.
+   * Remove or disable this method before production deployment.
    */
   private generateMockSignature(): string {
     const chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
@@ -191,9 +212,23 @@ export class SolanaTransactionManager {
   }
 
   /**
-   * Generate mock transaction history for demo purposes
+   * ⚠️ DEMO ONLY: Generate mock transaction history for demo purposes
+   *
+   * SECURITY WARNING: This returns FAKE transaction history for development/testing.
+   * In production, this should fetch real transaction data from the blockchain.
+   *
+   * Production implementation should use:
+   * ```
+   * const signatures = await this.connection.getSignaturesForAddress(
+   *   walletState.publicKey,
+   *   { limit }
+   * );
+   * return signatures;
+   * ```
    */
   private generateMockTransactionHistory(limit: number): TransactionHistoryItem[] {
+    console.warn('⚠️ DEMO MODE: Showing mock transaction history. Not real blockchain data.');
+
     const transactions: TransactionHistoryItem[] = [];
     const now = Math.floor(Date.now() / 1000);
 

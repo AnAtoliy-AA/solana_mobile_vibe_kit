@@ -80,7 +80,17 @@ export class SolanaWalletManager {
 
   /**
    * Simulate wallet connection (for demo purposes)
-   * In a real implementation, this would integrate with actual wallet adapters
+   *
+   * ⚠️ SECURITY WARNING: DEMO MODE ONLY - DO NOT USE IN PRODUCTION
+   *
+   * This is a mock implementation for development and testing.
+   * The demo wallet cannot sign transactions and should NEVER be used with real funds.
+   *
+   * For production use:
+   * - Use connectCustomWallet() with Privy's embedded wallets (see usePrivySolana hook)
+   * - Or integrate with actual wallet adapters (Phantom, Solflare, etc.)
+   *
+   * @param walletType - Type of wallet to connect (only 'demo' is implemented)
    */
   async connectWallet(walletType: 'phantom' | 'solflare' | 'demo' = 'demo'): Promise<void> {
     this.walletState.connecting = true;
@@ -91,9 +101,12 @@ export class SolanaWalletManager {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       if (walletType === 'demo') {
-        // Generate a demo public key for testing
+        // ⚠️ DEMO: Generate a demo public key for testing
+        // DO NOT use this wallet with real funds!
         const demoPublicKey = new PublicKey('11111111111111111111111111111112');
-        
+
+        console.warn('⚠️ DEMO WALLET: This is a test wallet and cannot sign transactions. Do not send real funds!');
+
         this.walletState = {
           connected: true,
           connecting: false,
@@ -195,6 +208,11 @@ export class SolanaWalletManager {
 
   /**
    * Sign a transaction using the connected wallet
+   *
+   * ⚠️ SECURITY: Actual signing should happen through secure wallet providers
+   * - For Privy: Signing happens in their secure infrastructure (see usePrivySolana)
+   * - For browser wallets: Signing happens in the wallet extension
+   * - Demo wallet: Cannot sign (will throw error)
    */
   async signTransaction(transaction: Transaction): Promise<Transaction> {
     if (!this.walletState.connected) {
@@ -205,9 +223,9 @@ export class SolanaWalletManager {
       return this.customAdapter.signTransaction(transaction);
     }
 
-    // For demo wallet, we can't actually sign
+    // ⚠️ DEMO: Demo wallet cannot sign transactions
     if (this.walletState.wallet?.type === 'demo') {
-      throw new Error('Demo wallet cannot sign transactions');
+      throw new Error('❌ Demo wallet cannot sign transactions. Use a real wallet or Privy embedded wallet.');
     }
 
     throw new Error('No wallet adapter available');

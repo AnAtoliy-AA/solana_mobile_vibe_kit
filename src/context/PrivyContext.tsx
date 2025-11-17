@@ -34,18 +34,56 @@ const PrivyAuthWrapper: React.FC<{ children: ReactNode }> = ({ children }) => {
 };
 
 export const PrivyProvider: React.FC<PrivyProviderProps> = ({ children }) => {
+  // SECURITY: All configuration loaded from environment variables
+  const privyAppId = process.env.REACT_APP_PRIVY_APP_ID;
+
+  // Validate required environment variables
+  if (!privyAppId) {
+    throw new Error(
+      '❌ REACT_APP_PRIVY_APP_ID is required but not found in environment variables. ' +
+      'Please create a .env file with your Privy App ID. ' +
+      'See .env.example for template.'
+    );
+  }
+
+  // Load optional configuration from environment
+  const logoUrl = process.env.REACT_APP_PRIVY_LOGO_URL;
+  const theme = process.env.REACT_APP_PRIVY_THEME;
+  const accentColor = process.env.REACT_APP_PRIVY_ACCENT_COLOR;
+
+  type PrivyTheme = 'light' | 'dark';
+  let parsedTheme: PrivyTheme | undefined;
+
+  if (theme && theme !== 'light' && theme !== 'dark') {
+    throw new Error('REACT_APP_PRIVY_THEME must be either "light" or "dark" when provided.');
+  }
+
+  if (theme) {
+    parsedTheme = theme as PrivyTheme;
+  }
+
+  // Validate accent color has # prefix
+  if (accentColor && !accentColor.startsWith('#')) {
+    throw new Error('REACT_APP_PRIVY_ACCENT_COLOR must start with # (e.g., #676FFF)');
+  }
+
+  const appearanceConfig = {
+    ...(parsedTheme ? { theme: parsedTheme } : {}),
+    ...(accentColor ? { accentColor: accentColor as `#${string}` } : {}),
+    ...(logoUrl ? { logo: logoUrl } : {}),
+  };
+
   return (
     <PrivyProviderBase
-      appId="cmbf1wlvo00d7jm0no9hnu50a"
+      appId={privyAppId}
       config={{
-        appearance: {
-          theme: 'light',
-          accentColor: '#676FFF',
-          logo: 'https://your-logo-url.com/logo.png',
-        },
+        appearance: appearanceConfig,
         loginMethods: ['email'],
         embeddedWallets: {
-          createOnLogin: 'users-without-wallets',
+          // SECURITY: Enable Solana embedded wallet with secure key management
+          solana: {
+            createOnLogin: 'users-without-wallets',
+          },
         },
       }}
     >
