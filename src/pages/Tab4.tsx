@@ -21,18 +21,12 @@ import {
   IonAvatar,
   IonButtons,
 } from '@ionic/react';
-import {
-  swapVertical,
-  refresh,
-  settingsOutline,
-  informationCircle,
-  chevronDown,
-  close,
-} from 'ionicons/icons';
+import { swapVertical, refresh, informationCircle, chevronDown, close } from 'ionicons/icons';
 import { useSolana } from '../context/SolanaContext';
 import { usePrivyAuth } from '../context/PrivyContext';
 import { usePrivySolana } from '../hooks/usePrivySolana';
 import { PublicKey } from '@solana/web3.js';
+import GlobalSettingsButton from '../components/settings/GlobalSettingsButton';
 import './Tab4.css';
 
 interface Token {
@@ -396,9 +390,7 @@ const Tab4: React.FC = () => {
                 <IonIcon icon={refresh} />
               </IonButton>
             )}
-            <IonButton fill="clear" onClick={() => setIsSettingsOpen(true)}>
-              <IonIcon icon={settingsOutline} />
-            </IonButton>
+            <GlobalSettingsButton />
           </IonButtons>
         </IonToolbar>
       </IonHeader>

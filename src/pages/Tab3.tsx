@@ -29,6 +29,7 @@ import {
 import { useSolana } from '../context/SolanaContext';
 import { usePrivyAuth } from '../context/PrivyContext';
 import { usePrivySolana } from '../hooks/usePrivySolana';
+import GlobalSettingsButton from '../components/settings/GlobalSettingsButton';
 import './Tab3.css';
 
 interface Transaction {
@@ -288,6 +289,7 @@ const Tab3: React.FC = () => {
                 <IonIcon icon={refresh} />
               </IonButton>
             )}
+            <GlobalSettingsButton />
           </IonButtons>
         </IonToolbar>
       </IonHeader>

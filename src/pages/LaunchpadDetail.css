@@ -25,13 +25,13 @@
 }
 
 .pool-detail-symbol {
-  color: var(--ion-color-medium);
+  color: var(--theme-text-secondary);
   font-size: 0.9rem;
   margin: 4px 0 0;
 }
 
 .pool-detail-description {
-  color: var(--ion-color-medium-shade);
+  color: var(--theme-text-secondary);
   line-height: 1.6;
   margin: 16px 0;
 }
@@ -50,7 +50,7 @@
 
 .pool-progress-percentage {
   font-weight: 600;
-  color: var(--ion-color-primary);
+  color: var(--theme-primary);
 }
 
 .pool-progress-amounts {
@@ -61,12 +61,12 @@
 }
 
 .pool-amount-raised {
-  color: var(--ion-color-primary);
+  color: var(--theme-primary);
   font-size: 1.1rem;
 }
 
 .pool-amount-target {
-  color: var(--ion-color-medium);
+  color: var(--theme-text-secondary);
   font-size: 0.95rem;
 }
 
@@ -77,7 +77,7 @@
 .stat-label {
   display: block;
   font-size: 0.75rem;
-  color: var(--ion-color-medium);
+  color: var(--theme-text-secondary);
   text-transform: uppercase;
   margin-bottom: 4px;
 }
@@ -86,14 +86,14 @@
   display: block;
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--ion-color-dark);
+  color: var(--theme-text-primary);
 }
 
 .timeline-item {
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px solid var(--ion-color-light);
+  border-bottom: 1px solid var(--theme-border-light);
 }
 
 .timeline-item:last-child {
@@ -102,18 +102,18 @@
 
 .timeline-label {
   font-weight: 500;
-  color: var(--ion-color-medium);
+  color: var(--theme-text-secondary);
 }
 
 .timeline-value {
   font-weight: 600;
-  color: var(--ion-color-dark);
+  color: var(--theme-text-primary);
 }
 
 .faq-item {
   margin: 16px 0;
   padding-bottom: 16px;
-  border-bottom: 1px solid var(--ion-color-light);
+  border-bottom: 1px solid var(--theme-border-light);
 }
 
 .faq-item:last-child {
@@ -124,12 +124,12 @@
   font-size: 0.95rem;
   font-weight: 600;
   margin: 0 0 8px;
-  color: var(--ion-color-dark);
+  color: var(--theme-text-primary);
 }
 
 .faq-answer {
   font-size: 0.9rem;
-  color: var(--ion-color-medium-shade);
+  color: var(--theme-text-secondary);
   line-height: 1.5;
   margin: 0;
 }
@@ -140,8 +140,8 @@
   left: 0;
   right: 0;
   padding: 16px;
-  background: var(--ion-background-color);
-  border-top: 1px solid var(--ion-color-light);
+  background: var(--theme-background);
+  border-top: 1px solid var(--theme-border-color);
   z-index: 10;
 }
 

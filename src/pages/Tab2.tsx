@@ -29,6 +29,7 @@ import { usePrivySolana } from '../hooks/usePrivySolana';
 import { TokenBalance, TokenInfo } from '../sdk/types';
 import { formatTokenAmount } from '../sdk/utils';
 import { PublicKey } from '@solana/web3.js';
+import GlobalSettingsButton from '../components/settings/GlobalSettingsButton';
 import './Tab2.css';
 
 const Tab2: React.FC = () => {
@@ -399,6 +400,7 @@ const Tab2: React.FC = () => {
                 <IonIcon icon={refresh} />
               </IonButton>
             )}
+            <GlobalSettingsButton />
           </IonButtons>
         </IonToolbar>
       </IonHeader>

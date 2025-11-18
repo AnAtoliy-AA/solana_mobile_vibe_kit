@@ -27,6 +27,7 @@ import { usePoolDetail } from '../hooks/usePools';
 import { useLivePool } from '../hooks/useLiveUpdates';
 import { useUIStore } from '../lib/stores/useUIStore';
 import { useMarketStore } from '../lib/stores/useMarketStore';
+import GlobalSettingsButton from '../components/settings/GlobalSettingsButton';
 import './LaunchpadDetail.css';
 
 const LaunchpadDetail: React.FC = () => {
@@ -93,6 +94,7 @@ const LaunchpadDetail: React.FC = () => {
               <IonBackButton defaultHref="/launchpad" />
             </IonButtons>
             <IonTitle>Loading...</IonTitle>
+            <GlobalSettingsButton />
           </IonToolbar>
         </IonHeader>
         <IonContent>
@@ -113,6 +115,7 @@ const LaunchpadDetail: React.FC = () => {
               <IonBackButton defaultHref="/launchpad" />
             </IonButtons>
             <IonTitle>Pool Not Found</IonTitle>
+            <GlobalSettingsButton />
           </IonToolbar>
         </IonHeader>
         <IonContent>
@@ -134,6 +137,7 @@ const LaunchpadDetail: React.FC = () => {
             <IonBackButton defaultHref="/launchpad" />
           </IonButtons>
           <IonTitle>{displayPool.symbol}</IonTitle>
+          <GlobalSettingsButton />
         </IonToolbar>
       </IonHeader>
 

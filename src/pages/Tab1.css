@@ -1,7 +1,7 @@
 /* Wallet Content */
 .wallet-content {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-tertiary) 100%);
+  --background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-tertiary) 100%);
 }
 
 /* Wallet Container */
@@ -24,7 +24,7 @@
 
 .connection-banner h2 {
   margin: 0 0 16px 0;
-  color: white;
+  color: var(--theme-primary-contrast);
   font-size: 24px;
   font-weight: 600;
 }
@@ -37,12 +37,12 @@
 
 /* Wallet Card */
 .wallet-card {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--theme-card-background);
   backdrop-filter: blur(20px);
   border-radius: 24px;
   padding: 24px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: var(--theme-shadow-large);
+  border: 1px solid var(--theme-border-color);
   margin-bottom: 16px;
 }
 
@@ -50,13 +50,13 @@
 .balance-section {
   text-align: center;
   padding: 20px 0;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.8);
+  border-bottom: 1px solid var(--theme-border-color);
   margin-bottom: 24px;
 }
 
 .balance-label {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--theme-text-secondary);
   margin-bottom: 8px;
   font-weight: 500;
 }
@@ -64,9 +64,9 @@
 .balance-amount {
   font-size: 36px;
   font-weight: 700;
-  color: #111827;
+  color: var(--theme-text-primary);
   margin-bottom: 8px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-tertiary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -74,17 +74,17 @@
 
 .balance-usd {
   font-size: 16px;
-  color: #6b7280;
+  color: var(--theme-text-secondary);
   font-weight: 500;
 }
 
 /* Wallet Info */
 .wallet-info {
-  background: rgba(249, 250, 251, 0.8);
+  background: var(--theme-background-secondary);
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 24px;
-  border: 1px solid rgba(229, 231, 235, 0.8);
+  border: 1px solid var(--theme-border-color);
 }
 
 .wallet-address {
@@ -96,19 +96,19 @@
 
 .wallet-address-label {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--theme-text-secondary);
   font-weight: 500;
 }
 
 .wallet-address-value {
   font-size: 14px;
-  color: #111827;
+  color: var(--theme-text-primary);
   font-weight: 600;
   font-family: 'Monaco', 'Menlo', monospace;
 }
 
 .copy-button {
-  --color: #3b82f6;
+  --color: var(--theme-primary);
   --padding-start: 8px;
   --padding-end: 8px;
   height: 32px;
@@ -122,7 +122,7 @@
 
 .network-label {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--theme-text-secondary);
   font-weight: 500;
 }
 
@@ -148,15 +148,15 @@
 }
 
 .action-button.primary {
-  --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --color: white;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  --background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-tertiary) 100%);
+  --color: var(--theme-primary-contrast);
+  box-shadow: var(--theme-shadow);
 }
 
 .action-button.secondary {
-  --background: rgba(249, 250, 251, 0.9);
-  --color: #374151;
-  --border-color: #d1d5db;
+  --background: var(--theme-background-secondary);
+  --color: var(--theme-text-primary);
+  --border-color: var(--theme-border-color);
   --border-width: 1px;
 }
 
@@ -173,7 +173,7 @@
 .login-title {
   font-size: 24px;
   font-weight: 700;
-  color: white;
+  color: var(--theme-primary-contrast);
   margin-bottom: 8px;
 }
 
@@ -184,30 +184,29 @@
 }
 
 .login-button {
-  --background: rgba(255, 255, 255, 0.9);
-  --color: #374151;
+  --background: var(--theme-card-background);
+  --color: var(--theme-text-primary);
   --border-radius: 16px;
   height: 56px;
   font-size: 18px;
   font-weight: 600;
   min-width: 200px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--theme-shadow-large);
 }
 
 .login-button:hover {
-  --background: white;
   transform: translateY(-1px);
-  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--theme-shadow-large);
 }
 
 /* User Info Card */
 .user-info-card {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--theme-card-background);
   backdrop-filter: blur(20px);
   border-radius: 20px;
   padding: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: var(--theme-shadow-large);
+  border: 1px solid var(--theme-border-color);
   margin-bottom: 16px;
 }
 
@@ -220,12 +219,12 @@
 .user-avatar {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-tertiary) 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--theme-primary-contrast);
   font-size: 20px;
   font-weight: 600;
   margin-right: 16px;
@@ -235,13 +234,13 @@
   margin: 0 0 4px 0;
   font-size: 18px;
   font-weight: 600;
-  color: #111827;
+  color: var(--theme-text-primary);
 }
 
 .user-details p {
   margin: 0;
   font-size: 14px;
-  color: #6b7280;
+  color: var(--theme-text-secondary);
 }
 
 /* Quick Actions */
@@ -256,7 +255,7 @@
 .quick-actions-title {
   font-size: 18px;
   font-weight: 600;
-  color: white;
+  color: var(--theme-primary-contrast);
   margin-bottom: 16px;
 }
 
@@ -283,13 +282,13 @@
 
 .quick-action-icon {
   font-size: 24px;
-  color: white;
+  color: var(--theme-primary-contrast);
   margin-bottom: 8px;
 }
 
 .quick-action-label {
   font-size: 14px;
-  color: white;
+  color: var(--theme-primary-contrast);
   font-weight: 500;
 }
 
@@ -318,57 +317,14 @@
   }
 }
 
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-  .wallet-card,
-  .user-info-card {
-    background: rgba(31, 41, 55, 0.95);
-    border: 1px solid rgba(75, 85, 99, 0.3);
-  }
-
-  .balance-amount {
-    color: #f3f4f6;
-  }
-
-  .wallet-info {
-    background: rgba(55, 65, 81, 0.8);
-    border-color: rgba(75, 85, 99, 0.8);
-  }
-
-  .wallet-address-value {
-    color: #f3f4f6;
-  }
-
-  .wallet-address-label,
-  .network-label,
-  .balance-label,
-  .balance-usd {
-    color: #9ca3af;
-  }
-
-  .action-button.secondary {
-    --background: #374151;
-    --color: #f3f4f6;
-    --border-color: #4b5563;
-  }
-
-  .user-details h3 {
-    color: #f3f4f6;
-  }
-
-  .user-details p {
-    color: #9ca3af;
-  }
-
-  .login-button {
-    --background: rgba(31, 41, 55, 0.9);
-    --color: #f3f4f6;
-  }
-}
-
 /* Loading States */
 .loading-shimmer {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(
+    90deg,
+    var(--theme-background-secondary) 25%,
+    var(--theme-border-light) 50%,
+    var(--theme-background-secondary) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }

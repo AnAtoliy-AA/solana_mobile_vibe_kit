@@ -1,0 +1,288 @@
+/* Theme CSS Variables */
+
+/* Default Theme - Light Purple/Blue */
+:root[data-theme='default'],
+:root {
+  --theme-primary: #3880ff;
+  --theme-primary-rgb: 56, 128, 255;
+  --theme-primary-contrast: #ffffff;
+  --theme-secondary: #0cd1e8;
+  --theme-secondary-rgb: 12, 209, 232;
+  --theme-tertiary: #7044ff;
+  --theme-success: #10dc60;
+  --theme-warning: #ffce00;
+  --theme-danger: #f04141;
+  --theme-light: #f4f5f8;
+  --theme-medium: #989aa2;
+  --theme-dark: #222428;
+
+  /* Background colors */
+  --theme-background: #ffffff;
+  --theme-background-secondary: #f8f9fa;
+  --theme-card-background: #ffffff;
+  --theme-navbar-background: rgba(255, 255, 255, 0.95);
+
+  /* Text colors */
+  --theme-text-primary: #000000;
+  --theme-text-secondary: #666666;
+  --theme-text-tertiary: #999999;
+
+  /* Border colors */
+  --theme-border-color: #e0e0e0;
+  --theme-border-light: #f0f0f0;
+
+  /* Shadow */
+  --theme-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --theme-shadow-large: 0 4px 16px rgba(0, 0, 0, 0.15);
+
+  /* Table specific */
+  --theme-table-header-bg: #f8f9fa;
+  --theme-table-row-hover: #f5f7fa;
+  --theme-table-border: #e9ecef;
+
+  /* Progress bar */
+  --theme-progress-bg: #e9ecef;
+  --theme-progress-fill: linear-gradient(90deg, #3880ff 0%, #0cd1e8 100%);
+}
+
+/* Dark Theme - Deep Blue/Purple */
+[data-theme='dark'] {
+  --theme-primary: #4a90e2;
+  --theme-primary-rgb: 74, 144, 226;
+  --theme-primary-contrast: #ffffff;
+  --theme-secondary: #50e3c2;
+  --theme-secondary-rgb: 80, 227, 194;
+  --theme-tertiary: #9b6dff;
+  --theme-success: #2dd36f;
+  --theme-warning: #ffc409;
+  --theme-danger: #eb445a;
+  --theme-light: #3a3f4b;
+  --theme-medium: #92949c;
+  --theme-dark: #f4f5f8;
+
+  /* Background colors */
+  --theme-background: #1a1d23;
+  --theme-background-secondary: #1e2229;
+  --theme-card-background: #242933;
+  --theme-navbar-background: rgba(26, 29, 35, 0.95);
+
+  /* Text colors */
+  --theme-text-primary: #ffffff;
+  --theme-text-secondary: #b0b3ba;
+  --theme-text-tertiary: #6c6f7a;
+
+  /* Border colors */
+  --theme-border-color: #2f343f;
+  --theme-border-light: #282c35;
+
+  /* Shadow */
+  --theme-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --theme-shadow-large: 0 4px 16px rgba(0, 0, 0, 0.6);
+
+  /* Table specific */
+  --theme-table-header-bg: #1e2229;
+  --theme-table-row-hover: #2a2f3a;
+  --theme-table-border: #2f343f;
+
+  /* Progress bar */
+  --theme-progress-bg: #2f343f;
+  --theme-progress-fill: linear-gradient(90deg, #4a90e2 0%, #50e3c2 100%);
+}
+
+/* Ocean Theme - Teal/Cyan */
+[data-theme='ocean'] {
+  --theme-primary: #00b4d8;
+  --theme-primary-rgb: 0, 180, 216;
+  --theme-primary-contrast: #ffffff;
+  --theme-secondary: #48cae4;
+  --theme-secondary-rgb: 72, 202, 228;
+  --theme-tertiary: #0096c7;
+  --theme-success: #06d6a0;
+  --theme-warning: #ffd166;
+  --theme-danger: #ef476f;
+  --theme-light: #caf0f8;
+  --theme-medium: #90e0ef;
+  --theme-dark: #03045e;
+
+  /* Background colors */
+  --theme-background: #e8f4f8;
+  --theme-background-secondary: #d4eef5;
+  --theme-card-background: #ffffff;
+  --theme-navbar-background: rgba(232, 244, 248, 0.95);
+
+  /* Text colors */
+  --theme-text-primary: #023047;
+  --theme-text-secondary: #126782;
+  --theme-text-tertiary: #4a8fa3;
+
+  /* Border colors */
+  --theme-border-color: #90e0ef;
+  --theme-border-light: #caf0f8;
+
+  /* Shadow */
+  --theme-shadow: 0 2px 8px rgba(0, 180, 216, 0.15);
+  --theme-shadow-large: 0 4px 16px rgba(0, 180, 216, 0.25);
+
+  /* Table specific */
+  --theme-table-header-bg: #d4eef5;
+  --theme-table-row-hover: #caf0f8;
+  --theme-table-border: #90e0ef;
+
+  /* Progress bar */
+  --theme-progress-bg: #caf0f8;
+  --theme-progress-fill: linear-gradient(90deg, #00b4d8 0%, #48cae4 100%);
+}
+
+/* Sunset Theme - Orange/Pink */
+[data-theme='sunset'] {
+  --theme-primary: #ff6b6b;
+  --theme-primary-rgb: 255, 107, 107;
+  --theme-primary-contrast: #ffffff;
+  --theme-secondary: #feca57;
+  --theme-secondary-rgb: 254, 202, 87;
+  --theme-tertiary: #ee5a6f;
+  --theme-success: #1dd1a1;
+  --theme-warning: #feca57;
+  --theme-danger: #ee5a6f;
+  --theme-light: #fff5f5;
+  --theme-medium: #ffb8b8;
+  --theme-dark: #5f27cd;
+
+  /* Background colors */
+  --theme-background: #fff5f0;
+  --theme-background-secondary: #ffe8e0;
+  --theme-card-background: #ffffff;
+  --theme-navbar-background: rgba(255, 245, 240, 0.95);
+
+  /* Text colors */
+  --theme-text-primary: #2d3436;
+  --theme-text-secondary: #636e72;
+  --theme-text-tertiary: #b2bec3;
+
+  /* Border colors */
+  --theme-border-color: #ffd7d1;
+  --theme-border-light: #ffe8e0;
+
+  /* Shadow */
+  --theme-shadow: 0 2px 8px rgba(255, 107, 107, 0.15);
+  --theme-shadow-large: 0 4px 16px rgba(255, 107, 107, 0.25);
+
+  /* Table specific */
+  --theme-table-header-bg: #ffe8e0;
+  --theme-table-row-hover: #fff5f5;
+  --theme-table-border: #ffd7d1;
+
+  /* Progress bar */
+  --theme-progress-bg: #ffe8e0;
+  --theme-progress-fill: linear-gradient(90deg, #ff6b6b 0%, #feca57 100%);
+}
+
+/* Apply theme colors to Ionic components */
+body {
+  --ion-color-primary: var(--theme-primary);
+  --ion-color-primary-rgb: var(--theme-primary-rgb);
+  --ion-color-primary-contrast: var(--theme-primary-contrast);
+  --ion-color-secondary: var(--theme-secondary);
+  --ion-color-secondary-rgb: var(--theme-secondary-rgb);
+  --ion-color-tertiary: var(--theme-tertiary);
+  --ion-color-success: var(--theme-success);
+  --ion-color-warning: var(--theme-warning);
+  --ion-color-danger: var(--theme-danger);
+  --ion-color-light: var(--theme-light);
+  --ion-color-medium: var(--theme-medium);
+  --ion-color-dark: var(--theme-dark);
+
+  --ion-background-color: var(--theme-background);
+  --ion-text-color: var(--theme-text-primary);
+  --ion-border-color: var(--theme-border-color);
+}
+
+/* Apply theme to custom components */
+.launchpad-content {
+  background: var(--theme-background) !important;
+  color: var(--theme-text-primary) !important;
+}
+
+.dashboard-container {
+  background: var(--theme-background-secondary);
+}
+
+.tokens-table {
+  background: var(--theme-card-background);
+  border-color: var(--theme-table-border);
+}
+
+.tokens-table thead {
+  background: var(--theme-table-header-bg);
+  color: var(--theme-text-primary);
+}
+
+.tokens-table tbody tr {
+  border-color: var(--theme-table-border);
+}
+
+.tokens-table tbody tr:hover {
+  background-color: var(--theme-table-row-hover);
+}
+
+.token-name {
+  color: var(--theme-text-primary);
+}
+
+.token-symbol {
+  color: var(--theme-text-secondary);
+}
+
+.metric-value {
+  color: var(--theme-text-primary);
+}
+
+.progress-bar-container {
+  background: var(--theme-progress-bg);
+}
+
+.progress-bar-fill {
+  background: var(--theme-progress-fill);
+}
+
+.launchpad-navbar {
+  background: var(--theme-navbar-background) !important;
+  border-bottom: 1px solid var(--theme-border-color);
+}
+
+.navbar-brand {
+  color: var(--theme-text-primary);
+}
+
+.modern-searchbar {
+  --background: var(--theme-card-background);
+  --color: var(--theme-text-primary);
+  --placeholder-color: var(--theme-text-tertiary);
+  --icon-color: var(--theme-text-secondary);
+}
+
+.tab-btn {
+  color: var(--theme-text-secondary);
+}
+
+.tab-btn.active {
+  color: var(--theme-primary);
+  border-bottom-color: var(--theme-primary);
+}
+
+ion-card {
+  background: var(--theme-card-background);
+  box-shadow: var(--theme-shadow);
+}
+
+.pool-detail-container ion-card {
+  background: var(--theme-card-background);
+}
+
+.stat-label {
+  color: var(--theme-text-secondary);
+}
+
+.stat-value {
+  color: var(--theme-text-primary);
+}

@@ -34,9 +34,12 @@ import { useSolana } from '../context/SolanaContext';
 import { usePrivyAuth } from '../context/PrivyContext';
 import { usePrivySolana } from '../hooks/usePrivySolana';
 import { formatSol, shortenAddress } from '../sdk/utils';
+import GlobalSettingsButton from '../components/settings/GlobalSettingsButton';
+import { useTranslation } from '../lib/i18n/useTranslation';
 import './Tab1.css';
 
 const Tab1: React.FC = () => {
+  const t = useTranslation();
   const { sdk, walletState, isLoading, error, connectWallet, disconnectWallet, switchNetwork } =
     useSolana();
 
@@ -68,7 +71,7 @@ const Tab1: React.FC = () => {
       setBalance(balanceInLamports);
     } catch (err) {
       console.error('Failed to fetch balance:', err);
-      showToastMessage('Failed to fetch balance');
+      showToastMessage(t.failedToFetchBalance);
     }
   };
 
@@ -83,17 +86,17 @@ const Tab1: React.FC = () => {
       try {
         await navigator.clipboard.writeText(walletState.publicKey.toString());
         setCopied(true);
-        showToastMessage('Address copied to clipboard');
+        showToastMessage(t.addressCopiedToClipboard);
         setTimeout(() => setCopied(false), 2000);
       } catch (err) {
-        showToastMessage('Failed to copy address');
+        showToastMessage(t.failedToCopyAddress);
       }
     }
   };
 
   const handleSendTransaction = async () => {
     if (!sendAddress || !sendAmount) {
-      showToastMessage('Please fill in all required fields');
+      showToastMessage(t.pleaseFillInAllRequiredFields);
       return;
     }
 
@@ -107,17 +110,17 @@ const Tab1: React.FC = () => {
       });
 
       if (result.success) {
-        showToastMessage(`Transaction sent! ${result.signature.substring(0, 8)}...`);
+        showToastMessage(`${t.transactionSent} ${result.signature.substring(0, 8)}...`);
         setShowSendModal(false);
         setSendAddress('');
         setSendAmount('');
         setSendMemo('');
         await fetchBalance();
       } else {
-        showToastMessage(`Transaction failed: ${result.error}`);
+        showToastMessage(`${t.transactionFailed}: ${result.error}`);
       }
     } catch (err) {
-      showToastMessage('Transaction failed');
+      showToastMessage(t.transactionFailed);
     }
   };
 
@@ -134,7 +137,7 @@ const Tab1: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Wallet</IonTitle>
+          <IonTitle>{t.wallet}</IonTitle>
           <IonButtons slot="end">
             {walletState.connected && (
               <IonButton fill="clear" onClick={handleRefresh} disabled={refreshing}>
@@ -144,6 +147,7 @@ const Tab1: React.FC = () => {
             <IonButton fill="clear" onClick={() => setShowNetworkAlert(true)}>
               <IonChip color="primary">{currentNetwork.name}</IonChip>
             </IonButton>
+            <GlobalSettingsButton />
           </IonButtons>
         </IonToolbar>
       </IonHeader>
@@ -151,7 +155,7 @@ const Tab1: React.FC = () => {
       <IonContent fullscreen className="wallet-content">
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large">Wallet</IonTitle>
+            <IonTitle size="large">{t.wallet}</IonTitle>
           </IonToolbar>
         </IonHeader>
 
@@ -174,13 +178,11 @@ const Tab1: React.FC = () => {
           {/* Login Section */}
           {!authenticated && ready && (
             <div className="login-section">
-              <div className="login-title">Welcome to Solana Wallet</div>
-              <div className="login-subtitle">
-                Connect your email to access wallet features and manage your Solana assets
-              </div>
+              <div className="login-title">{t.welcomeToSolanaWallet}</div>
+              <div className="login-subtitle">{t.connectEmailDescription}</div>
               <IonButton className="login-button" onClick={login} disabled={!ready}>
                 <IonIcon icon={mail} slot="start" />
-                {!ready ? 'Loading...' : 'Login with Email'}
+                {!ready ? t.loading : t.loginWithEmail}
               </IonButton>
             </div>
           )}
@@ -193,7 +195,7 @@ const Tab1: React.FC = () => {
                   <IonIcon icon={person} />
                 </div>
                 <div className="user-details">
-                  <h3>Welcome back!</h3>
+                  <h3>{t.welcomeBack}</h3>
                   <p>{user.email.address}</p>
                 </div>
                 <IonButton fill="clear" onClick={logout} color="danger" size="small">
@@ -209,7 +211,7 @@ const Tab1: React.FC = () => {
                   expand="block"
                 >
                   <IonIcon icon={wallet} slot="start" />
-                  {isLoading ? 'Connecting...' : 'Connect Demo Wallet'}
+                  {isLoading ? t.connecting : t.connectDemoWallet}
                 </IonButton>
               )}
             </div>
@@ -221,7 +223,7 @@ const Tab1: React.FC = () => {
               {/* Balance Card */}
               <div className="wallet-card">
                 <div className="balance-section">
-                  <div className="balance-label">Your Balance</div>
+                  <div className="balance-label">{t.yourBalance}</div>
                   <div className="balance-amount">
                     {refreshing ? <IonSpinner name="dots" /> : `${formatSol(balance)} SOL`}
                   </div>
@@ -233,11 +235,11 @@ const Tab1: React.FC = () => {
                 {/* Wallet Info */}
                 <div className="wallet-info">
                   <div className="wallet-address">
-                    <span className="wallet-address-label">Wallet Address</span>
+                    <span className="wallet-address-label">{t.walletAddress}</span>
                     <span className="wallet-address-value">
                       {walletState.publicKey
                         ? shortenAddress(walletState.publicKey.toString())
-                        : 'Not connected'}
+                        : t.notConnected}
                     </span>
                     {walletState.publicKey && (
                       <IonButton className="copy-button" fill="clear" onClick={handleCopyAddress}>
@@ -250,7 +252,7 @@ const Tab1: React.FC = () => {
                   </div>
 
                   <div className="network-info">
-                    <span className="network-label">Network</span>
+                    <span className="network-label">{t.network}</span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <IonChip className="network-chip" color="primary">
                         {currentNetwork.name}
@@ -274,14 +276,14 @@ const Tab1: React.FC = () => {
                     disabled={balance === 0}
                   >
                     <IonIcon icon={send} slot="start" />
-                    Send SOL
+                    {t.sendSol}
                   </IonButton>
                   <IonButton
                     className="action-button secondary"
-                    onClick={() => showToastMessage('Receive functionality coming soon!')}
+                    onClick={() => showToastMessage(t.receiveComingSoon)}
                   >
                     <IonIcon icon={wallet} slot="start" />
-                    Receive
+                    {t.receive}
                   </IonButton>
                 </div>
               </div>
@@ -291,25 +293,25 @@ const Tab1: React.FC = () => {
           {/* Quick Actions */}
           {authenticated && walletState.connected && (
             <div className="quick-actions">
-              <div className="quick-actions-title">Quick Actions</div>
+              <div className="quick-actions-title">{t.quickActions}</div>
               <div className="quick-actions-grid">
                 <div className="quick-action-item" onClick={handleRefresh}>
                   <div className="quick-action-icon">
                     <IonIcon icon={refresh} />
                   </div>
-                  <div className="quick-action-label">Refresh Balance</div>
+                  <div className="quick-action-label">{t.refreshBalance}</div>
                 </div>
                 <div className="quick-action-item" onClick={() => setShowNetworkAlert(true)}>
                   <div className="quick-action-icon">
                     <IonIcon icon={swapHorizontal} />
                   </div>
-                  <div className="quick-action-label">Switch Network</div>
+                  <div className="quick-action-label">{t.switchNetwork}</div>
                 </div>
                 <div className="quick-action-item" onClick={handleCopyAddress}>
                   <div className="quick-action-icon">
                     <IonIcon icon={copy} />
                   </div>
-                  <div className="quick-action-label">Copy Address</div>
+                  <div className="quick-action-label">{t.copyAddress}</div>
                 </div>
                 <div
                   className="quick-action-item"
@@ -321,7 +323,7 @@ const Tab1: React.FC = () => {
                   <div className="quick-action-icon">
                     <IonIcon icon={logOut} />
                   </div>
-                  <div className="quick-action-label">Disconnect</div>
+                  <div className="quick-action-label">{t.disconnect}</div>
                 </div>
               </div>
             </div>
@@ -332,7 +334,7 @@ const Tab1: React.FC = () => {
         <IonModal isOpen={showSendModal} onDidDismiss={() => setShowSendModal(false)}>
           <IonHeader>
             <IonToolbar>
-              <IonTitle>Send SOL</IonTitle>
+              <IonTitle>{t.sendSol}</IonTitle>
               <IonButtons slot="end">
                 <IonButton onClick={() => setShowSendModal(false)}>
                   <IonIcon icon={close} />
@@ -344,15 +346,15 @@ const Tab1: React.FC = () => {
             <div className="wallet-container">
               <div className="wallet-card">
                 <IonItem>
-                  <IonLabel position="stacked">Recipient Address</IonLabel>
+                  <IonLabel position="stacked">{t.recipientAddress}</IonLabel>
                   <IonInput
                     value={sendAddress}
                     onIonChange={(event) => setSendAddress(event.detail.value ?? '')}
-                    placeholder="Enter Solana address"
+                    placeholder={t.enterSolanaAddress}
                   />
                 </IonItem>
                 <IonItem>
-                  <IonLabel position="stacked">Amount (SOL)</IonLabel>
+                  <IonLabel position="stacked">{t.amountSol}</IonLabel>
                   <IonInput
                     type="number"
                     value={sendAmount}
@@ -361,11 +363,11 @@ const Tab1: React.FC = () => {
                   />
                 </IonItem>
                 <IonItem>
-                  <IonLabel position="stacked">Memo (Optional)</IonLabel>
+                  <IonLabel position="stacked">{t.memoOptional}</IonLabel>
                   <IonInput
                     value={sendMemo}
                     onIonChange={(event) => setSendMemo(event.detail.value ?? '')}
-                    placeholder="Transaction memo"
+                    placeholder={t.transactionMemo}
                   />
                 </IonItem>
 
@@ -377,7 +379,7 @@ const Tab1: React.FC = () => {
                   style={{ marginTop: '20px' }}
                 >
                   <IonIcon icon={send} slot="start" />
-                  Send Transaction
+                  {t.sendTransaction}
                 </IonButton>
               </div>
             </div>
@@ -388,22 +390,22 @@ const Tab1: React.FC = () => {
         <IonAlert
           isOpen={showNetworkAlert}
           onDidDismiss={() => setShowNetworkAlert(false)}
-          header="Select Network"
+          header={t.selectNetwork}
           buttons={[
             {
-              text: 'Cancel',
+              text: t.cancel,
               role: 'cancel',
             },
             {
-              text: 'Mainnet',
+              text: t.mainnet,
               handler: () => switchNetwork('mainnet-beta'),
             },
             {
-              text: 'Testnet',
+              text: t.testnet,
               handler: () => switchNetwork('testnet'),
             },
             {
-              text: 'Devnet',
+              text: t.devnet,
               handler: () => switchNetwork('devnet'),
             },
           ]}
@@ -416,7 +418,7 @@ const Tab1: React.FC = () => {
           duration={3000}
         />
 
-        <IonLoading isOpen={refreshing} message="Refreshing..." />
+        <IonLoading isOpen={refreshing} message={t.refreshing} />
       </IonContent>
     </IonPage>
   );

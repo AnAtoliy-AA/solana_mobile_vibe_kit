@@ -29,11 +29,14 @@ import { usePoolList } from '../hooks/usePools';
 import { useLiveActivity } from '../hooks/useLiveUpdates';
 import { Pool } from '../lib/api/types';
 import { useMarketStore } from '../lib/stores/useMarketStore';
+import { useTranslation } from '../lib/i18n/useTranslation';
 import Tooltip from '../components/launchpad/Tooltip';
+import GlobalSettingsButton from '../components/settings/GlobalSettingsButton';
 import './Launchpad.css';
 
 const Launchpad: React.FC = () => {
   const history = useHistory();
+  const t = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'upcoming' | 'finished'>('all');
 
@@ -116,11 +119,11 @@ const Launchpad: React.FC = () => {
     const diffMs = now.getTime() - past.getTime();
     const diffMins = Math.floor(diffMs / 60000);
 
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffMins < 1) return t.justNow;
+    if (diffMins < 60) return `${diffMins}${t.minutesAgo}`;
     const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return `${Math.floor(diffHours / 24)}d ago`;
+    if (diffHours < 24) return `${diffHours}${t.hoursAgo}`;
+    return `${Math.floor(diffHours / 24)}${t.daysAgo}`;
   };
 
   const filteredPools = mergedPools?.filter((pool: Pool) => {
@@ -144,15 +147,16 @@ const Launchpad: React.FC = () => {
             </div>
             <IonButtons className="navbar-menu">
               <IonButton onClick={() => history.push('/launchpad')} className="nav-btn">
-                Home
+                {t.home}
               </IonButton>
-              <IonButton className="nav-btn">Create Meme</IonButton>
+              <IonButton className="nav-btn">{t.createMeme}</IonButton>
               <IonButton className="nav-btn">
                 <IonIcon icon={logoTwitter} slot="start" />
-                Mentions on X
+                {t.mentionsOnX}
               </IonButton>
+              <GlobalSettingsButton className="nav-btn" />
               <IonButton className="nav-btn nav-btn-login" fill="solid" color="primary">
-                Login
+                {t.login}
               </IonButton>
             </IonButtons>
           </div>
@@ -163,7 +167,7 @@ const Launchpad: React.FC = () => {
             <IonSearchbar
               value={searchQuery}
               onIonInput={(e) => setSearchQuery(e.detail.value || '')}
-              placeholder="Search by token name, ticker, or contract address..."
+              placeholder={t.searchPlaceholder}
               className="modern-searchbar"
               animated
             />
@@ -176,25 +180,25 @@ const Launchpad: React.FC = () => {
               className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`}
               onClick={() => setActiveTab('all')}
             >
-              All Tokens
+              {t.allTokens}
             </button>
             <button
               className={`tab-btn ${activeTab === 'active' ? 'active' : ''}`}
               onClick={() => setActiveTab('active')}
             >
-              Active
+              {t.active}
             </button>
             <button
               className={`tab-btn ${activeTab === 'upcoming' ? 'active' : ''}`}
               onClick={() => setActiveTab('upcoming')}
             >
-              Upcoming
+              {t.upcoming}
             </button>
             <button
               className={`tab-btn ${activeTab === 'finished' ? 'active' : ''}`}
               onClick={() => setActiveTab('finished')}
             >
-              Finished
+              {t.finished}
             </button>
           </div>
         </IonToolbar>
@@ -210,7 +214,7 @@ const Launchpad: React.FC = () => {
             <div className="loading-state">
               <IonSpinner name="crescent" color="primary" />
               <IonText color="medium">
-                <p>Loading tokens...</p>
+                <p>{t.loadingTokens}</p>
               </IonText>
             </div>
           ) : filteredPools && filteredPools.length > 0 ? (
@@ -220,55 +224,43 @@ const Launchpad: React.FC = () => {
                   <thead>
                     <tr>
                       <th>
-                        <Tooltip content="Token name and symbol" position="bottom">
-                          Token
+                        <Tooltip content={t.tokenTooltip} position="bottom">
+                          {t.token}
                         </Tooltip>
                       </th>
                       <th>
-                        <Tooltip content="Solana blockchain contract address" position="bottom">
-                          Contract Address
+                        <Tooltip content={t.contractTooltip} position="bottom">
+                          {t.contractAddress}
                         </Tooltip>
                       </th>
                       <th>
-                        <Tooltip
-                          content="Total trading volume in the last 24 hours"
-                          position="bottom"
-                        >
-                          Volume 24h
+                        <Tooltip content={t.volumeTooltip} position="bottom">
+                          {t.volume24h}
                         </Tooltip>
                       </th>
                       <th>
-                        <Tooltip
-                          content="Total market capitalization (circulating supply × price)"
-                          position="bottom"
-                        >
-                          Market Cap
+                        <Tooltip content={t.marketCapTooltip} position="bottom">
+                          {t.marketCap}
                         </Tooltip>
                       </th>
                       <th>
-                        <Tooltip
-                          content="Fundraising progress towards target goal"
-                          position="bottom"
-                        >
-                          Progress
+                        <Tooltip content={t.progressTooltip} position="bottom">
+                          {t.progress}
                         </Tooltip>
                       </th>
                       <th>
-                        <Tooltip
-                          content="Number of unique wallet addresses holding this token"
-                          position="bottom"
-                        >
-                          Holders
+                        <Tooltip content={t.holdersTooltip} position="bottom">
+                          {t.holders}
                         </Tooltip>
                       </th>
                       <th>
-                        <Tooltip content="Time since token launch" position="bottom">
-                          Time
+                        <Tooltip content={t.timeTooltip} position="bottom">
+                          {t.time}
                         </Tooltip>
                       </th>
                       <th>
-                        <Tooltip content="Available actions for this token" position="bottom">
-                          Actions
+                        <Tooltip content={t.actionsTooltip} position="bottom">
+                          {t.actions}
                         </Tooltip>
                       </th>
                     </tr>
@@ -303,14 +295,14 @@ const Launchpad: React.FC = () => {
                           >
                             <div className="address-cell">
                               <span className="address-text">{formatAddress(pool.id)}</span>
-                              <Tooltip content="Copy to clipboard" position="bottom">
+                              <Tooltip content={t.copyTooltip} position="bottom">
                                 <IonIcon
                                   icon={copyOutline}
                                   className="action-icon"
                                   onClick={(e) => copyToClipboard(pool.id, e)}
                                 />
                               </Tooltip>
-                              <Tooltip content="View on Solscan" position="bottom">
+                              <Tooltip content={t.viewOnSolscan} position="bottom">
                                 <IonIcon
                                   icon={openOutline}
                                   className="action-icon"
@@ -383,7 +375,7 @@ const Launchpad: React.FC = () => {
                         </td>
                         <td className="actions">
                           <div className="action-buttons">
-                            <Tooltip content="Trade this token on DEX" position="bottom">
+                            <Tooltip content={t.tradeTooltip} position="bottom">
                               <IonButton
                                 size="small"
                                 fill="solid"
@@ -393,11 +385,11 @@ const Launchpad: React.FC = () => {
                                 }}
                               >
                                 <IonIcon icon={swapHorizontalOutline} slot="start" />
-                                Trade
+                                {t.trade}
                               </IonButton>
                             </Tooltip>
                             {pool.twitterUrl && (
-                              <Tooltip content="Visit official Twitter/X" position="bottom">
+                              <Tooltip content={t.visitTwitter} position="bottom">
                                 <IonButton
                                   size="small"
                                   fill="clear"
@@ -411,7 +403,7 @@ const Launchpad: React.FC = () => {
                               </Tooltip>
                             )}
                             {pool.websiteUrl && (
-                              <Tooltip content="Visit official website" position="bottom">
+                              <Tooltip content={t.visitWebsite} position="bottom">
                                 <IonButton
                                   size="small"
                                   fill="clear"
@@ -435,8 +427,8 @@ const Launchpad: React.FC = () => {
           ) : (
             <div className="empty-state">
               <IonText color="medium">
-                <h2>No tokens found</h2>
-                <p>Try adjusting your search or check back later for new launches</p>
+                <h2>{t.noTokensFound}</h2>
+                <p>{t.noTokensFoundDesc}</p>
               </IonText>
             </div>
           )}

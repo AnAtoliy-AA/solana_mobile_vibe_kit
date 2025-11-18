@@ -9,7 +9,7 @@
 
 .pool-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--theme-shadow-large);
 }
 
 .pool-card-header {
@@ -21,7 +21,7 @@
 
 .pool-description {
   font-size: 0.9rem;
-  color: var(--ion-color-medium);
+  color: var(--theme-text-secondary);
   margin: 8px 0 16px;
   line-height: 1.4;
   display: -webkit-box;
@@ -36,7 +36,7 @@
   gap: 12px;
   margin: 16px 0;
   padding: 12px;
-  background: var(--ion-color-light);
+  background: var(--theme-background-secondary);
   border-radius: 8px;
 }
 
@@ -48,14 +48,14 @@
 
 .pool-stat-label {
   font-size: 0.75rem;
-  color: var(--ion-color-medium);
+  color: var(--theme-text-secondary);
   text-transform: uppercase;
 }
 
 .pool-stat-value {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--ion-color-dark);
+  color: var(--theme-text-primary);
 }
 
 .pool-progress {
@@ -67,7 +67,7 @@
   justify-content: space-between;
   margin-bottom: 8px;
   font-size: 0.85rem;
-  color: var(--ion-color-medium);
+  color: var(--theme-text-secondary);
 }
 
 .pool-progress-amounts {
@@ -79,7 +79,7 @@
 }
 
 .pool-progress-target {
-  color: var(--ion-color-medium);
+  color: var(--theme-text-secondary);
 }
 
 .pool-tags {
