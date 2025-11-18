@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js';
+import { useEffect, useMemo } from 'react';
+import { PublicKey, Transaction } from '@solana/web3.js';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { useSolana } from '../context/SolanaContext';
 
@@ -21,94 +21,116 @@ export const usePrivySolana = () => {
   const { wallets } = useWallets();
   const { sdk } = useSolana();
 
+  const walletSignature = useMemo(() => {
+    if (!wallets || wallets.length === 0) {
+      return 'empty';
+    }
+
+    return wallets
+      .map((wallet) => {
+        const clientType = wallet.walletClientType ?? 'unknown';
+        const address = wallet.address ?? 'no-address';
+        return `${clientType}:${address}`;
+      })
+      .sort()
+      .join('|');
+  }, [wallets]);
+
   useEffect(() => {
     const handlePrivyAuth = async () => {
-      if (authenticated && user) {
-        try {
-          // Find the Solana embedded wallet created by Privy
-          // Privy embedded wallets have walletClientType === 'privy'
-          // and address starting with Solana base58 format
-          const solanaWallet = wallets.find(
-            (wallet) => wallet.walletClientType === 'privy'
-          );
+      if (!sdk) {
+        return;
+      }
 
-          if (solanaWallet && solanaWallet.address) {
-            // Convert Privy wallet address to Solana PublicKey
-            const publicKey = new PublicKey(solanaWallet.address);
-
-            // Connect Privy's secure embedded wallet to SDK
-            await sdk.wallet.connectCustomWallet('Privy Embedded Wallet', {
-              publicKey,
-              signTransaction: async (tx: Transaction) => {
-                // SECURITY: Signing happens in Privy's secure infrastructure
-                // The private key is never exposed to the client
-                const provider = await solanaWallet.getEthereumProvider();
-
-                if (!provider || typeof provider.request !== 'function') {
-                  throw new Error('Privy wallet provider not available');
-                }
-
-                // Serialize transaction for signing
-                const serializedTx = tx.serialize({
-                  requireAllSignatures: false,
-                  verifySignatures: false,
-                });
-
-                // Request signature from Privy's secure infrastructure
-                const signature = await provider.request({
-                  method: 'signTransaction',
-                  params: [serializedTx.toString('base64')],
-                });
-
-                // Deserialize signed transaction
-                return Transaction.from(Buffer.from(signature as string, 'base64'));
-              },
-              signAllTransactions: async (txs: Transaction[]) => {
-                // SECURITY: Batch signing through Privy's secure infrastructure
-                const provider = await solanaWallet.getEthereumProvider();
-
-                if (!provider || typeof provider.request !== 'function') {
-                  throw new Error('Privy wallet provider not available');
-                }
-
-                const serializedTxs = txs.map((tx) =>
-                  tx.serialize({
-                    requireAllSignatures: false,
-                    verifySignatures: false,
-                  }).toString('base64')
-                );
-
-                const signatures = await provider.request({
-                  method: 'signAllTransactions',
-                  params: [serializedTxs],
-                });
-
-                return (signatures as string[]).map((sig) =>
-                  Transaction.from(Buffer.from(sig, 'base64'))
-                );
-              },
-            });
-
-            console.info('✅ Secure Privy wallet connected:', solanaWallet.address);
-          } else {
-            console.warn('⚠️ No Solana embedded wallet found. Ensure Privy is configured for Solana.');
-          }
-        } catch (error) {
-          console.error('❌ Failed to connect secure Privy wallet:', error);
+      if (!authenticated || !user) {
+        if (!sdk.wallet.isConnected()) {
+          return;
         }
-      } else if (!authenticated) {
-        // Disconnect wallet on logout
+
         try {
           await sdk.wallet.disconnectWallet();
           console.info('✅ Wallet disconnected');
         } catch (error) {
           console.error('❌ Failed to disconnect wallet:', error);
         }
+        return;
+      }
+
+      try {
+        const solanaWallet = wallets.find(
+          (wallet) => wallet.walletClientType === 'privy' && wallet.address
+        );
+
+        if (!solanaWallet || !solanaWallet.address) {
+          console.warn(
+            '⚠️ No Solana embedded wallet found. Ensure Privy is configured for Solana.'
+          );
+          return;
+        }
+
+        const currentState = sdk.wallet.getState();
+        if (currentState.publicKey?.toBase58() === solanaWallet.address && currentState.connected) {
+          return;
+        }
+
+        const publicKey = new PublicKey(solanaWallet.address);
+
+        await sdk.wallet.connectCustomWallet('Privy Embedded Wallet', {
+          publicKey,
+          signTransaction: async (tx: Transaction) => {
+            const provider = await solanaWallet.getEthereumProvider();
+
+            if (!provider || typeof provider.request !== 'function') {
+              throw new Error('Privy wallet provider not available');
+            }
+
+            const serializedTx = tx.serialize({
+              requireAllSignatures: false,
+              verifySignatures: false,
+            });
+
+            const signature = await provider.request({
+              method: 'signTransaction',
+              params: [serializedTx.toString('base64')],
+            });
+
+            return Transaction.from(Buffer.from(signature as string, 'base64'));
+          },
+          signAllTransactions: async (txs: Transaction[]) => {
+            const provider = await solanaWallet.getEthereumProvider();
+
+            if (!provider || typeof provider.request !== 'function') {
+              throw new Error('Privy wallet provider not available');
+            }
+
+            const serializedTxs = txs.map((tx) =>
+              tx
+                .serialize({
+                  requireAllSignatures: false,
+                  verifySignatures: false,
+                })
+                .toString('base64')
+            );
+
+            const signatures = await provider.request({
+              method: 'signAllTransactions',
+              params: [serializedTxs],
+            });
+
+            return (signatures as string[]).map((sig) =>
+              Transaction.from(Buffer.from(sig, 'base64'))
+            );
+          },
+        });
+
+        console.info('✅ Secure Privy wallet connected:', solanaWallet.address);
+      } catch (error) {
+        console.error('❌ Failed to connect secure Privy wallet:', error);
       }
     };
 
     handlePrivyAuth();
-  }, [authenticated, user, wallets, sdk]);
+  }, [authenticated, user?.id, walletSignature, sdk]);
 
   return { authenticated, user, wallets };
-}; 
+};

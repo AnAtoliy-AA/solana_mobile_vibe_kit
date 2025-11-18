@@ -1,0 +1,25 @@
+# Dependencies
+node_modules
+package-lock.json
+yarn.lock
+
+# Build outputs
+build
+dist
+coverage
+
+# Environment files
+.env
+.env.*
+
+# IDE
+.idea
+.vscode
+
+# Capacitor
+android
+ios
+
+# Other
+*.min.js
+*.min.css
