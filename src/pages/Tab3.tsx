@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import type { RefresherEventDetail } from '@ionic/core';
 import {
   IonContent,
   IonHeader,
@@ -14,7 +15,6 @@ import {
   IonModal,
   IonButtons,
   IonSkeletonText,
-  IonText
 } from '@ionic/react';
 import {
   refresh,
@@ -24,12 +24,11 @@ import {
   close,
   time,
   openOutline,
-  copy
+  copy,
 } from 'ionicons/icons';
 import { useSolana } from '../context/SolanaContext';
 import { usePrivyAuth } from '../context/PrivyContext';
 import { usePrivySolana } from '../hooks/usePrivySolana';
-import { TransactionHistoryItem } from '../sdk/types';
 import './Tab3.css';
 
 interface Transaction {
@@ -44,7 +43,7 @@ interface Transaction {
 }
 
 const Tab3: React.FC = () => {
-  const { sdk, walletState } = useSolana();
+  const { walletState } = useSolana();
   const { authenticated } = usePrivyAuth();
   usePrivySolana();
 
@@ -56,6 +55,8 @@ const Tab3: React.FC = () => {
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [activeFilter, setActiveFilter] = useState<'all' | 'send' | 'receive' | 'swap'>('all');
+  const senderAddress = selectedTransaction?.from;
+  const recipientAddress = selectedTransaction?.to;
 
   // Mock transaction data
   const mockTransactions: Transaction[] = [
@@ -66,7 +67,7 @@ const Tab3: React.FC = () => {
       token: 'SOL',
       status: 'confirmed',
       timestamp: Date.now() - 3600000, // 1 hour ago
-      to: '7xKXtg2CW3UuvBFbEhC1GZGgCCWjB1Z2N8V9QmRpXzHe'
+      to: '7xKXtg2CW3UuvBFbEhC1GZGgCCWjB1Z2N8V9QmRpXzHe',
     },
     {
       signature: '2mE6P7f8K1jH4G5d6CxVyM5u3Q6w0RdQ1zA7bD8eF2gH3iJ4kL5mN6oP7qR8sT9uV0wX1y',
@@ -75,7 +76,7 @@ const Tab3: React.FC = () => {
       token: 'SOL',
       status: 'confirmed',
       timestamp: Date.now() - 7200000, // 2 hours ago
-      from: '9yMXsg3DX2VuuBGcFhD2HZHgDDXkC2A3O9W0RnSpYzIf'
+      from: '9yMXsg3DX2VuuBGcFhD2HZHgDDXkC2A3O9W0RnSpYzIf',
     },
     {
       signature: '1lD5O6e7J0iG3F4c5BwUxL4t2P5v9QcP0yZ6aE7dE1fG2hH3jK4lM5nN6pP7qR8sT9uV0w',
@@ -92,7 +93,7 @@ const Tab3: React.FC = () => {
       token: 'USDC',
       status: 'pending',
       timestamp: Date.now() - 1800000, // 30 minutes ago
-      to: '5vJWrg1CW2UtvAEaEhB0FYFgBBWiA0Y1M7V8QlQpWzGd'
+      to: '5vJWrg1CW2UtvAEaEhB0FYFgBBWiA0Y1M7V8QlQpWzGd',
     },
     {
       signature: '9jB3M4c5H8gE1D2a3ZuSvJ2r0N3t7OaF8wX4aG5bG9dE0fF1gH2iI3kL4mM5nN6oP7qR8s',
@@ -101,8 +102,8 @@ const Tab3: React.FC = () => {
       token: 'BONK',
       status: 'confirmed',
       timestamp: Date.now() - 86400000, // 1 day ago
-      from: '3uHWpf2BV1UssZDaChA9EXEgAAViZ9X0L6U7PlPpVzEe'
-    }
+      from: '3uHWpf2BV1UssZDaChA9EXEgAAViZ9X0L6U7PlPpVzEe',
+    },
   ];
 
   useEffect(() => {
@@ -123,7 +124,7 @@ const Tab3: React.FC = () => {
     try {
       // In a real app, you would fetch actual transaction history
       // For now, use mock data
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate loading
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate loading
       setTransactions(mockTransactions);
     } catch (error) {
       console.error('Failed to load transaction history:', error);
@@ -137,11 +138,11 @@ const Tab3: React.FC = () => {
     if (activeFilter === 'all') {
       setFilteredTransactions(transactions);
     } else {
-      setFilteredTransactions(transactions.filter(tx => tx.type === activeFilter));
+      setFilteredTransactions(transactions.filter((tx) => tx.type === activeFilter));
     }
   };
 
-  const handleRefresh = async (event: any) => {
+  const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
     await loadTransactionHistory();
     event.detail.complete();
   };
@@ -191,10 +192,14 @@ const Tab3: React.FC = () => {
 
   const getTransactionIcon = (type: string) => {
     switch (type) {
-      case 'send': return send;
-      case 'receive': return download;
-      case 'swap': return swapHorizontal;
-      default: return time;
+      case 'send':
+        return send;
+      case 'receive':
+        return download;
+      case 'swap':
+        return swapHorizontal;
+      default:
+        return time;
     }
   };
 
@@ -206,8 +211,8 @@ const Tab3: React.FC = () => {
 
   const calculateStats = () => {
     const total = transactions.length;
-    const confirmed = transactions.filter(tx => tx.status === 'confirmed').length;
-    const pending = transactions.filter(tx => tx.status === 'pending').length;
+    const confirmed = transactions.filter((tx) => tx.status === 'confirmed').length;
+    const pending = transactions.filter((tx) => tx.status === 'pending').length;
     return { total, confirmed, pending };
   };
 
@@ -220,32 +225,34 @@ const Tab3: React.FC = () => {
       <div className={`transaction-icon ${transaction.type}`}>
         <IonIcon icon={getTransactionIcon(transaction.type)} />
       </div>
-      
+
       <div className="transaction-info">
         <h3 className="transaction-type">
           {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)} {transaction.token}
         </h3>
         <p className="transaction-details">
-          {transaction.type === 'send' && transaction.to && `To: ${transaction.to.substring(0, 8)}...`}
-          {transaction.type === 'receive' && transaction.from && `From: ${transaction.from.substring(0, 8)}...`}
+          {transaction.type === 'send' &&
+            transaction.to &&
+            `To: ${transaction.to.substring(0, 8)}...`}
+          {transaction.type === 'receive' &&
+            transaction.from &&
+            `From: ${transaction.from.substring(0, 8)}...`}
           {transaction.type === 'swap' && 'Token swap transaction'}
           {transaction.type === 'unknown' && 'Unknown transaction'}
         </p>
       </div>
-      
+
       <div className="transaction-meta">
         <div className={`transaction-amount ${getAmountClass(transaction.amount)}`}>
           {formatAmount(transaction.amount, transaction.token)}
         </div>
         <div className="transaction-time">{formatTime(transaction.timestamp)}</div>
-        <span className={`transaction-status ${transaction.status}`}>
-          {transaction.status}
-        </span>
+        <span className={`transaction-status ${transaction.status}`}>{transaction.status}</span>
       </div>
     </div>
   );
 
-  const renderLoadingItems = () => (
+  const renderLoadingItems = () =>
     Array.from({ length: 5 }, (_, index) => (
       <div key={index} className="loading-item">
         <IonSkeletonText className="loading-icon" animated />
@@ -254,8 +261,7 @@ const Tab3: React.FC = () => {
           <IonSkeletonText className="loading-text long" animated />
         </div>
       </div>
-    ))
-  );
+    ));
 
   const renderEmptyState = () => (
     <div className="empty-state">
@@ -354,18 +360,14 @@ const Tab3: React.FC = () => {
               <div className="history-list">
                 <div className="history-list-header">
                   <h2 className="history-list-title">Recent Activity</h2>
-                  <span className="history-count">
-                    {filteredTransactions.length} transactions
-                  </span>
+                  <span className="history-count">{filteredTransactions.length} transactions</span>
                 </div>
 
-                {isLoading ? (
-                  renderLoadingItems()
-                ) : filteredTransactions.length > 0 ? (
-                  filteredTransactions.map(renderTransactionItem)
-                ) : (
-                  renderEmptyState()
-                )}
+                {isLoading
+                  ? renderLoadingItems()
+                  : filteredTransactions.length > 0
+                    ? filteredTransactions.map(renderTransactionItem)
+                    : renderEmptyState()}
               </div>
             </>
           )}
@@ -389,54 +391,61 @@ const Tab3: React.FC = () => {
                 <div className="transaction-detail-row">
                   <span className="transaction-detail-label">Type</span>
                   <span className="transaction-detail-value">
-                    {selectedTransaction.type.charAt(0).toUpperCase() + selectedTransaction.type.slice(1)}
+                    {selectedTransaction.type.charAt(0).toUpperCase() +
+                      selectedTransaction.type.slice(1)}
                   </span>
                 </div>
-                
+
                 <div className="transaction-detail-row">
                   <span className="transaction-detail-label">Amount</span>
                   <span className="transaction-detail-value">
                     {formatAmount(selectedTransaction.amount, selectedTransaction.token)}
                   </span>
                 </div>
-                
+
                 <div className="transaction-detail-row">
                   <span className="transaction-detail-label">Status</span>
                   <span className={`transaction-status ${selectedTransaction.status}`}>
                     {selectedTransaction.status}
                   </span>
                 </div>
-                
+
                 <div className="transaction-detail-row">
                   <span className="transaction-detail-label">Time</span>
                   <span className="transaction-detail-value">
                     {new Date(selectedTransaction.timestamp).toLocaleString()}
                   </span>
                 </div>
-                
-                {selectedTransaction.from && (
+
+                {senderAddress && (
                   <div className="transaction-detail-row">
                     <span className="transaction-detail-label">From</span>
-                    <span className="transaction-detail-value" onClick={() => copyToClipboard(selectedTransaction.from!)}>
-                      {selectedTransaction.from}
+                    <span
+                      className="transaction-detail-value"
+                      onClick={() => copyToClipboard(senderAddress)}
+                    >
+                      {senderAddress}
                     </span>
                   </div>
                 )}
-                
-                {selectedTransaction.to && (
+
+                {recipientAddress && (
                   <div className="transaction-detail-row">
                     <span className="transaction-detail-label">To</span>
-                    <span className="transaction-detail-value" onClick={() => copyToClipboard(selectedTransaction.to!)}>
-                      {selectedTransaction.to}
+                    <span
+                      className="transaction-detail-value"
+                      onClick={() => copyToClipboard(recipientAddress)}
+                    >
+                      {recipientAddress}
                     </span>
                   </div>
                 )}
-                
+
                 <div className="transaction-detail-row">
                   <span className="transaction-detail-label">Signature</span>
                   <span className="transaction-detail-value">
-                    <a 
-                      href="#" 
+                    <a
+                      href="#"
                       className="signature-link"
                       onClick={(e) => {
                         e.preventDefault();
@@ -447,7 +456,7 @@ const Tab3: React.FC = () => {
                     </a>
                   </span>
                 </div>
-                
+
                 <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
                   <IonButton
                     expand="block"

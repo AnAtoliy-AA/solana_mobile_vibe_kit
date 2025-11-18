@@ -24,7 +24,7 @@ export const SolanaProvider: React.FC<SolanaProviderProps> = ({ children }) => {
     connected: false,
     connecting: false,
     publicKey: null,
-    wallet: null
+    wallet: null,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -76,14 +76,10 @@ export const SolanaProvider: React.FC<SolanaProviderProps> = ({ children }) => {
     error,
     connectWallet,
     disconnectWallet,
-    switchNetwork
+    switchNetwork,
   };
 
-  return (
-    <SolanaContext.Provider value={value}>
-      {children}
-    </SolanaContext.Provider>
-  );
+  return <SolanaContext.Provider value={value}>{children}</SolanaContext.Provider>;
 };
 
 export const useSolana = (): SolanaContextType => {
@@ -92,4 +88,4 @@ export const useSolana = (): SolanaContextType => {
     throw new Error('useSolana must be used within a SolanaProvider');
   }
   return context;
-}; 
+};

@@ -1,0 +1,449 @@
+// Launchpad main page - Modern dashboard with table view
+
+import React, { useState, useMemo, useEffect } from 'react';
+import {
+  IonPage,
+  IonHeader,
+  IonToolbar,
+  IonContent,
+  IonSearchbar,
+  IonRefresher,
+  IonRefresherContent,
+  IonSpinner,
+  IonText,
+  IonButton,
+  IonButtons,
+  IonIcon,
+} from '@ionic/react';
+import { useHistory } from 'react-router-dom';
+import {
+  trendingUpOutline,
+  copyOutline,
+  openOutline,
+  logoTwitter,
+  globeOutline,
+  swapHorizontalOutline,
+  timeOutline,
+} from 'ionicons/icons';
+import { usePoolList } from '../hooks/usePools';
+import { useLiveActivity } from '../hooks/useLiveUpdates';
+import { Pool } from '../lib/api/types';
+import { useMarketStore } from '../lib/stores/useMarketStore';
+import Tooltip from '../components/launchpad/Tooltip';
+import './Launchpad.css';
+
+const Launchpad: React.FC = () => {
+  const history = useHistory();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'all' | 'active' | 'upcoming' | 'finished'>('all');
+
+  // Enable live activity feed updates
+  useLiveActivity();
+
+  const status = activeTab === 'all' ? undefined : activeTab;
+  const { data: pools, isLoading, refetch } = usePoolList(status);
+
+  // Get live-updated pools from market store (merged with API data)
+  const livePoolsFromStore = useMarketStore((state) => state.pools);
+  const setPools = useMarketStore((state) => state.setPools);
+
+  // Sync API pools to store when they load
+  useEffect(() => {
+    if (pools && pools.length > 0) {
+      setPools(pools);
+    }
+  }, [pools, setPools]);
+
+  // Merge API pools with live WebSocket updates from store
+  const mergedPools = useMemo(() => {
+    if (!pools) return [];
+
+    // If store has no updates, return API pools as-is
+    if (livePoolsFromStore.length === 0) return pools;
+
+    // Create a map of store pools for quick lookup
+    const storePoolsMap = new Map(livePoolsFromStore.map((p) => [p.id, p]));
+
+    // Merge: use store data if available (it has live updates), otherwise use API data
+    return pools.map((apiPool) => {
+      const livePool = storePoolsMap.get(apiPool.id);
+      return livePool || apiPool;
+    });
+  }, [pools, livePoolsFromStore]);
+
+  const handleRefresh = async (event: CustomEvent) => {
+    await refetch();
+    event.detail.complete();
+  };
+
+  const handlePoolClick = (poolId: string) => {
+    history.push(`/launchpad/${poolId}`);
+  };
+
+  const copyToClipboard = (text: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(text);
+  };
+
+  const openBlockExplorer = (address: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    window.open(`https://solscan.io/token/${address}`, '_blank');
+  };
+
+  const formatNumber = (num: string | number) => {
+    const value = typeof num === 'string' ? parseFloat(num) : num;
+    if (value >= 1000000) {
+      return `$${(value / 1000000).toFixed(2)}M`;
+    } else if (value >= 1000) {
+      return `$${(value / 1000).toFixed(1)}K`;
+    }
+    return `$${value.toFixed(0)}`;
+  };
+
+  const getFullNumber = (num: string | number) => {
+    const value = typeof num === 'string' ? parseFloat(num) : num;
+    return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
+  const formatAddress = (address: string) => {
+    if (!address) return 'N/A';
+    return `${address.slice(0, 4)}...${address.slice(-4)}`;
+  };
+
+  const getTimeAgo = (date: string) => {
+    const now = new Date();
+    const past = new Date(date);
+    const diffMs = now.getTime() - past.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${Math.floor(diffHours / 24)}d ago`;
+  };
+
+  const filteredPools = mergedPools?.filter((pool: Pool) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      pool.name.toLowerCase().includes(query) ||
+      pool.symbol.toLowerCase().includes(query) ||
+      pool.id.toLowerCase().includes(query)
+    );
+  });
+
+  return (
+    <IonPage>
+      <IonHeader className="launchpad-header">
+        <IonToolbar className="launchpad-navbar">
+          <div className="navbar-content">
+            <div className="navbar-brand">
+              <span className="brand-icon">🚀</span>
+              <span className="brand-text">Meme Launchpad</span>
+            </div>
+            <IonButtons className="navbar-menu">
+              <IonButton onClick={() => history.push('/launchpad')} className="nav-btn">
+                Home
+              </IonButton>
+              <IonButton className="nav-btn">Create Meme</IonButton>
+              <IonButton className="nav-btn">
+                <IonIcon icon={logoTwitter} slot="start" />
+                Mentions on X
+              </IonButton>
+              <IonButton className="nav-btn nav-btn-login" fill="solid" color="primary">
+                Login
+              </IonButton>
+            </IonButtons>
+          </div>
+        </IonToolbar>
+
+        <IonToolbar className="launchpad-search-toolbar">
+          <div className="search-container">
+            <IonSearchbar
+              value={searchQuery}
+              onIonInput={(e) => setSearchQuery(e.detail.value || '')}
+              placeholder="Search by token name, ticker, or contract address..."
+              className="modern-searchbar"
+              animated
+            />
+          </div>
+        </IonToolbar>
+
+        <IonToolbar className="launchpad-tabs-toolbar">
+          <div className="tabs-container">
+            <button
+              className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`}
+              onClick={() => setActiveTab('all')}
+            >
+              All Tokens
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'active' ? 'active' : ''}`}
+              onClick={() => setActiveTab('active')}
+            >
+              Active
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'upcoming' ? 'active' : ''}`}
+              onClick={() => setActiveTab('upcoming')}
+            >
+              Upcoming
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'finished' ? 'active' : ''}`}
+              onClick={() => setActiveTab('finished')}
+            >
+              Finished
+            </button>
+          </div>
+        </IonToolbar>
+      </IonHeader>
+
+      <IonContent className="launchpad-content">
+        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+          <IonRefresherContent />
+        </IonRefresher>
+
+        <div className="dashboard-container">
+          {isLoading ? (
+            <div className="loading-state">
+              <IonSpinner name="crescent" color="primary" />
+              <IonText color="medium">
+                <p>Loading tokens...</p>
+              </IonText>
+            </div>
+          ) : filteredPools && filteredPools.length > 0 ? (
+            <div className="table-wrapper">
+              <div className="table-scroll-wrapper">
+                <table className="tokens-table">
+                  <thead>
+                    <tr>
+                      <th>
+                        <Tooltip content="Token name and symbol" position="bottom">
+                          Token
+                        </Tooltip>
+                      </th>
+                      <th>
+                        <Tooltip content="Solana blockchain contract address" position="bottom">
+                          Contract Address
+                        </Tooltip>
+                      </th>
+                      <th>
+                        <Tooltip
+                          content="Total trading volume in the last 24 hours"
+                          position="bottom"
+                        >
+                          Volume 24h
+                        </Tooltip>
+                      </th>
+                      <th>
+                        <Tooltip
+                          content="Total market capitalization (circulating supply × price)"
+                          position="bottom"
+                        >
+                          Market Cap
+                        </Tooltip>
+                      </th>
+                      <th>
+                        <Tooltip
+                          content="Fundraising progress towards target goal"
+                          position="bottom"
+                        >
+                          Progress
+                        </Tooltip>
+                      </th>
+                      <th>
+                        <Tooltip
+                          content="Number of unique wallet addresses holding this token"
+                          position="bottom"
+                        >
+                          Holders
+                        </Tooltip>
+                      </th>
+                      <th>
+                        <Tooltip content="Time since token launch" position="bottom">
+                          Time
+                        </Tooltip>
+                      </th>
+                      <th>
+                        <Tooltip content="Available actions for this token" position="bottom">
+                          Actions
+                        </Tooltip>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredPools.map((pool: Pool) => (
+                      <tr
+                        key={pool.id}
+                        className="token-row"
+                        onClick={() => handlePoolClick(pool.id)}
+                      >
+                        <td className="token-info">
+                          <Tooltip
+                            content={`${pool.name} (${pool.symbol})\nClick to view details`}
+                            position="bottom"
+                          >
+                            <div className="token-name-cell">
+                              {pool.imageUrl && (
+                                <img src={pool.imageUrl} alt={pool.symbol} className="token-icon" />
+                              )}
+                              <div>
+                                <div className="token-name">{pool.name}</div>
+                                <div className="token-symbol">{pool.symbol}</div>
+                              </div>
+                            </div>
+                          </Tooltip>
+                        </td>
+                        <td className="contract-address">
+                          <Tooltip
+                            content={`Full Address:\n${pool.id}\n\nClick icons to copy or view on blockchain explorer`}
+                            position="bottom"
+                          >
+                            <div className="address-cell">
+                              <span className="address-text">{formatAddress(pool.id)}</span>
+                              <Tooltip content="Copy to clipboard" position="bottom">
+                                <IonIcon
+                                  icon={copyOutline}
+                                  className="action-icon"
+                                  onClick={(e) => copyToClipboard(pool.id, e)}
+                                />
+                              </Tooltip>
+                              <Tooltip content="View on Solscan" position="bottom">
+                                <IonIcon
+                                  icon={openOutline}
+                                  className="action-icon"
+                                  onClick={(e) => openBlockExplorer(pool.id, e)}
+                                />
+                              </Tooltip>
+                            </div>
+                          </Tooltip>
+                        </td>
+                        <td className="volume">
+                          <Tooltip
+                            content={`24h Trading Volume\n\nTotal: ${getFullNumber(pool.tvl)}\nChange: +12.5% from previous 24h`}
+                            position="bottom"
+                          >
+                            <div className="metric-cell">
+                              <span className="metric-value">{formatNumber(pool.tvl)}</span>
+                              <span className="metric-change positive">
+                                <IonIcon icon={trendingUpOutline} />
+                                +12.5%
+                              </span>
+                            </div>
+                          </Tooltip>
+                        </td>
+                        <td className="market-cap">
+                          <Tooltip
+                            content={`Market Capitalization\n\nTotal value of all tokens in circulation\n\nFull amount: ${getFullNumber(pool.tvl)}`}
+                            position="bottom"
+                          >
+                            <span className="metric-value bold">{formatNumber(pool.tvl)}</span>
+                          </Tooltip>
+                        </td>
+                        <td className="progress">
+                          <Tooltip
+                            content={`Launch Progress\n\nRaised: ${getFullNumber(pool.currentAmount)}\nTarget: ${getFullNumber(pool.targetAmount)}\nCompletion: ${(pool.progress * 100).toFixed(1)}%`}
+                            position="bottom"
+                          >
+                            <div className="progress-cell">
+                              <div className="progress-bar-container">
+                                <div
+                                  className="progress-bar-fill"
+                                  style={{ width: `${pool.progress * 100}%` }}
+                                />
+                              </div>
+                              <span className="progress-text">
+                                {(pool.progress * 100).toFixed(0)}%
+                              </span>
+                            </div>
+                          </Tooltip>
+                        </td>
+                        <td className="holders">
+                          <Tooltip
+                            content={`Token Holders\n\nTotal unique wallet addresses holding this token\n\nCurrent count: ${pool.participants.toLocaleString()} holders`}
+                            position="bottom"
+                          >
+                            <span className="metric-value">
+                              {pool.participants.toLocaleString()}
+                            </span>
+                          </Tooltip>
+                        </td>
+                        <td className="time">
+                          <Tooltip
+                            content={`Launch Time\n\nStarted: ${new Date(pool.startTime).toLocaleString()}\nTime ago: ${getTimeAgo(pool.startTime)}`}
+                            position="bottom"
+                          >
+                            <div className="time-cell">
+                              <IonIcon icon={timeOutline} className="time-icon" />
+                              <span>{getTimeAgo(pool.startTime)}</span>
+                            </div>
+                          </Tooltip>
+                        </td>
+                        <td className="actions">
+                          <div className="action-buttons">
+                            <Tooltip content="Trade this token on DEX" position="bottom">
+                              <IonButton
+                                size="small"
+                                fill="solid"
+                                color="success"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                }}
+                              >
+                                <IonIcon icon={swapHorizontalOutline} slot="start" />
+                                Trade
+                              </IonButton>
+                            </Tooltip>
+                            {pool.twitterUrl && (
+                              <Tooltip content="Visit official Twitter/X" position="bottom">
+                                <IonButton
+                                  size="small"
+                                  fill="clear"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    window.open(pool.twitterUrl, '_blank');
+                                  }}
+                                >
+                                  <IonIcon icon={logoTwitter} />
+                                </IonButton>
+                              </Tooltip>
+                            )}
+                            {pool.websiteUrl && (
+                              <Tooltip content="Visit official website" position="bottom">
+                                <IonButton
+                                  size="small"
+                                  fill="clear"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    window.open(pool.websiteUrl, '_blank');
+                                  }}
+                                >
+                                  <IonIcon icon={globeOutline} />
+                                </IonButton>
+                              </Tooltip>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : (
+            <div className="empty-state">
+              <IonText color="medium">
+                <h2>No tokens found</h2>
+                <p>Try adjusting your search or check back later for new launches</p>
+              </IonText>
+            </div>
+          )}
+        </div>
+      </IonContent>
+    </IonPage>
+  );
+};
+
+export default Launchpad;

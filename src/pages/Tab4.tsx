@@ -5,10 +5,6 @@ import {
   IonPage,
   IonTitle,
   IonToolbar,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
   IonButton,
   IonIcon,
   IonItem,
@@ -17,16 +13,13 @@ import {
   IonToast,
   IonLoading,
   IonChip,
-  IonGrid,
-  IonRow,
-  IonCol,
   IonText,
   IonSpinner,
   IonModal,
   IonList,
   IonSearchbar,
   IonAvatar,
-  IonButtons
+  IonButtons,
 } from '@ionic/react';
 import {
   swapVertical,
@@ -35,12 +28,11 @@ import {
   informationCircle,
   chevronDown,
   close,
-  checkmark
 } from 'ionicons/icons';
 import { useSolana } from '../context/SolanaContext';
 import { usePrivyAuth } from '../context/PrivyContext';
 import { usePrivySolana } from '../hooks/usePrivySolana';
-import { PublicKey, Connection } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 import './Tab4.css';
 
 interface Token {
@@ -54,7 +46,7 @@ interface Token {
 
 const Tab4: React.FC = () => {
   const { sdk, walletState, isLoading: walletLoading } = useSolana();
-  const { authenticated, user } = usePrivyAuth();
+  const { authenticated } = usePrivyAuth();
   usePrivySolana();
 
   // State for trading
@@ -71,7 +63,7 @@ const Tab4: React.FC = () => {
   const [tokenList, setTokenList] = useState<Token[]>([]);
   const [priceImpact, setPriceImpact] = useState<number | null>(null);
   const [exchangeRate, setExchangeRate] = useState<string>('');
-  
+
   // Modal states
   const [isTokenSelectOpen, setIsTokenSelectOpen] = useState(false);
   const [selectingTokenType, setSelectingTokenType] = useState<'input' | 'output'>('input');
@@ -86,24 +78,27 @@ const Tab4: React.FC = () => {
       name: 'Solana',
       mintAddress: 'So11111111111111111111111111111111111111112',
       decimals: 9,
-      logoURI: 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png',
-      balance: 0
+      logoURI:
+        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png',
+      balance: 0,
     },
     {
       symbol: 'USDC',
       name: 'USD Coin',
       mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
       decimals: 6,
-      logoURI: 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
-      balance: 0
+      logoURI:
+        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
+      balance: 0,
     },
     {
       symbol: 'USDT',
       name: 'Tether USD',
       mintAddress: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
       decimals: 6,
-      logoURI: 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/logo.png',
-      balance: 0
+      logoURI:
+        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/logo.png',
+      balance: 0,
     },
     {
       symbol: 'BONK',
@@ -111,7 +106,7 @@ const Tab4: React.FC = () => {
       mintAddress: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
       decimals: 5,
       logoURI: 'https://arweave.net/hQiPZOsRZXGXBJd_82PhVdlM_hACsT_q6wqwf5cSY7I',
-      balance: 0
+      balance: 0,
     },
     {
       symbol: 'JUP',
@@ -119,8 +114,8 @@ const Tab4: React.FC = () => {
       mintAddress: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN',
       decimals: 6,
       logoURI: 'https://static.jup.ag/jup/icon.png',
-      balance: 0
-    }
+      balance: 0,
+    },
   ];
 
   // Fetch SOL balance
@@ -128,7 +123,7 @@ const Tab4: React.FC = () => {
     try {
       const connection = sdk?.wallet?.getConnection();
       if (!connection) return 0;
-      
+
       const publicKey = new PublicKey(walletAddress);
       const balance = await connection.getBalance(publicKey);
       return balance / 1e9; // Convert lamports to SOL
@@ -139,31 +134,34 @@ const Tab4: React.FC = () => {
   };
 
   // Fetch token balance for a specific mint
-  const fetchTokenBalance = async (walletAddress: string, mintAddress: string, decimals: number): Promise<number> => {
+  const fetchTokenBalance = async (
+    walletAddress: string,
+    mintAddress: string,
+    _decimals: number
+  ): Promise<number> => {
     try {
       const connection = sdk?.wallet?.getConnection();
       if (!connection) return 0;
-      
+
       const walletPublicKey = new PublicKey(walletAddress);
       const mintPublicKey = new PublicKey(mintAddress);
-      
+
       // Get token accounts for this mint
-      const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
-        walletPublicKey,
-        { mint: mintPublicKey }
-      );
-      
+      const tokenAccounts = await connection.getParsedTokenAccountsByOwner(walletPublicKey, {
+        mint: mintPublicKey,
+      });
+
       if (tokenAccounts.value.length === 0) {
         return 0;
       }
-      
+
       // Sum all token account balances for this mint
       let totalBalance = 0;
       for (const account of tokenAccounts.value) {
         const balance = account.account.data.parsed.info.tokenAmount.uiAmount || 0;
         totalBalance += balance;
       }
-      
+
       return totalBalance;
     } catch (error) {
       console.error(`Error fetching token balance for ${mintAddress}:`, error);
@@ -179,12 +177,12 @@ const Tab4: React.FC = () => {
 
     setIsLoadingBalances(true);
     const walletAddress = walletState.publicKey.toString();
-    
+
     try {
       const updatedTokens = await Promise.all(
         defaultTokens.map(async (token) => {
           let balance = 0;
-          
+
           if (token.symbol === 'SOL') {
             // Fetch SOL balance
             balance = await fetchSolBalance(walletAddress);
@@ -192,27 +190,30 @@ const Tab4: React.FC = () => {
             // Fetch token balance
             balance = await fetchTokenBalance(walletAddress, token.mintAddress, token.decimals);
           }
-          
+
           return {
             ...token,
-            balance
+            balance,
           };
         })
       );
-      
+
       setTokenList(updatedTokens);
-      
+
       // Update current input/output tokens with new balances
       if (inputToken) {
-        const updatedInputToken = updatedTokens.find(t => t.mintAddress === inputToken.mintAddress);
+        const updatedInputToken = updatedTokens.find(
+          (t) => t.mintAddress === inputToken.mintAddress
+        );
         if (updatedInputToken) setInputToken(updatedInputToken);
       }
-      
+
       if (outputToken) {
-        const updatedOutputToken = updatedTokens.find(t => t.mintAddress === outputToken.mintAddress);
+        const updatedOutputToken = updatedTokens.find(
+          (t) => t.mintAddress === outputToken.mintAddress
+        );
         if (updatedOutputToken) setOutputToken(updatedOutputToken);
       }
-      
     } catch (error) {
       console.error('Error fetching balances:', error);
       setToastMessage('Failed to fetch token balances');
@@ -252,19 +253,21 @@ const Tab4: React.FC = () => {
 
     setIsLoadingQuote(true);
     try {
-      const inputAmountLamports = Math.floor(parseFloat(inputAmount) * Math.pow(10, inputToken.decimals));
-      
+      const inputAmountLamports = Math.floor(
+        parseFloat(inputAmount) * Math.pow(10, inputToken.decimals)
+      );
+
       // Simulate Jupiter quote API call
       const response = await fetch(
         `https://quote-api.jup.ag/v6/quote?inputMint=${inputToken.mintAddress}&outputMint=${outputToken.mintAddress}&amount=${inputAmountLamports}&slippageBps=${Math.floor(slippage * 100)}`
       );
-      
+
       if (response.ok) {
         const data = await response.json();
         const outAmount = data.outAmount / Math.pow(10, outputToken.decimals);
         setOutputAmount(outAmount.toFixed(6));
         setPriceImpact(data.priceImpactPct || 0);
-        
+
         // Calculate exchange rate
         const rate = outAmount / parseFloat(inputAmount);
         setExchangeRate(`1 ${inputToken.symbol} = ${rate.toFixed(6)} ${outputToken.symbol}`);
@@ -304,12 +307,14 @@ const Tab4: React.FC = () => {
     setIsSwapping(true);
     try {
       // Simulated swap
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setToastMessage(`Successfully swapped ${inputAmount} ${inputToken.symbol} for ${outputAmount} ${outputToken.symbol}`);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      setToastMessage(
+        `Successfully swapped ${inputAmount} ${inputToken.symbol} for ${outputAmount} ${outputToken.symbol}`
+      );
       setToastColor('success');
       setShowToast(true);
-      
+
       // Reset form
       setInputAmount('');
       setOutputAmount('');
@@ -371,28 +376,30 @@ const Tab4: React.FC = () => {
     return 'danger';
   };
 
-  const filteredTokens = tokenList.filter(token =>
-    token.symbol.toLowerCase().includes(tokenSearchText.toLowerCase()) ||
-    token.name.toLowerCase().includes(tokenSearchText.toLowerCase())
+  const filteredTokens = tokenList.filter(
+    (token) =>
+      token.symbol.toLowerCase().includes(tokenSearchText.toLowerCase()) ||
+      token.name.toLowerCase().includes(tokenSearchText.toLowerCase())
   );
 
-  const isSwapDisabled = !inputAmount || !outputAmount || isLoadingQuote || isSwapping || !walletState.connected;
+  const isSwapDisabled =
+    !inputAmount || !outputAmount || isLoadingQuote || isSwapping || !walletState.connected;
 
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
           <IonTitle>Swap</IonTitle>
-                      <IonButtons slot="end">
-              {walletState.connected && (
-                <IonButton fill="clear" onClick={fetchAllBalances} disabled={isLoadingBalances}>
-                  <IonIcon icon={refresh} />
-                </IonButton>
-              )}
-              <IonButton fill="clear" onClick={() => setIsSettingsOpen(true)}>
-                <IonIcon icon={settingsOutline} />
+          <IonButtons slot="end">
+            {walletState.connected && (
+              <IonButton fill="clear" onClick={fetchAllBalances} disabled={isLoadingBalances}>
+                <IonIcon icon={refresh} />
               </IonButton>
-            </IonButtons>
+            )}
+            <IonButton fill="clear" onClick={() => setIsSettingsOpen(true)}>
+              <IonIcon icon={settingsOutline} />
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className="trading-content">
@@ -428,7 +435,8 @@ const Tab4: React.FC = () => {
                 <IonLabel>From</IonLabel>
                 {inputToken?.balance !== undefined && (
                   <IonText color="medium" className="balance-text">
-                    Balance: {isLoadingBalances ? (
+                    Balance:{' '}
+                    {isLoadingBalances ? (
                       <>
                         <IonSpinner name="dots" style={{ width: '12px', height: '12px' }} />
                         Loading...
@@ -439,14 +447,14 @@ const Tab4: React.FC = () => {
                   </IonText>
                 )}
               </div>
-              
+
               <div className="token-input-container">
                 <div className="amount-input">
                   <IonInput
                     type="number"
                     placeholder="0.0"
                     value={inputAmount}
-                    onIonChange={(e) => setInputAmount(e.detail.value!)}
+                    onIonChange={({ detail }) => setInputAmount(detail.value ?? '')}
                     className="large-input"
                   />
                   {inputToken?.balance !== undefined && (
@@ -461,7 +469,7 @@ const Tab4: React.FC = () => {
                     </IonButton>
                   )}
                 </div>
-                
+
                 <IonButton
                   fill="outline"
                   className="token-select-button"
@@ -505,7 +513,8 @@ const Tab4: React.FC = () => {
                 <IonLabel>To</IonLabel>
                 {outputToken?.balance !== undefined && (
                   <IonText color="medium" className="balance-text">
-                    Balance: {isLoadingBalances ? (
+                    Balance:{' '}
+                    {isLoadingBalances ? (
                       <>
                         <IonSpinner name="dots" style={{ width: '12px', height: '12px' }} />
                         Loading...
@@ -516,7 +525,7 @@ const Tab4: React.FC = () => {
                   </IonText>
                 )}
               </div>
-              
+
               <div className="token-input-container">
                 <div className="amount-input">
                   <IonInput
@@ -532,7 +541,7 @@ const Tab4: React.FC = () => {
                     </div>
                   )}
                 </div>
-                
+
                 <IonButton
                   fill="outline"
                   className="token-select-button"
@@ -629,7 +638,7 @@ const Tab4: React.FC = () => {
           <IonContent>
             <IonSearchbar
               value={tokenSearchText}
-              onIonChange={(e) => setTokenSearchText(e.detail.value!)}
+              onIonChange={({ detail }) => setTokenSearchText(detail.value ?? '')}
               placeholder="Search tokens"
             />
             <IonList>
@@ -681,10 +690,13 @@ const Tab4: React.FC = () => {
               <IonItem>
                 <IonLabel>
                   <h3>Slippage Tolerance</h3>
-                  <p>Your transaction will revert if the price changes unfavorably by more than this percentage</p>
+                  <p>
+                    Your transaction will revert if the price changes unfavorably by more than this
+                    percentage
+                  </p>
                 </IonLabel>
               </IonItem>
-              
+
               <div className="slippage-options">
                 {[0.1, 0.5, 1.0, 3.0].map((value) => (
                   <IonButton
@@ -708,13 +720,10 @@ const Tab4: React.FC = () => {
           color={toastColor}
         />
 
-        <IonLoading
-          isOpen={walletLoading}
-          message="Loading..."
-        />
+        <IonLoading isOpen={walletLoading} message="Loading..." />
       </IonContent>
     </IonPage>
   );
 };
 
-export default Tab4; 
+export default Tab4;

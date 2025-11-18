@@ -1,0 +1,155 @@
+.pool-detail-container {
+  padding: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+}
+
+.pool-detail-loading,
+.pool-detail-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
+}
+
+.pool-detail-hero {
+  margin-bottom: 16px;
+}
+
+.pool-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.pool-detail-symbol {
+  color: var(--ion-color-medium);
+  font-size: 0.9rem;
+  margin: 4px 0 0;
+}
+
+.pool-detail-description {
+  color: var(--ion-color-medium-shade);
+  line-height: 1.6;
+  margin: 16px 0;
+}
+
+.pool-detail-progress {
+  margin-top: 24px;
+}
+
+.pool-progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.pool-progress-percentage {
+  font-weight: 600;
+  color: var(--ion-color-primary);
+}
+
+.pool-progress-amounts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.pool-amount-raised {
+  color: var(--ion-color-primary);
+  font-size: 1.1rem;
+}
+
+.pool-amount-target {
+  color: var(--ion-color-medium);
+  font-size: 0.95rem;
+}
+
+.stat-item {
+  padding: 12px 0;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--ion-color-medium);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ion-color-dark);
+}
+
+.timeline-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ion-color-light);
+}
+
+.timeline-item:last-child {
+  border-bottom: none;
+}
+
+.timeline-label {
+  font-weight: 500;
+  color: var(--ion-color-medium);
+}
+
+.timeline-value {
+  font-weight: 600;
+  color: var(--ion-color-dark);
+}
+
+.faq-item {
+  margin: 16px 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--ion-color-light);
+}
+
+.faq-item:last-child {
+  border-bottom: none;
+}
+
+.faq-question {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--ion-color-dark);
+}
+
+.faq-answer {
+  font-size: 0.9rem;
+  color: var(--ion-color-medium-shade);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.pool-detail-action {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  background: var(--ion-background-color);
+  border-top: 1px solid var(--ion-color-light);
+  z-index: 10;
+}
+
+/* Tablet and desktop */
+@media (min-width: 768px) {
+  .pool-detail-action {
+    position: relative;
+    border-top: none;
+    margin-top: 24px;
+  }
+}

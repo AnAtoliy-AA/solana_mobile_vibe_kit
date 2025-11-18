@@ -1,4 +1,4 @@
-import { PublicKey, Transaction, Connection } from '@solana/web3.js';
+import { PublicKey, Transaction } from '@solana/web3.js';
 
 // Wallet Types
 export interface WalletInfo {
@@ -81,6 +81,6 @@ export interface TransactionHistoryItem {
   slot: number;
   blockTime: number | null;
   confirmationStatus: 'processed' | 'confirmed' | 'finalized';
-  err: any;
+  err: unknown;
   memo?: string;
-} 
+}

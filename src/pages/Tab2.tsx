@@ -19,17 +19,10 @@ import {
   IonItem,
   IonSpinner,
   IonText,
-  IonSkeletonText
+  IonSkeletonText,
 } from '@ionic/react';
-import {
-  refresh,
-  send,
-  add,
-  close,
-  wallet,
-  trendingUp,
-  swapHorizontal
-} from 'ionicons/icons';
+import type { RefresherEventDetail } from '@ionic/core';
+import { refresh, send, add, close, wallet, swapHorizontal } from 'ionicons/icons';
 import { useSolana } from '../context/SolanaContext';
 import { usePrivyAuth } from '../context/PrivyContext';
 import { usePrivySolana } from '../hooks/usePrivySolana';
@@ -65,29 +58,31 @@ const Tab2: React.FC = () => {
       name: 'USD Coin',
       mint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
       decimals: 6,
-      logoUri: 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png'
+      logoUri:
+        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
     },
     {
       symbol: 'USDT',
       name: 'Tether USD',
       mint: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
       decimals: 6,
-      logoUri: 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/logo.png'
+      logoUri:
+        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/logo.png',
     },
     {
       symbol: 'BONK',
       name: 'Bonk',
       mint: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
       decimals: 5,
-      logoUri: 'https://arweave.net/hQiPZOsRZXGXBJd_82PhVdlM_hACsT_q6wqwf5cSY7I'
+      logoUri: 'https://arweave.net/hQiPZOsRZXGXBJd_82PhVdlM_hACsT_q6wqwf5cSY7I',
     },
     {
       symbol: 'JUP',
       name: 'Jupiter',
       mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN',
       decimals: 6,
-      logoUri: 'https://static.jup.ag/jup/icon.png'
-    }
+      logoUri: 'https://static.jup.ag/jup/icon.png',
+    },
   ];
 
   // Function to fetch SOL balance
@@ -95,7 +90,7 @@ const Tab2: React.FC = () => {
     try {
       const connection = sdk?.wallet?.getConnection();
       if (!connection) return 0;
-      
+
       const publicKey = new PublicKey(walletAddress);
       const balance = await connection.getBalance(publicKey);
       return balance / 1e9; // Convert lamports to SOL
@@ -106,31 +101,34 @@ const Tab2: React.FC = () => {
   };
 
   // Function to fetch token balance for a specific mint
-  const fetchTokenBalance = async (walletAddress: string, mintAddress: string, decimals: number): Promise<number> => {
+  const fetchTokenBalance = async (
+    walletAddress: string,
+    mintAddress: string,
+    _: number
+  ): Promise<number> => {
     try {
       const connection = sdk?.wallet?.getConnection();
       if (!connection) return 0;
-      
+
       const walletPublicKey = new PublicKey(walletAddress);
       const mintPublicKey = new PublicKey(mintAddress);
-      
+
       // Get token accounts for this mint
-      const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
-        walletPublicKey,
-        { mint: mintPublicKey }
-      );
-      
+      const tokenAccounts = await connection.getParsedTokenAccountsByOwner(walletPublicKey, {
+        mint: mintPublicKey,
+      });
+
       if (tokenAccounts.value.length === 0) {
         return 0;
       }
-      
+
       // Sum all token account balances for this mint
       let totalBalance = 0;
       for (const account of tokenAccounts.value) {
         const balance = account.account.data.parsed.info.tokenAmount.uiAmount || 0;
         totalBalance += balance;
       }
-      
+
       return totalBalance;
     } catch (error) {
       console.error(`Error fetching token balance for ${mintAddress}:`, error);
@@ -156,7 +154,7 @@ const Tab2: React.FC = () => {
     setIsLoading(true);
     setIsLoadingBalances(true);
     const walletAddress = walletState.publicKey.toString();
-    
+
     try {
       // Create SOL balance entry
       const solBalance = await fetchSolBalance(walletAddress);
@@ -170,21 +168,22 @@ const Tab2: React.FC = () => {
           symbol: 'SOL',
           name: 'Solana',
           decimals: 9,
-          logoUri: 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png'
-        }
+          logoUri:
+            'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png',
+        },
       };
 
       // Fetch token balances for popular tokens
       const tokenBalancesPromises = mockPopularTokens.map(async (token) => {
         const balance = await fetchTokenBalance(walletAddress, token.mint, token.decimals);
-        
+
         if (balance > 0) {
           return {
             mint: token.mint,
             amount: (balance * Math.pow(10, token.decimals)).toString(),
             decimals: token.decimals,
             uiAmount: balance,
-            tokenInfo: token
+            tokenInfo: token,
           };
         }
         return null;
@@ -195,10 +194,9 @@ const Tab2: React.FC = () => {
 
       // Combine SOL balance with token balances
       const allBalances = [solTokenBalance, ...validTokenBalances];
-      
+
       setTokenBalances(allBalances);
       setPopularTokens(mockPopularTokens);
-      
     } catch (error) {
       console.error('Failed to load token data:', error);
       showToastMessage('Failed to load token data');
@@ -208,7 +206,7 @@ const Tab2: React.FC = () => {
     }
   };
 
-  const handleRefresh = async (event: any) => {
+  const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
     await loadTokenData();
     event.detail.complete();
   };
@@ -216,9 +214,10 @@ const Tab2: React.FC = () => {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     if (query.trim()) {
-      const filtered = popularTokens.filter(token =>
-        token.symbol.toLowerCase().includes(query.toLowerCase()) ||
-        token.name.toLowerCase().includes(query.toLowerCase())
+      const filtered = popularTokens.filter(
+        (token) =>
+          token.symbol.toLowerCase().includes(query.toLowerCase()) ||
+          token.name.toLowerCase().includes(query.toLowerCase())
       );
       setSearchResults(filtered);
     } else {
@@ -272,18 +271,27 @@ const Tab2: React.FC = () => {
     return tokenBalances.reduce((total, token) => {
       const amount = parseFloat(token.amount) / Math.pow(10, token.decimals);
       let mockPrice = 0;
-      
+
       // Use more realistic mock prices
       switch (token.tokenInfo?.symbol) {
-        case 'SOL': mockPrice = 180; break;
-        case 'USDC': 
-        case 'USDT': mockPrice = 1; break;
-        case 'BONK': mockPrice = 0.000025; break;
-        case 'JUP': mockPrice = 0.75; break;
-        default: mockPrice = 0.1;
+        case 'SOL':
+          mockPrice = 180;
+          break;
+        case 'USDC':
+        case 'USDT':
+          mockPrice = 1;
+          break;
+        case 'BONK':
+          mockPrice = 0.000025;
+          break;
+        case 'JUP':
+          mockPrice = 0.75;
+          break;
+        default:
+          mockPrice = 0.1;
       }
-      
-      return total + (amount * mockPrice);
+
+      return total + amount * mockPrice;
     }, 0);
   };
 
@@ -299,37 +307,43 @@ const Tab2: React.FC = () => {
           <img src={token.tokenInfo.logoUri} alt={token.tokenInfo.symbol} />
         </div>
       ) : (
-        <div className="token-placeholder">
-          {token.tokenInfo?.symbol?.[0] || '?'}
-        </div>
+        <div className="token-placeholder">{token.tokenInfo?.symbol?.[0] || '?'}</div>
       )}
-      
+
       <div className="token-info">
         <h3 className="token-symbol">{token.tokenInfo?.symbol || 'Unknown'}</h3>
         <p className="token-name">{token.tokenInfo?.name || 'Unknown Token'}</p>
       </div>
-      
+
       <div className="token-balance">
-        <div className="token-amount">
-          {formatTokenAmount(token.amount, token.decimals)}
-        </div>
+        <div className="token-amount">{formatTokenAmount(token.amount, token.decimals)}</div>
         <div className="token-value">
-          ≈ ${(() => {
+          ≈ $
+          {(() => {
             const amount = parseFloat(token.amount) / Math.pow(10, token.decimals);
             let mockPrice = 0;
             switch (token.tokenInfo?.symbol) {
-              case 'SOL': mockPrice = 180; break;
-              case 'USDC': 
-              case 'USDT': mockPrice = 1; break;
-              case 'BONK': mockPrice = 0.000025; break;
-              case 'JUP': mockPrice = 0.75; break;
-              default: mockPrice = 0.1;
+              case 'SOL':
+                mockPrice = 180;
+                break;
+              case 'USDC':
+              case 'USDT':
+                mockPrice = 1;
+                break;
+              case 'BONK':
+                mockPrice = 0.000025;
+                break;
+              case 'JUP':
+                mockPrice = 0.75;
+                break;
+              default:
+                mockPrice = 0.1;
             }
             return (amount * mockPrice).toFixed(2);
           })()}
         </div>
       </div>
-      
+
       <div className="token-actions">
         <IonButton
           className="token-action-button"
@@ -349,7 +363,7 @@ const Tab2: React.FC = () => {
     </div>
   );
 
-  const renderLoadingItems = () => (
+  const renderLoadingItems = () =>
     Array.from({ length: 3 }, (_, index) => (
       <div key={index} className="loading-item">
         <IonSkeletonText className="loading-avatar" animated />
@@ -358,8 +372,7 @@ const Tab2: React.FC = () => {
           <IonSkeletonText className="loading-text long" animated />
         </div>
       </div>
-    ))
-  );
+    ));
 
   const renderEmptyState = () => (
     <div className="empty-state">
@@ -367,9 +380,7 @@ const Tab2: React.FC = () => {
         <IonIcon icon={wallet} />
       </div>
       <h3 className="empty-state-title">No Tokens Found</h3>
-      <p className="empty-state-description">
-        Add some tokens to your wallet to get started
-      </p>
+      <p className="empty-state-description">Add some tokens to your wallet to get started</p>
     </div>
   );
 
@@ -380,7 +391,11 @@ const Tab2: React.FC = () => {
           <IonTitle>Tokens</IonTitle>
           <IonButtons slot="end">
             {walletState.connected && (
-              <IonButton fill="clear" onClick={loadTokenData} disabled={isLoading || isLoadingBalances}>
+              <IonButton
+                fill="clear"
+                onClick={loadTokenData}
+                disabled={isLoading || isLoadingBalances}
+              >
                 <IonIcon icon={refresh} />
               </IonButton>
             )}
@@ -460,11 +475,11 @@ const Tab2: React.FC = () => {
                     Add Token
                   </IonButton>
                 </div>
-                
+
                 <IonSearchbar
                   className="token-searchbar"
                   value={searchQuery}
-                  onIonInput={(e) => handleSearch(e.detail.value!)}
+                  onIonInput={({ detail }) => handleSearch(detail.value ?? '')}
                   placeholder="Search tokens..."
                   showClearButton="focus"
                 />
@@ -483,13 +498,11 @@ const Tab2: React.FC = () => {
                   </span>
                 </div>
 
-                {isLoading || isLoadingBalances ? (
-                  renderLoadingItems()
-                ) : tokenBalances.length > 0 ? (
-                  tokenBalances.map(renderTokenItem)
-                ) : (
-                  renderEmptyState()
-                )}
+                {isLoading || isLoadingBalances
+                  ? renderLoadingItems()
+                  : tokenBalances.length > 0
+                    ? tokenBalances.map(renderTokenItem)
+                    : renderEmptyState()}
               </div>
 
               {/* Popular Tokens */}
@@ -516,16 +529,16 @@ const Tab2: React.FC = () => {
                 <div className="popular-tokens">
                   <div className="popular-tokens-title">Popular Tokens</div>
                   <div className="popular-grid">
-                                      {popularTokens.map((token) => (
-                    <div
-                      key={token.mint}
-                      className="popular-token-item"
-                      onClick={() => showToastMessage(`Add ${token.symbol} coming soon!`)}
-                    >
-                      <div className="popular-token-symbol">{token.symbol}</div>
-                      <div className="popular-token-name">{token.name}</div>
-                    </div>
-                  ))}
+                    {popularTokens.map((token) => (
+                      <div
+                        key={token.mint}
+                        className="popular-token-item"
+                        onClick={() => showToastMessage(`Add ${token.symbol} coming soon!`)}
+                      >
+                        <div className="popular-token-symbol">{token.symbol}</div>
+                        <div className="popular-token-name">{token.name}</div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
@@ -552,11 +565,11 @@ const Tab2: React.FC = () => {
                   <IonLabel position="stacked">Token Contract Address</IonLabel>
                   <IonInput
                     value={newTokenAddress}
-                    onIonChange={(e) => setNewTokenAddress(e.detail.value!)}
+                    onIonChange={({ detail }) => setNewTokenAddress(detail.value ?? '')}
                     placeholder="Enter token mint address"
                   />
                 </IonItem>
-                
+
                 <IonButton
                   className="add-token-button"
                   onClick={handleAddToken}
@@ -591,7 +604,7 @@ const Tab2: React.FC = () => {
                   <IonLabel position="stacked">Recipient Address</IonLabel>
                   <IonInput
                     value={sendAddress}
-                    onIonChange={(e) => setSendAddress(e.detail.value!)}
+                    onIonChange={({ detail }) => setSendAddress(detail.value ?? '')}
                     placeholder="Enter recipient address"
                   />
                 </IonItem>
@@ -600,21 +613,29 @@ const Tab2: React.FC = () => {
                   <IonInput
                     type="number"
                     value={sendAmount}
-                    onIonChange={(e) => setSendAmount(e.detail.value!)}
+                    onIonChange={({ detail }) => setSendAmount(detail.value ?? '')}
                     placeholder="0.00"
                   />
                 </IonItem>
-                
+
                 {selectedToken && (
-                  <div style={{ margin: '16px 0', padding: '12px', background: '#f8f9fa', borderRadius: '8px' }}>
+                  <div
+                    style={{
+                      margin: '16px 0',
+                      padding: '12px',
+                      background: '#f8f9fa',
+                      borderRadius: '8px',
+                    }}
+                  >
                     <IonText>
                       <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>
-                        Available: {formatTokenAmount(selectedToken.amount, selectedToken.decimals)} {selectedToken.tokenInfo?.symbol}
+                        Available: {formatTokenAmount(selectedToken.amount, selectedToken.decimals)}{' '}
+                        {selectedToken.tokenInfo?.symbol}
                       </p>
                     </IonText>
                   </div>
                 )}
-                
+
                 <IonButton
                   className="add-token-button"
                   onClick={handleSendToken}

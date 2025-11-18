@@ -315,22 +315,22 @@
   .trading-container {
     padding: 16px;
   }
-  
+
   .swap-card {
     padding: 20px;
     border-radius: 20px;
   }
-  
+
   .token-input-container {
     flex-direction: column;
     gap: 8px;
   }
-  
+
   .token-select-button {
     width: 100%;
     min-width: auto;
   }
-  
+
   .large-input {
     font-size: 20px;
   }
@@ -342,73 +342,73 @@
     background: rgba(31, 41, 55, 0.95);
     border: 1px solid rgba(75, 85, 99, 0.3);
   }
-  
+
   .from-section,
   .to-section {
     background: rgba(55, 65, 81, 0.6);
     border-color: rgba(75, 85, 99, 0.8);
   }
-  
+
   .section-header ion-label {
     color: #e5e7eb;
   }
-  
+
   .large-input {
     --color: #f3f4f6;
   }
-  
+
   .output-input {
     --color: #9ca3af;
   }
-  
+
   .token-select-button {
     --background: #374151;
     --color: #f3f4f6;
     --border-color: #4b5563;
   }
-  
+
   .token-select-button:hover {
     --background: #4b5563;
   }
-  
+
   .swap-switch-button {
     --background: #374151;
     --color: #9ca3af;
     --border-color: #4b5563;
   }
-  
+
   .swap-switch-button:hover {
     --background: #4b5563;
     --color: #60a5fa;
   }
-  
+
   .trade-details {
     background: rgba(55, 65, 81, 0.8);
     border-color: rgba(75, 85, 99, 0.8);
   }
-  
+
   .detail-row span:first-child {
     color: #9ca3af;
   }
-  
+
   .detail-row span:last-child {
     color: #f3f4f6;
   }
-  
+
   .token-list-item {
     --background: #374151;
     --color: #f3f4f6;
   }
-  
+
   .token-list-item:hover {
     --background: #4b5563;
   }
-  
+
   .token-list-item h2 {
     color: #f3f4f6;
   }
-  
+
   .token-list-item p {
     color: #9ca3af;
   }
-} 
+}

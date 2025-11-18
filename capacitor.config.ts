@@ -1,4 +1,10 @@
 import type { CapacitorConfig } from '@capacitor/cli';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+// This is required because Capacitor CLI commands run outside of React's build process
+// which doesn't automatically load .env files
+dotenv.config();
 
 /**
  * Capacitor Configuration
@@ -20,7 +26,7 @@ if (!appName) {
 const config: CapacitorConfig = {
   appId,
   appName,
-  webDir: 'build'
+  webDir: 'build',
 };
 
 export default config;

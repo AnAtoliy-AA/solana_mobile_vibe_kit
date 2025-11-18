@@ -6,18 +6,18 @@ export const NETWORKS: Record<string, NetworkInfo> = {
   'mainnet-beta': {
     name: 'Mainnet Beta',
     rpcUrl: 'https://api.mainnet-beta.solana.com',
-    chainId: 'mainnet-beta'
+    chainId: 'mainnet-beta',
   },
-  'testnet': {
+  testnet: {
     name: 'Testnet',
     rpcUrl: 'https://api.testnet.solana.com',
-    chainId: 'testnet'
+    chainId: 'testnet',
   },
-  'devnet': {
+  devnet: {
     name: 'Devnet',
     rpcUrl: 'https://api.devnet.solana.com',
-    chainId: 'devnet'
-  }
+    chainId: 'devnet',
+  },
 };
 
 /**
@@ -57,7 +57,11 @@ export const formatSol = (lamports: number, decimals = 4): string => {
 /**
  * Formats token amount based on decimals
  */
-export const formatTokenAmount = (amount: string, decimals: number, displayDecimals = 4): string => {
+export const formatTokenAmount = (
+  amount: string,
+  decimals: number,
+  displayDecimals = 4
+): string => {
   const parsedAmount = parseFloat(amount) / Math.pow(10, decimals);
   return parsedAmount.toFixed(displayDecimals);
 };
@@ -97,7 +101,7 @@ export const generateTransactionId = (): string => {
  * Delays execution for specified milliseconds
  */
 export const delay = (ms: number): Promise<void> => {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 /**
@@ -113,4 +117,4 @@ export const isMobile = (): boolean => {
 export const getExplorerUrl = (signature: string, network = 'mainnet-beta'): string => {
   const cluster = network === 'mainnet-beta' ? '' : `?cluster=${network}`;
   return `https://explorer.solana.com/tx/${signature}${cluster}`;
-}; 
+};

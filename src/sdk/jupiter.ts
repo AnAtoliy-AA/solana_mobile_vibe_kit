@@ -19,7 +19,21 @@ export interface JupiterQuote {
   swapMode: string;
   slippageBps: number;
   priceImpactPct: number;
-  routePlan: any[];
+  routePlan: JupiterRouteStep[];
+}
+
+export interface JupiterRouteStep {
+  poolId: string;
+  percent: number;
+  swapInfo: {
+    ammKey: string;
+    inputMint: string;
+    outputMint: string;
+    inAmount: string;
+    outAmount: string;
+    feeAmount: string;
+    feeMint: string;
+  };
 }
 
 export interface SwapTransaction {
@@ -30,7 +44,7 @@ export interface SwapTransaction {
 
 export class JupiterAPI {
   private baseUrl = 'https://quote-api.jup.ag/v6';
-  
+
   constructor(private connection: Connection) {}
 
   /**
@@ -74,7 +88,7 @@ export class JupiterAPI {
       if (!response.ok) {
         throw new Error('Failed to fetch quote');
       }
-      
+
       return await response.json();
     } catch (error) {
       console.error('Error fetching Jupiter quote:', error);
@@ -125,7 +139,7 @@ export class JupiterAPI {
    */
   deserializeTransaction(swapTransactionBase64: string): Transaction | VersionedTransaction {
     const transactionBuf = new Uint8Array(Buffer.from(swapTransactionBase64, 'base64'));
-    
+
     try {
       // Try to deserialize as versioned transaction first
       return VersionedTransaction.deserialize(transactionBuf);
@@ -138,22 +152,24 @@ export class JupiterAPI {
   /**
    * Get token account info
    */
-  async getTokenAccountInfo(walletAddress: string, mintAddress: string): Promise<any> {
+  async getTokenAccountInfo(
+    walletAddress: string,
+    mintAddress: string
+  ): Promise<ParsedTokenAccountInfo | null> {
     try {
       const walletPublicKey = new PublicKey(walletAddress);
       const mintPublicKey = new PublicKey(mintAddress);
-      
+
       // Get token accounts for the wallet
-      const response = await this.connection.getParsedTokenAccountsByOwner(
-        walletPublicKey,
-        { mint: mintPublicKey }
-      );
-      
+      const response = await this.connection.getParsedTokenAccountsByOwner(walletPublicKey, {
+        mint: mintPublicKey,
+      });
+
       if (response.value.length === 0) {
         return null;
       }
-      
-      return response.value[0].account.data.parsed.info;
+
+      return response.value[0].account.data.parsed.info as ParsedTokenAccountInfo;
     } catch (error) {
       console.error('Error getting token account info:', error);
       throw error;
@@ -184,4 +200,16 @@ export const COMMON_TOKENS = {
   JUP: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN',
   PYTH: 'HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3',
   JTO: 'jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL',
-}; 
+};
+
+interface ParsedTokenAccountInfo {
+  mint: string;
+  owner: string;
+  state?: string;
+  tokenAmount: {
+    amount: string;
+    decimals: number;
+    uiAmount: number | null;
+    uiAmountString: string;
+  };
+}

@@ -5,4 +5,4 @@ export * from './token';
 export * from './utils';
 export * from './types';
 export * from './SolanaSDK';
-export * from './jupiter'; 
+export * from './jupiter';

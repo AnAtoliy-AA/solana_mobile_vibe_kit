@@ -1,11 +1,11 @@
 import React, { createContext, useContext, ReactNode } from 'react';
-import { PrivyProvider as PrivyProviderBase, usePrivy } from '@privy-io/react-auth';
+import { PrivyProvider as PrivyProviderBase, usePrivy, User } from '@privy-io/react-auth';
 
 interface PrivyContextType {
   login: () => void;
   logout: () => void;
   authenticated: boolean;
-  user: any;
+  user: User | null;
   ready: boolean;
 }
 
@@ -23,14 +23,10 @@ const PrivyAuthWrapper: React.FC<{ children: ReactNode }> = ({ children }) => {
     logout,
     authenticated,
     user,
-    ready
+    ready,
   };
 
-  return (
-    <PrivyContext.Provider value={value}>
-      {children}
-    </PrivyContext.Provider>
-  );
+  return <PrivyContext.Provider value={value}>{children}</PrivyContext.Provider>;
 };
 
 export const PrivyProvider: React.FC<PrivyProviderProps> = ({ children }) => {
@@ -41,8 +37,8 @@ export const PrivyProvider: React.FC<PrivyProviderProps> = ({ children }) => {
   if (!privyAppId) {
     throw new Error(
       '❌ REACT_APP_PRIVY_APP_ID is required but not found in environment variables. ' +
-      'Please create a .env file with your Privy App ID. ' +
-      'See .env.example for template.'
+        'Please create a .env file with your Privy App ID. ' +
+        'See .env.example for template.'
     );
   }
 
@@ -98,4 +94,4 @@ export const usePrivyAuth = (): PrivyContextType => {
     throw new Error('usePrivyAuth must be used within a PrivyProvider');
   }
   return context;
-}; 
+};

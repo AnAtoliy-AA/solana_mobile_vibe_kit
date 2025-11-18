@@ -1,19 +1,18 @@
-import { 
-  Connection, 
-  PublicKey, 
-  Transaction, 
-  SystemProgram, 
-  LAMPORTS_PER_SOL,
+import {
+  Connection,
+  PublicKey,
+  Transaction,
+  SystemProgram,
   TransactionInstruction,
-  sendAndConfirmTransaction,
-  Keypair
 } from '@solana/web3.js';
-import { 
-  TransactionResult, 
-  SendTransactionParams, 
-  TransactionHistoryItem 
-} from './types';
+import type { TransactionResponse, VersionedTransactionResponse } from '@solana/web3.js';
+import { TransactionResult, SendTransactionParams, TransactionHistoryItem } from './types';
 import { SolanaWalletManager } from './wallet';
+
+const isVersionedTransactionResponse = (
+  transaction: TransactionResponse | VersionedTransactionResponse
+): transaction is VersionedTransactionResponse =>
+  'version' in transaction && transaction.version !== undefined;
 
 export class SolanaTransactionManager {
   private walletManager: SolanaWalletManager;
@@ -88,15 +87,14 @@ export class SolanaTransactionManager {
 
       return {
         signature,
-        success: true
+        success: true,
       };
-
     } catch (error) {
       console.error('Transaction failed:', error);
       return {
         signature: '',
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -106,7 +104,7 @@ export class SolanaTransactionManager {
    */
   async getTransactionHistory(limit = 10): Promise<TransactionHistoryItem[]> {
     const walletState = this.walletManager.getState();
-    
+
     if (!walletState.connected || !walletState.publicKey) {
       throw new Error('Wallet not connected');
     }
@@ -115,7 +113,6 @@ export class SolanaTransactionManager {
       // For demo purposes, return mock transaction history
       // In a real implementation, you would fetch from the RPC
       return this.generateMockTransactionHistory(limit);
-      
     } catch (error) {
       console.error('Error fetching transaction history:', error);
       throw error;
@@ -129,20 +126,20 @@ export class SolanaTransactionManager {
     try {
       const recipientPubkey = new PublicKey(params.recipientAddress);
       const walletState = this.walletManager.getState();
-      
+
       if (!walletState.publicKey) {
         throw new Error('Wallet not connected');
       }
 
       // Create a mock transaction to estimate fees
       const transaction = new Transaction();
-      
+
       const transferInstruction = SystemProgram.transfer({
         fromPubkey: walletState.publicKey,
         toPubkey: recipientPubkey,
         lamports: params.amount,
       });
-      
+
       transaction.add(transferInstruction);
 
       if (params.memo) {
@@ -162,7 +159,6 @@ export class SolanaTransactionManager {
       // Estimate fee
       const fee = await this.connection.getFeeForMessage(transaction.compileMessage());
       return fee.value || 5000; // Default to 5000 lamports if estimation fails
-
     } catch (error) {
       console.error('Error estimating transaction fee:', error);
       return 5000; // Default fee
@@ -172,13 +168,24 @@ export class SolanaTransactionManager {
   /**
    * Get transaction details by signature
    */
-  async getTransactionDetails(signature: string): Promise<any> {
+  async getTransactionDetails(signature: string): Promise<TransactionResponse | null> {
     try {
-      const transaction = await this.connection.getTransaction(signature);
+      const transaction = await this.connection.getTransaction(signature, {
+        maxSupportedTransactionVersion: 0,
+      });
+
+      if (!transaction) {
+        return null;
+      }
+
+      if (isVersionedTransactionResponse(transaction)) {
+        return null;
+      }
+
       return transaction;
     } catch (error) {
       console.error('Error fetching transaction details:', error);
-      throw error;
+      return null;
     }
   }
 
@@ -236,13 +243,13 @@ export class SolanaTransactionManager {
       transactions.push({
         signature: this.generateMockSignature(),
         slot: 200000000 + i,
-        blockTime: now - (i * 3600), // One hour apart
+        blockTime: now - i * 3600, // One hour apart
         confirmationStatus: 'finalized',
         err: null,
-        memo: i % 3 === 0 ? `Demo transaction ${i + 1}` : undefined
+        memo: i % 3 === 0 ? `Demo transaction ${i + 1}` : undefined,
       });
     }
 
     return transactions;
   }
-} 
+}

@@ -385,33 +385,33 @@
   .history-container {
     padding: 16px;
   }
-  
+
   .history-list,
   .filter-tabs {
     padding: 20px;
     border-radius: 20px;
   }
-  
+
   .stats-grid {
     grid-template-columns: 1fr;
     gap: 12px;
   }
-  
+
   .transaction-item {
     padding: 12px;
   }
-  
+
   .transaction-icon {
     width: 40px;
     height: 40px;
     margin-right: 12px;
     font-size: 18px;
   }
-  
+
   .filter-buttons {
     justify-content: center;
   }
-  
+
   .transaction-modal-content {
     margin: 10px;
     padding: 16px;
@@ -425,54 +425,54 @@
     background: rgba(31, 41, 55, 0.95);
     border: 1px solid rgba(75, 85, 99, 0.3);
   }
-  
+
   .history-list-title,
   .filter-tabs-header,
   .transaction-type,
   .transaction-detail-value {
     color: #f3f4f6;
   }
-  
+
   .transaction-details,
   .transaction-time,
   .transaction-detail-label,
   .empty-state-description {
     color: #9ca3af;
   }
-  
+
   .empty-state-title {
     color: #e5e7eb;
   }
-  
+
   .transaction-item {
     background: rgba(55, 65, 81, 0.8);
     border-color: rgba(75, 85, 99, 0.8);
   }
-  
+
   .transaction-item:hover {
     background: rgba(75, 85, 99, 0.9);
   }
-  
+
   .history-count {
     background: rgba(55, 65, 81, 0.8);
     color: #9ca3af;
   }
-  
+
   .filter-button {
     --background: rgba(55, 65, 81, 0.8);
     --color: #9ca3af;
   }
-  
+
   .loading-icon,
   .loading-text {
     background: #4b5563;
   }
-  
+
   .transaction-modal-content {
     background: rgba(31, 41, 55, 0.95);
     border: 1px solid rgba(75, 85, 99, 0.3);
   }
-  
+
   .transaction-detail-row {
     border-bottom-color: rgba(75, 85, 99, 0.8);
   }

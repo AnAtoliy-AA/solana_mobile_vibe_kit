@@ -15,7 +15,7 @@ export class SolanaSDK {
 
   constructor(config: SolanaSDKConfig) {
     this.config = config;
-    
+
     // Initialize managers
     this.wallet = new SolanaWalletManager(config);
     this.transaction = new SolanaTransactionManager(this.wallet);
@@ -34,7 +34,7 @@ export class SolanaSDK {
    */
   updateConfig(newConfig: Partial<SolanaSDKConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    
+
     // Reinitialize managers with new config
     this.wallet = new SolanaWalletManager(this.config);
     this.transaction = new SolanaTransactionManager(this.wallet);
@@ -76,5 +76,5 @@ export function createSolanaSDK(config: SolanaSDKConfig): SolanaSDK {
  */
 export const defaultConfig: SolanaSDKConfig = {
   network: 'devnet',
-  commitment: 'confirmed'
-}; 
+  commitment: 'confirmed',
+};

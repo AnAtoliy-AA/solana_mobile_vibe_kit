@@ -1,4 +1,4 @@
-import { Connection, PublicKey, clusterApiUrl, Transaction } from '@solana/web3.js';
+import { Connection, PublicKey, Transaction } from '@solana/web3.js';
 import { WalletState, SolanaSDKConfig } from './types';
 import { NETWORKS } from './utils';
 
@@ -21,12 +21,12 @@ export class SolanaWalletManager {
       config.rpcEndpoint || NETWORKS[config.network].rpcUrl,
       config.commitment || 'confirmed'
     );
-    
+
     this.walletState = {
       connected: false,
       connecting: false,
       publicKey: null,
-      wallet: null
+      wallet: null,
     };
   }
 
@@ -47,7 +47,7 @@ export class SolanaWalletManager {
    * Notify all listeners of state changes
    */
   private notifyStateChange(): void {
-    this.listeners.forEach(listener => listener({ ...this.walletState }));
+    this.listeners.forEach((listener) => listener({ ...this.walletState }));
   }
 
   /**
@@ -59,15 +59,15 @@ export class SolanaWalletManager {
 
     try {
       this.customAdapter = adapter;
-      
+
       this.walletState = {
         connected: true,
         connecting: false,
         publicKey: adapter.publicKey,
         wallet: {
           name: walletName,
-          type: 'custom'
-        }
+          type: 'custom',
+        },
       };
 
       this.notifyStateChange();
@@ -98,14 +98,16 @@ export class SolanaWalletManager {
 
     try {
       // Simulate connection delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       if (walletType === 'demo') {
         // ⚠️ DEMO: Generate a demo public key for testing
         // DO NOT use this wallet with real funds!
         const demoPublicKey = new PublicKey('11111111111111111111111111111112');
 
-        console.warn('⚠️ DEMO WALLET: This is a test wallet and cannot sign transactions. Do not send real funds!');
+        console.warn(
+          '⚠️ DEMO WALLET: This is a test wallet and cannot sign transactions. Do not send real funds!'
+        );
 
         this.walletState = {
           connected: true,
@@ -113,8 +115,8 @@ export class SolanaWalletManager {
           publicKey: demoPublicKey,
           wallet: {
             name: 'Demo Wallet',
-            type: walletType
-          }
+            type: walletType,
+          },
         };
       } else {
         // In a real implementation, you would use the wallet adapter here
@@ -138,7 +140,7 @@ export class SolanaWalletManager {
       connected: false,
       connecting: false,
       publicKey: null,
-      wallet: null
+      wallet: null,
     };
     this.notifyStateChange();
   }
@@ -225,7 +227,9 @@ export class SolanaWalletManager {
 
     // ⚠️ DEMO: Demo wallet cannot sign transactions
     if (this.walletState.wallet?.type === 'demo') {
-      throw new Error('❌ Demo wallet cannot sign transactions. Use a real wallet or Privy embedded wallet.');
+      throw new Error(
+        '❌ Demo wallet cannot sign transactions. Use a real wallet or Privy embedded wallet.'
+      );
     }
 
     throw new Error('No wallet adapter available');
@@ -250,4 +254,4 @@ export class SolanaWalletManager {
 
     throw new Error('No wallet adapter available');
   }
-} 
+}

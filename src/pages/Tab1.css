@@ -298,20 +298,21 @@
   .wallet-container {
     padding: 16px;
   }
-  
-  .wallet-card, .user-info-card {
+
+  .wallet-card,
+  .user-info-card {
     padding: 20px;
     border-radius: 20px;
   }
-  
+
   .balance-amount {
     font-size: 28px;
   }
-  
+
   .action-buttons {
     grid-template-columns: 1fr;
   }
-  
+
   .quick-actions-grid {
     grid-template-columns: 1fr;
   }
@@ -319,45 +320,46 @@
 
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
-  .wallet-card, .user-info-card {
+  .wallet-card,
+  .user-info-card {
     background: rgba(31, 41, 55, 0.95);
     border: 1px solid rgba(75, 85, 99, 0.3);
   }
-  
+
   .balance-amount {
     color: #f3f4f6;
   }
-  
+
   .wallet-info {
     background: rgba(55, 65, 81, 0.8);
     border-color: rgba(75, 85, 99, 0.8);
   }
-  
+
   .wallet-address-value {
     color: #f3f4f6;
   }
-  
+
   .wallet-address-label,
   .network-label,
   .balance-label,
   .balance-usd {
     color: #9ca3af;
   }
-  
+
   .action-button.secondary {
     --background: #374151;
     --color: #f3f4f6;
     --border-color: #4b5563;
   }
-  
+
   .user-details h3 {
     color: #f3f4f6;
   }
-  
+
   .user-details p {
     color: #9ca3af;
   }
-  
+
   .login-button {
     --background: rgba(31, 41, 55, 0.9);
     --color: #f3f4f6;

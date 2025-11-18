@@ -17,7 +17,7 @@ import {
   IonAlert,
   IonItem,
   IonSpinner,
-  IonText
+  IonText,
 } from '@ionic/react';
 import {
   wallet,
@@ -28,7 +28,7 @@ import {
   swapHorizontal,
   mail,
   person,
-  logOut
+  logOut,
 } from 'ionicons/icons';
 import { useSolana } from '../context/SolanaContext';
 import { usePrivyAuth } from '../context/PrivyContext';
@@ -37,15 +37,8 @@ import { formatSol, shortenAddress } from '../sdk/utils';
 import './Tab1.css';
 
 const Tab1: React.FC = () => {
-  const {
-    sdk,
-    walletState,
-    isLoading,
-    error,
-    connectWallet,
-    disconnectWallet,
-    switchNetwork
-  } = useSolana();
+  const { sdk, walletState, isLoading, error, connectWallet, disconnectWallet, switchNetwork } =
+    useSolana();
 
   const { login, logout, authenticated, user, ready } = usePrivyAuth();
   usePrivySolana();
@@ -110,7 +103,7 @@ const Tab1: React.FC = () => {
       const result = await sdk.transaction.sendSol({
         recipientAddress: sendAddress,
         amount: amountInLamports,
-        memo: sendMemo || undefined
+        memo: sendMemo || undefined,
       });
 
       if (result.success) {
@@ -165,7 +158,13 @@ const Tab1: React.FC = () => {
         <div className="wallet-container">
           {/* Error Display */}
           {error && (
-            <div className="connection-banner" style={{ background: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgba(239, 68, 68, 0.2)' }}>
+            <div
+              className="connection-banner"
+              style={{
+                background: 'rgba(239, 68, 68, 0.1)',
+                borderColor: 'rgba(239, 68, 68, 0.2)',
+              }}
+            >
               <IonText color="danger">
                 <p>{error}</p>
               </IonText>
@@ -176,12 +175,10 @@ const Tab1: React.FC = () => {
           {!authenticated && ready && (
             <div className="login-section">
               <div className="login-title">Welcome to Solana Wallet</div>
-              <div className="login-subtitle">Connect your email to access wallet features and manage your Solana assets</div>
-              <IonButton
-                className="login-button"
-                onClick={login}
-                disabled={!ready}
-              >
+              <div className="login-subtitle">
+                Connect your email to access wallet features and manage your Solana assets
+              </div>
+              <IonButton className="login-button" onClick={login} disabled={!ready}>
                 <IonIcon icon={mail} slot="start" />
                 {!ready ? 'Loading...' : 'Login with Email'}
               </IonButton>
@@ -203,7 +200,7 @@ const Tab1: React.FC = () => {
                   <IonIcon icon={logOut} />
                 </IonButton>
               </div>
-              
+
               {!walletState.connected && (
                 <IonButton
                   className="action-button primary"
@@ -226,11 +223,7 @@ const Tab1: React.FC = () => {
                 <div className="balance-section">
                   <div className="balance-label">Your Balance</div>
                   <div className="balance-amount">
-                    {refreshing ? (
-                      <IonSpinner name="dots" />
-                    ) : (
-                      `${formatSol(balance)} SOL`
-                    )}
+                    {refreshing ? <IonSpinner name="dots" /> : `${formatSol(balance)} SOL`}
                   </div>
                   <div className="balance-usd">
                     ≈ ${refreshing ? '...' : balanceInUsd.toFixed(2)} USD
@@ -242,19 +235,20 @@ const Tab1: React.FC = () => {
                   <div className="wallet-address">
                     <span className="wallet-address-label">Wallet Address</span>
                     <span className="wallet-address-value">
-                      {walletState.publicKey ? shortenAddress(walletState.publicKey.toString()) : 'Not connected'}
+                      {walletState.publicKey
+                        ? shortenAddress(walletState.publicKey.toString())
+                        : 'Not connected'}
                     </span>
                     {walletState.publicKey && (
-                      <IonButton
-                        className="copy-button"
-                        fill="clear"
-                        onClick={handleCopyAddress}
-                      >
-                        <IonIcon icon={copied ? close : copy} color={copied ? 'success' : 'primary'} />
+                      <IonButton className="copy-button" fill="clear" onClick={handleCopyAddress}>
+                        <IonIcon
+                          icon={copied ? close : copy}
+                          color={copied ? 'success' : 'primary'}
+                        />
                       </IonButton>
                     )}
                   </div>
-                  
+
                   <div className="network-info">
                     <span className="network-label">Network</span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -317,10 +311,13 @@ const Tab1: React.FC = () => {
                   </div>
                   <div className="quick-action-label">Copy Address</div>
                 </div>
-                <div className="quick-action-item" onClick={async () => {
-                  if (authenticated) await logout();
-                  await disconnectWallet();
-                }}>
+                <div
+                  className="quick-action-item"
+                  onClick={async () => {
+                    if (authenticated) await logout();
+                    await disconnectWallet();
+                  }}
+                >
                   <div className="quick-action-icon">
                     <IonIcon icon={logOut} />
                   </div>
@@ -350,7 +347,7 @@ const Tab1: React.FC = () => {
                   <IonLabel position="stacked">Recipient Address</IonLabel>
                   <IonInput
                     value={sendAddress}
-                    onIonChange={(e) => setSendAddress(e.detail.value!)}
+                    onIonChange={(event) => setSendAddress(event.detail.value ?? '')}
                     placeholder="Enter Solana address"
                   />
                 </IonItem>
@@ -359,7 +356,7 @@ const Tab1: React.FC = () => {
                   <IonInput
                     type="number"
                     value={sendAmount}
-                    onIonChange={(e) => setSendAmount(e.detail.value!)}
+                    onIonChange={(event) => setSendAmount(event.detail.value ?? '')}
                     placeholder="0.00"
                   />
                 </IonItem>
@@ -367,11 +364,11 @@ const Tab1: React.FC = () => {
                   <IonLabel position="stacked">Memo (Optional)</IonLabel>
                   <IonInput
                     value={sendMemo}
-                    onIonChange={(e) => setSendMemo(e.detail.value!)}
+                    onIonChange={(event) => setSendMemo(event.detail.value ?? '')}
                     placeholder="Transaction memo"
                   />
                 </IonItem>
-                
+
                 <IonButton
                   className="action-button primary"
                   onClick={handleSendTransaction}
@@ -395,20 +392,20 @@ const Tab1: React.FC = () => {
           buttons={[
             {
               text: 'Cancel',
-              role: 'cancel'
+              role: 'cancel',
             },
             {
               text: 'Mainnet',
-              handler: () => switchNetwork('mainnet-beta')
+              handler: () => switchNetwork('mainnet-beta'),
             },
             {
               text: 'Testnet',
-              handler: () => switchNetwork('testnet')
+              handler: () => switchNetwork('testnet'),
             },
             {
               text: 'Devnet',
-              handler: () => switchNetwork('devnet')
-            }
+              handler: () => switchNetwork('devnet'),
+            },
           ]}
         />
 
