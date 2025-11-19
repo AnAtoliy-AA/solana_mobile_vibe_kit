@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { RefresherEventDetail } from '@ionic/core';
 import {
   IonContent,
@@ -43,6 +43,53 @@ interface Transaction {
   to?: string;
 }
 
+const MOCK_TRANSACTIONS: Transaction[] = [
+  {
+    signature: '3nF7Q8g9L2mK5H8p9WxYzN6v4R7e1TdS2aB8cE9fG3hI4jK5lM6nO7pQ8rS9tU0vW1xY2z',
+    type: 'send',
+    amount: -0.5,
+    token: 'SOL',
+    status: 'confirmed',
+    timestamp: Date.now() - 3600000, // 1 hour ago
+    to: '7xKXtg2CW3UuvBFbEhC1GZGgCCWjB1Z2N8V9QmRpXzHe',
+  },
+  {
+    signature: '2mE6P7f8K1jH4G5d6CxVyM5u3Q6w0RdQ1zA7bD8eF2gH3iJ4kL5mN6oP7qR8sT9uV0wX1y',
+    type: 'receive',
+    amount: 1.25,
+    token: 'SOL',
+    status: 'confirmed',
+    timestamp: Date.now() - 7200000, // 2 hours ago
+    from: '9yMXsg3DX2VuuBGcFhD2HZHgDDXkC2A3O9W0RnSpYzIf',
+  },
+  {
+    signature: '1lD5O6e7J0iG3F4c5BwUxL4t2P5v9QcP0yZ6aE7dE1fG2hH3jK4lM5nN6pP7qR8sT9uV0w',
+    type: 'swap',
+    amount: 0,
+    token: 'USDC',
+    status: 'confirmed',
+    timestamp: Date.now() - 14400000, // 4 hours ago
+  },
+  {
+    signature: '0kC4N5d6I9hF2E3b4AvTwK3s1O4u8PbO9xY5aD6cD0eF1gG2hJ3kL4mM5oN6pP7qR8sT9u',
+    type: 'send',
+    amount: -100,
+    token: 'USDC',
+    status: 'pending',
+    timestamp: Date.now() - 1800000, // 30 minutes ago
+    to: '5vJWrg1CW2UtvAEaEhB0FYFgBBWiA0Y1M7V8QlQpWzGd',
+  },
+  {
+    signature: '9jB3M4c5H8gE1D2a3ZuSvJ2r0N3t7OaF8wX4aG5bG9dE0fF1gH2iI3kL4mM5nN6oP7qR8s',
+    type: 'receive',
+    amount: 2500000,
+    token: 'BONK',
+    status: 'confirmed',
+    timestamp: Date.now() - 86400000, // 1 day ago
+    from: '3uHWpf2BV1UssZDaChA9EXEgAAViZ9X0L6U7PlPpVzEe',
+  },
+];
+
 const Tab3: React.FC = () => {
   const { walletState } = useSolana();
   const { authenticated } = usePrivyAuth();
@@ -59,53 +106,25 @@ const Tab3: React.FC = () => {
   const senderAddress = selectedTransaction?.from;
   const recipientAddress = selectedTransaction?.to;
 
-  // Mock transaction data
-  const mockTransactions: Transaction[] = [
-    {
-      signature: '3nF7Q8g9L2mK5H8p9WxYzN6v4R7e1TdS2aB8cE9fG3hI4jK5lM6nO7pQ8rS9tU0vW1xY2z',
-      type: 'send',
-      amount: -0.5,
-      token: 'SOL',
-      status: 'confirmed',
-      timestamp: Date.now() - 3600000, // 1 hour ago
-      to: '7xKXtg2CW3UuvBFbEhC1GZGgCCWjB1Z2N8V9QmRpXzHe',
-    },
-    {
-      signature: '2mE6P7f8K1jH4G5d6CxVyM5u3Q6w0RdQ1zA7bD8eF2gH3iJ4kL5mN6oP7qR8sT9uV0wX1y',
-      type: 'receive',
-      amount: 1.25,
-      token: 'SOL',
-      status: 'confirmed',
-      timestamp: Date.now() - 7200000, // 2 hours ago
-      from: '9yMXsg3DX2VuuBGcFhD2HZHgDDXkC2A3O9W0RnSpYzIf',
-    },
-    {
-      signature: '1lD5O6e7J0iG3F4c5BwUxL4t2P5v9QcP0yZ6aE7dE1fG2hH3jK4lM5nN6pP7qR8sT9uV0w',
-      type: 'swap',
-      amount: 0,
-      token: 'USDC',
-      status: 'confirmed',
-      timestamp: Date.now() - 14400000, // 4 hours ago
-    },
-    {
-      signature: '0kC4N5d6I9hF2E3b4AvTwK3s1O4u8PbO9xY5aD6cD0eF1gG2hJ3kL4mM5oN6pP7qR8sT9u',
-      type: 'send',
-      amount: -100,
-      token: 'USDC',
-      status: 'pending',
-      timestamp: Date.now() - 1800000, // 30 minutes ago
-      to: '5vJWrg1CW2UtvAEaEhB0FYFgBBWiA0Y1M7V8QlQpWzGd',
-    },
-    {
-      signature: '9jB3M4c5H8gE1D2a3ZuSvJ2r0N3t7OaF8wX4aG5bG9dE0fF1gH2iI3kL4mM5nN6oP7qR8s',
-      type: 'receive',
-      amount: 2500000,
-      token: 'BONK',
-      status: 'confirmed',
-      timestamp: Date.now() - 86400000, // 1 day ago
-      from: '3uHWpf2BV1UssZDaChA9EXEgAAViZ9X0L6U7PlPpVzEe',
-    },
-  ];
+  const showToastMessage = useCallback((message: string) => {
+    setToastMessage(message);
+    setShowToast(true);
+  }, []);
+
+  const loadTransactionHistory = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      // In a real app, you would fetch actual transaction history
+      // For now, use mock data
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate loading
+      setTransactions(MOCK_TRANSACTIONS);
+    } catch (error) {
+      console.error('Failed to load transaction history:', error);
+      showToastMessage('Failed to load transaction history');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [showToastMessage]);
 
   useEffect(() => {
     if (walletState.connected) {
@@ -114,34 +133,15 @@ const Tab3: React.FC = () => {
       setTransactions([]);
       setFilteredTransactions([]);
     }
-  }, [walletState.connected]);
+  }, [walletState.connected, loadTransactionHistory]);
 
   useEffect(() => {
-    filterTransactions();
-  }, [transactions, activeFilter]);
-
-  const loadTransactionHistory = async () => {
-    setIsLoading(true);
-    try {
-      // In a real app, you would fetch actual transaction history
-      // For now, use mock data
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate loading
-      setTransactions(mockTransactions);
-    } catch (error) {
-      console.error('Failed to load transaction history:', error);
-      showToastMessage('Failed to load transaction history');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const filterTransactions = () => {
     if (activeFilter === 'all') {
       setFilteredTransactions(transactions);
-    } else {
-      setFilteredTransactions(transactions.filter((tx) => tx.type === activeFilter));
+      return;
     }
-  };
+    setFilteredTransactions(transactions.filter((tx) => tx.type === activeFilter));
+  }, [transactions, activeFilter]);
 
   const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
     await loadTransactionHistory();
@@ -162,14 +162,10 @@ const Tab3: React.FC = () => {
     }
   };
 
-  const openInExplorer = (signature: string) => {
-    const explorerUrl = `https://explorer.solana.com/tx/${signature}`;
-    window.open(explorerUrl, '_blank');
-  };
+  const getExplorerUrl = (signature: string) => `https://explorer.solana.com/tx/${signature}`;
 
-  const showToastMessage = (message: string) => {
-    setToastMessage(message);
-    setShowToast(true);
+  const openInExplorer = (signature: string) => {
+    window.open(getExplorerUrl(signature), '_blank', 'noopener,noreferrer');
   };
 
   const formatAmount = (amount: number, token: string) => {
@@ -447,12 +443,10 @@ const Tab3: React.FC = () => {
                   <span className="transaction-detail-label">Signature</span>
                   <span className="transaction-detail-value">
                     <a
-                      href="#"
+                      href={getExplorerUrl(selectedTransaction.signature)}
+                      target="_blank"
+                      rel="noreferrer"
                       className="signature-link"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        openInExplorer(selectedTransaction.signature);
-                      }}
                     >
                       View on Explorer
                     </a>

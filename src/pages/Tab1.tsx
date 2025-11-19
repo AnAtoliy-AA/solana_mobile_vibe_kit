@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   IonContent,
   IonHeader,
@@ -57,15 +57,12 @@ const Tab1: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    if (walletState.connected) {
-      fetchBalance();
-    } else {
+  const fetchBalance = useCallback(async () => {
+    if (!sdk?.wallet) {
       setBalance(0);
+      return;
     }
-  }, [walletState.connected]);
 
-  const fetchBalance = async () => {
     try {
       const balanceInLamports = await sdk.wallet.getBalance();
       setBalance(balanceInLamports);
@@ -73,7 +70,15 @@ const Tab1: React.FC = () => {
       console.error('Failed to fetch balance:', err);
       showToastMessage(t.failedToFetchBalance);
     }
-  };
+  }, [sdk, t]);
+
+  useEffect(() => {
+    if (walletState.connected) {
+      fetchBalance();
+    } else {
+      setBalance(0);
+    }
+  }, [walletState.connected, fetchBalance]);
 
   const handleRefresh = async () => {
     setRefreshing(true);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   IonContent,
   IonHeader,
@@ -38,14 +38,63 @@ interface Token {
   balance?: number;
 }
 
+const DEFAULT_TOKENS: Token[] = [
+  {
+    symbol: 'SOL',
+    name: 'Solana',
+    mintAddress: 'So11111111111111111111111111111111111111112',
+    decimals: 9,
+    logoURI:
+      'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png',
+    balance: 0,
+  },
+  {
+    symbol: 'USDC',
+    name: 'USD Coin',
+    mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+    decimals: 6,
+    logoURI:
+      'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
+    balance: 0,
+  },
+  {
+    symbol: 'USDT',
+    name: 'Tether USD',
+    mintAddress: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
+    decimals: 6,
+    logoURI:
+      'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/logo.png',
+    balance: 0,
+  },
+  {
+    symbol: 'BONK',
+    name: 'Bonk',
+    mintAddress: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
+    decimals: 5,
+    logoURI: 'https://arweave.net/hQiPZOsRZXGXBJd_82PhVdlM_hACsT_q6wqwf5cSY7I',
+    balance: 0,
+  },
+  {
+    symbol: 'JUP',
+    name: 'Jupiter',
+    mintAddress: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN',
+    decimals: 6,
+    logoURI: 'https://static.jup.ag/jup/icon.png',
+    balance: 0,
+  },
+];
+
+const createDefaultTokens = (): Token[] => DEFAULT_TOKENS.map((token) => ({ ...token }));
+
 const Tab4: React.FC = () => {
   const { sdk, walletState, isLoading: walletLoading } = useSolana();
   const { authenticated } = usePrivyAuth();
   usePrivySolana();
 
   // State for trading
-  const [inputToken, setInputToken] = useState<Token | null>(null);
-  const [outputToken, setOutputToken] = useState<Token | null>(null);
+  const [tokenList, setTokenList] = useState<Token[]>(() => createDefaultTokens());
+  const [inputToken, setInputToken] = useState<Token | null>(() => createDefaultTokens()[0]);
+  const [outputToken, setOutputToken] = useState<Token | null>(() => createDefaultTokens()[1]);
   const [inputAmount, setInputAmount] = useState<string>('');
   const [outputAmount, setOutputAmount] = useState<string>('');
   const [slippage, setSlippage] = useState<number>(0.5);
@@ -54,7 +103,6 @@ const Tab4: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'success' | 'danger'>('success');
-  const [tokenList, setTokenList] = useState<Token[]>([]);
   const [priceImpact, setPriceImpact] = useState<number | null>(null);
   const [exchangeRate, setExchangeRate] = useState<string>('');
 
@@ -65,106 +113,61 @@ const Tab4: React.FC = () => {
   const [tokenSearchText, setTokenSearchText] = useState('');
   const [isLoadingBalances, setIsLoadingBalances] = useState(false);
 
-  // Popular tokens on Solana - balances will be fetched from wallet
-  const defaultTokens: Token[] = [
-    {
-      symbol: 'SOL',
-      name: 'Solana',
-      mintAddress: 'So11111111111111111111111111111111111111112',
-      decimals: 9,
-      logoURI:
-        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png',
-      balance: 0,
-    },
-    {
-      symbol: 'USDC',
-      name: 'USD Coin',
-      mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-      decimals: 6,
-      logoURI:
-        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
-      balance: 0,
-    },
-    {
-      symbol: 'USDT',
-      name: 'Tether USD',
-      mintAddress: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
-      decimals: 6,
-      logoURI:
-        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/logo.png',
-      balance: 0,
-    },
-    {
-      symbol: 'BONK',
-      name: 'Bonk',
-      mintAddress: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',
-      decimals: 5,
-      logoURI: 'https://arweave.net/hQiPZOsRZXGXBJd_82PhVdlM_hACsT_q6wqwf5cSY7I',
-      balance: 0,
-    },
-    {
-      symbol: 'JUP',
-      name: 'Jupiter',
-      mintAddress: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN',
-      decimals: 6,
-      logoURI: 'https://static.jup.ag/jup/icon.png',
-      balance: 0,
-    },
-  ];
-
   // Fetch SOL balance
-  const fetchSolBalance = async (walletAddress: string): Promise<number> => {
-    try {
-      const connection = sdk?.wallet?.getConnection();
-      if (!connection) return 0;
+  const fetchSolBalance = useCallback(
+    async (walletAddress: string): Promise<number> => {
+      try {
+        const connection = sdk?.wallet?.getConnection();
+        if (!connection) return 0;
 
-      const publicKey = new PublicKey(walletAddress);
-      const balance = await connection.getBalance(publicKey);
-      return balance / 1e9; // Convert lamports to SOL
-    } catch (error) {
-      console.error('Error fetching SOL balance:', error);
-      return 0;
-    }
-  };
-
-  // Fetch token balance for a specific mint
-  const fetchTokenBalance = async (
-    walletAddress: string,
-    mintAddress: string,
-    _decimals: number
-  ): Promise<number> => {
-    try {
-      const connection = sdk?.wallet?.getConnection();
-      if (!connection) return 0;
-
-      const walletPublicKey = new PublicKey(walletAddress);
-      const mintPublicKey = new PublicKey(mintAddress);
-
-      // Get token accounts for this mint
-      const tokenAccounts = await connection.getParsedTokenAccountsByOwner(walletPublicKey, {
-        mint: mintPublicKey,
-      });
-
-      if (tokenAccounts.value.length === 0) {
+        const publicKey = new PublicKey(walletAddress);
+        const balance = await connection.getBalance(publicKey);
+        return balance / 1e9; // Convert lamports to SOL
+      } catch (error) {
+        console.error('Error fetching SOL balance:', error);
         return 0;
       }
+    },
+    [sdk]
+  );
 
-      // Sum all token account balances for this mint
-      let totalBalance = 0;
-      for (const account of tokenAccounts.value) {
-        const balance = account.account.data.parsed.info.tokenAmount.uiAmount || 0;
-        totalBalance += balance;
+  // Fetch token balance for a specific mint
+  const fetchTokenBalance = useCallback(
+    async (walletAddress: string, mintAddress: string, _decimals: number): Promise<number> => {
+      try {
+        const connection = sdk?.wallet?.getConnection();
+        if (!connection) return 0;
+
+        const walletPublicKey = new PublicKey(walletAddress);
+        const mintPublicKey = new PublicKey(mintAddress);
+
+        // Get token accounts for this mint
+        const tokenAccounts = await connection.getParsedTokenAccountsByOwner(walletPublicKey, {
+          mint: mintPublicKey,
+        });
+
+        if (tokenAccounts.value.length === 0) {
+          return 0;
+        }
+
+        // Sum all token account balances for this mint
+        let totalBalance = 0;
+        for (const account of tokenAccounts.value) {
+          const balance = account.account.data.parsed.info.tokenAmount.uiAmount || 0;
+          totalBalance += balance;
+        }
+
+        return totalBalance;
+      } catch (error) {
+        console.error(`Error fetching token balance for ${mintAddress}:`, error);
+        return 0;
       }
-
-      return totalBalance;
-    } catch (error) {
-      console.error(`Error fetching token balance for ${mintAddress}:`, error);
-      return 0;
-    }
-  };
+    },
+    [sdk]
+  );
 
   // Fetch all token balances
-  const fetchAllBalances = async () => {
+  const fetchAllBalances = useCallback(async () => {
     if (!walletState.connected || !walletState.publicKey) {
       return;
     }
@@ -174,7 +177,7 @@ const Tab4: React.FC = () => {
 
     try {
       const updatedTokens = await Promise.all(
-        defaultTokens.map(async (token) => {
+        DEFAULT_TOKENS.map(async (token) => {
           let balance = 0;
 
           if (token.symbol === 'SOL') {
@@ -194,20 +197,15 @@ const Tab4: React.FC = () => {
 
       setTokenList(updatedTokens);
 
-      // Update current input/output tokens with new balances
-      if (inputToken) {
-        const updatedInputToken = updatedTokens.find(
-          (t) => t.mintAddress === inputToken.mintAddress
-        );
-        if (updatedInputToken) setInputToken(updatedInputToken);
-      }
+      setInputToken((prev) => {
+        if (!prev) return prev;
+        return updatedTokens.find((t) => t.mintAddress === prev.mintAddress) ?? prev;
+      });
 
-      if (outputToken) {
-        const updatedOutputToken = updatedTokens.find(
-          (t) => t.mintAddress === outputToken.mintAddress
-        );
-        if (updatedOutputToken) setOutputToken(updatedOutputToken);
-      }
+      setOutputToken((prev) => {
+        if (!prev) return prev;
+        return updatedTokens.find((t) => t.mintAddress === prev.mintAddress) ?? prev;
+      });
     } catch (error) {
       console.error('Error fetching balances:', error);
       setToastMessage('Failed to fetch token balances');
@@ -216,13 +214,7 @@ const Tab4: React.FC = () => {
     } finally {
       setIsLoadingBalances(false);
     }
-  };
-
-  useEffect(() => {
-    setTokenList(defaultTokens);
-    setInputToken(defaultTokens[0]); // SOL
-    setOutputToken(defaultTokens[1]); // USDC
-  }, []);
+  }, [walletState.connected, walletState.publicKey, fetchSolBalance, fetchTokenBalance]);
 
   // Fetch balances when wallet connects
   useEffect(() => {
@@ -230,14 +222,15 @@ const Tab4: React.FC = () => {
       fetchAllBalances();
     } else {
       // Reset to default tokens with zero balances when wallet disconnects
-      setTokenList(defaultTokens);
-      if (inputToken) setInputToken({ ...inputToken, balance: 0 });
-      if (outputToken) setOutputToken({ ...outputToken, balance: 0 });
+      const defaults = createDefaultTokens();
+      setTokenList(defaults);
+      setInputToken(defaults[0]);
+      setOutputToken(defaults[1]);
     }
-  }, [walletState.connected, walletState.publicKey, sdk?.wallet]);
+  }, [walletState.connected, walletState.publicKey, sdk, fetchAllBalances]);
 
   // Fetch quote from Jupiter
-  const fetchQuote = async () => {
+  const fetchQuote = useCallback(async () => {
     if (!inputToken || !outputToken || !inputAmount || parseFloat(inputAmount) === 0) {
       setOutputAmount('');
       setExchangeRate('');
@@ -277,7 +270,7 @@ const Tab4: React.FC = () => {
     } finally {
       setIsLoadingQuote(false);
     }
-  };
+  }, [inputAmount, inputToken, outputToken, slippage]);
 
   // Debounced quote fetching
   useEffect(() => {
@@ -288,7 +281,7 @@ const Tab4: React.FC = () => {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [inputAmount, inputToken, outputToken, slippage]);
+  }, [inputAmount, inputToken, outputToken, slippage, fetchQuote]);
 
   const handleSwap = async () => {
     if (!walletState.connected || !inputToken || !outputToken || !inputAmount) {

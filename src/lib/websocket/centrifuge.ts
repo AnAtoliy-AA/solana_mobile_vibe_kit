@@ -156,7 +156,7 @@ export const isConnected = (): boolean => {
   return centrifugeInstance?.state === 'connected';
 };
 
-export default {
+const centrifugeClient = {
   init: initCentrifuge,
   get: getCentrifuge,
   subscribe,
@@ -164,3 +164,5 @@ export default {
   disconnect,
   isConnected,
 };
+
+export default centrifugeClient;

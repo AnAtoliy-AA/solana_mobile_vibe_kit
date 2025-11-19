@@ -268,7 +268,7 @@ export const subscribeToPumpfunTokenUpdates = (
         // Failed to parse pumpfun token update
       }
     },
-    (error) => {
+    () => {
       // Pumpfun token updates subscription error
     }
   );

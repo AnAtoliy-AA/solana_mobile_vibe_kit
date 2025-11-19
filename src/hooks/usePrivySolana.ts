@@ -130,7 +130,7 @@ export const usePrivySolana = () => {
     };
 
     handlePrivyAuth();
-  }, [authenticated, user?.id, walletSignature, sdk]);
+  }, [authenticated, user, walletSignature, sdk, wallets]);
 
   return { authenticated, user, wallets };
 };
