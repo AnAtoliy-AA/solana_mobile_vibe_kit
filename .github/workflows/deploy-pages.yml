@@ -33,6 +33,20 @@ jobs:
         run: npm ci
 
       - name: Build
+        env:
+          PUBLIC_URL: /solana_mobile_vibe_kit
+          REACT_APP_PROXY_URL: ${{ vars.REACT_APP_PROXY_URL }}
+          REACT_APP_PRIVY_APP_ID: ${{ vars.REACT_APP_PRIVY_APP_ID }}
+          REACT_APP_PRIVY_LOGO_URL: ${{ vars.REACT_APP_PRIVY_LOGO_URL }}
+          REACT_APP_PRIVY_THEME: ${{ vars.REACT_APP_PRIVY_THEME }}
+          REACT_APP_PRIVY_ACCENT_COLOR: ${{ vars.REACT_APP_PRIVY_ACCENT_COLOR }}
+          REACT_APP_LAUNCHPAD_WS_URL: ${{ vars.REACT_APP_LAUNCHPAD_WS_URL }}
+          REACT_APP_CENTRIFUGE_KEY: ${{ secrets.REACT_APP_CENTRIFUGE_KEY }}
+          REACT_APP_LAUNCHPAD_USE_MOCK: ${{ vars.REACT_APP_LAUNCHPAD_USE_MOCK }}
+          REACT_APP_WS_RECONNECT_DELAY: ${{ vars.REACT_APP_WS_RECONNECT_DELAY }}
+          REACT_APP_WS_MAX_RECONNECT_ATTEMPTS: ${{ vars.REACT_APP_WS_MAX_RECONNECT_ATTEMPTS }}
+          REACT_APP_API_TIMEOUT: ${{ vars.REACT_APP_API_TIMEOUT }}
+          REACT_APP_API_RETRY_ATTEMPTS: ${{ vars.REACT_APP_API_RETRY_ATTEMPTS }}
         run: npm run build
 
       - name: Upload artifact

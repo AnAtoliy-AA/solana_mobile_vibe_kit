@@ -10,15 +10,23 @@ interface ErrorResponseData {
   message?: string;
 }
 
-// Use proxy in development to avoid CORS issues
-// The API server sends duplicate CORS headers when Origin is localhost
-// The proxy sets Origin: https://launch.meme to match server expectations
+// Use proxy to avoid CORS issues
+// The API server sends duplicate CORS headers which causes browsers to reject requests
+// In development: proxy through webpack dev server (config-overrides.js)
+// In production: use Cloudflare Worker or similar proxy (see PROXY_SETUP.md)
 const getApiBaseUrl = (): string => {
-  // Use proxy in development, direct URL in production
-  if (process.env.NODE_ENV === 'development') {
-    return '/api'; // Proxied through setupProxy.js
+  // Use CORS proxy if configured (for production)
+  if (process.env.REACT_APP_PROXY_URL) {
+    return process.env.REACT_APP_PROXY_URL;
   }
-  return 'https://launch.meme/api/'; // Direct call in production
+
+  // Use webpack dev server proxy in development
+  if (process.env.NODE_ENV === 'development') {
+    return '/api'; // Proxied through config-overrides.js
+  }
+
+  // Fallback to direct API call (may have CORS issues)
+  return 'https://launch.meme/api/';
 };
 
 const API_BASE_URL = getApiBaseUrl();
@@ -72,10 +80,20 @@ apiClient.interceptors.response.use(
     }
 
     // Retry logic with exponential backoff
-    if (config.retryCount < MAX_RETRIES && error.response?.status && error.response.status >= 500) {
+    // Retry on 5xx errors OR network/CORS errors
+    const shouldRetry =
+      config.retryCount < MAX_RETRIES &&
+      ((error.response?.status && error.response.status >= 500) ||
+        (!error.response && error.request) || // Network error
+        error.message?.toLowerCase().includes('cors')); // CORS error
+
+    if (shouldRetry) {
       config.retryCount += 1;
       const delay = Math.pow(2, config.retryCount) * 1000; // Exponential backoff
 
+      console.warn(
+        `Retrying request (attempt ${config.retryCount}/${MAX_RETRIES}) after ${delay}ms...`
+      );
       await new Promise((resolve) => setTimeout(resolve, delay));
 
       return apiClient(config);
@@ -94,10 +112,20 @@ export const handleApiError = (error: Error | AxiosError): string => {
       return data?.message || `Error: ${error.response.status}`;
     } else if (error.request) {
       // Request made but no response
+      // Check if it's a CORS error
+      if (
+        error.message.toLowerCase().includes('cors') ||
+        error.message.toLowerCase().includes('network error')
+      ) {
+        return 'API temporarily unavailable due to network error. Please try again.';
+      }
       return 'Network error. Please check your connection.';
     }
   }
   // Something else happened
+  if (error.message.toLowerCase().includes('cors')) {
+    return 'API temporarily unavailable due to network error. Please try again.';
+  }
   return error.message || 'An unexpected error occurred.';
 };
 

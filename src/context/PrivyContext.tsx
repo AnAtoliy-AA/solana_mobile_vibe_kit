@@ -33,13 +33,31 @@ export const PrivyProvider: React.FC<PrivyProviderProps> = ({ children }) => {
   // SECURITY: All configuration loaded from environment variables
   const privyAppId = process.env.REACT_APP_PRIVY_APP_ID;
 
-  // Validate required environment variables
+  // Fallback mode when Privy configuration is missing (e.g., public demo builds)
   if (!privyAppId) {
-    throw new Error(
-      '❌ REACT_APP_PRIVY_APP_ID is required but not found in environment variables. ' +
-        'Please create a .env file with your Privy App ID. ' +
-        'See .env.example for template.'
-    );
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(
+        'REACT_APP_PRIVY_APP_ID is not set. Privy authentication features are disabled.'
+      );
+    }
+
+    const disabledValue: PrivyContextType = {
+      login: () => {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Privy login requested but Privy is not configured.');
+        }
+      },
+      logout: () => {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Privy logout requested but Privy is not configured.');
+        }
+      },
+      authenticated: false,
+      user: null,
+      ready: false,
+    };
+
+    return <PrivyContext.Provider value={disabledValue}>{children}</PrivyContext.Provider>;
   }
 
   // Load optional configuration from environment

@@ -64,7 +64,7 @@ const App: React.FC = () => (
       <ThemeInitializer>
         <PrivyProvider>
           <SolanaProvider>
-            <IonReactRouter>
+            <IonReactRouter basename={process.env.PUBLIC_URL || '/'}>
               <IonTabs>
                 <IonRouterOutlet>
                   <Route exact path="/tab1">
