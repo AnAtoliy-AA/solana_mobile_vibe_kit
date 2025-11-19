@@ -2,6 +2,7 @@
   "name": "solana-mobile-sdk",
   "version": "0.1.0",
   "description": "A comprehensive SDK for developing Solana applications on iOS and Android using Ionic, Capacitor, and React",
+  "homepage": "https://AnAtoliy-AA.github.io/solana_mobile_vibe_kit",
   "keywords": [
     "solana",
     "mobile",
