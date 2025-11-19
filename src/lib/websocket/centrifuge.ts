@@ -1,13 +1,6 @@
 // Centrifuge WebSocket client for real-time updates
 
-import {
-  Centrifuge,
-  Subscription,
-  PublicationContext,
-  SubscribedContext,
-  UnsubscribedContext,
-  SubscriptionErrorContext,
-} from 'centrifuge';
+import { Centrifuge, Subscription, PublicationContext, SubscriptionErrorContext } from 'centrifuge';
 
 const WS_URL = process.env.REACT_APP_LAUNCHPAD_WS_URL || 'wss://launch.meme/connection/websocket';
 const CENTRIFUGE_KEY = process.env.REACT_APP_CENTRIFUGE_KEY || '';
@@ -25,9 +18,6 @@ let reconnectAttempts = 0;
  */
 export const initCentrifuge = (): CentrifugeInstance | null => {
   if (USE_MOCK) {
-    if (process.env.NODE_ENV === 'development') {
-      console.info('📡 WebSocket: Running in mock mode');
-    }
     return null;
   }
 
@@ -36,9 +26,6 @@ export const initCentrifuge = (): CentrifugeInstance | null => {
   }
 
   if (!CENTRIFUGE_KEY) {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('⚠️ REACT_APP_CENTRIFUGE_KEY not set - WebSocket disabled');
-    }
     return null;
   }
 
@@ -51,38 +38,17 @@ export const initCentrifuge = (): CentrifugeInstance | null => {
     // Connection event handlers
     centrifugeInstance.on('connected', () => {
       reconnectAttempts = 0;
-      if (process.env.NODE_ENV === 'development') {
-        console.info('✅ WebSocket connected');
-      }
     });
 
-    centrifugeInstance.on('disconnected', (ctx) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('⚠️ WebSocket disconnected:', ctx.reason);
-      }
-    });
-
-    centrifugeInstance.on('error', (ctx) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('❌ WebSocket error:', ctx);
-      }
-
+    centrifugeInstance.on('error', () => {
       // Handle reconnection with exponential backoff
       if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
         reconnectAttempts++;
         const delay = RECONNECT_DELAY * Math.pow(2, reconnectAttempts - 1);
 
-        if (process.env.NODE_ENV === 'development') {
-          console.info(
-            `🔄 Reconnecting in ${delay}ms (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`
-          );
-        }
-
         setTimeout(() => {
           centrifugeInstance?.connect();
         }, delay);
-      } else if (process.env.NODE_ENV === 'development') {
-        console.error('❌ Max reconnection attempts reached');
       }
     });
 
@@ -120,7 +86,32 @@ export const subscribe = (
   }
 
   try {
-    const subscription = centrifuge.newSubscription(channel);
+    // Check if subscription already exists
+    let subscription = centrifuge.getSubscription(channel);
+
+    if (subscription) {
+      // Remove old listeners to avoid duplicates
+      subscription.removeAllListeners();
+
+      // Re-attach handlers to existing subscription
+      subscription.on('publication', (ctx: PublicationContext) => {
+        onMessage(ctx.data);
+      });
+
+      subscription.on('error', (ctx: SubscriptionErrorContext) => {
+        onError?.(ctx.error);
+      });
+
+      // Re-subscribe if needed
+      if (subscription.state !== 'subscribed') {
+        subscription.subscribe();
+      }
+
+      return subscription;
+    }
+
+    // Create new subscription
+    subscription = centrifuge.newSubscription(channel);
 
     subscription.on('publication', (ctx: PublicationContext) => {
       onMessage(ctx.data);
@@ -128,14 +119,6 @@ export const subscribe = (
 
     subscription.on('error', (ctx: SubscriptionErrorContext) => {
       onError?.(ctx.error);
-    });
-
-    subscription.on('subscribed', (_ctx: SubscribedContext) => {
-      // Subscribed successfully
-    });
-
-    subscription.on('unsubscribed', (_ctx: UnsubscribedContext) => {
-      // Unsubscribed successfully
     });
 
     subscription.subscribe();

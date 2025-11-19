@@ -1,0 +1,46 @@
+.last-updated {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--ion-color-medium);
+  font-weight: 500;
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+.last-updated-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--ion-color-success);
+  display: inline-block;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Tooltip on hover */
+.last-updated:hover {
+  color: var(--ion-color-primary);
+  cursor: help;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .last-updated {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .last-updated:hover {
+    color: var(--ion-color-primary);
+  }
+}

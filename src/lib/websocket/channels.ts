@@ -45,6 +45,69 @@ export interface UserUpdate {
   data: UserUpdateData;
 }
 
+export interface PumpfunMintTokensEvent {
+  mint?: string;
+  token?: string;
+  name?: string;
+  symbol?: string;
+  description?: string;
+  website?: string;
+  x?: string;
+  telegram?: string;
+  photo?: string;
+  metadataUri?: string;
+  creator?: string;
+  price?: number;
+  priceUsd?: number;
+  marketCap?: number;
+  marketCapUsd?: number;
+  createdAt?: string;
+}
+
+export interface TopHolder {
+  wallet: string;
+  amount: number;
+  percentage: number;
+}
+
+export interface PumpfunTokenUpdateEvent {
+  token?: string; // Token mint address
+  mint?: string; // Alias for token
+  name?: string;
+  symbol?: string;
+  description?: string;
+  website?: string;
+  x?: string;
+  telegram?: string;
+  photo?: string;
+  metadataUri?: string;
+  price?: number;
+  priceUsd?: number;
+  marketCap?: number;
+  marketCapUsd?: number;
+  volumeSol?: number;
+  volumeUsd?: number;
+  volume24h?: number;
+  liquidity?: number;
+  buys?: number;
+  sells?: number;
+  txCount?: number;
+  last_tx_time?: number;
+  progress?: number;
+  progressSol?: number;
+  _balanceSol?: number;
+  _balanceTokens?: number;
+  updatedAt?: string;
+  lastUpdated?: number;
+  // New fields from actual websocket data
+  isCurrentlyLive?: boolean;
+  liveStartTime?: string | null;
+  creatorSharePercentage?: number;
+  holders?: number;
+  topHoldersList?: TopHolder[];
+  topHoldersPercentage?: number;
+}
+
 /**
  * Subscribe to pool updates
  */
@@ -64,17 +127,14 @@ export const subscribeToPool = (
           poolId,
           data: msg.data || (msg as PoolUpdateData),
         };
+
         onUpdate(update);
       } catch (error) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error('Failed to parse pool update:', error);
-        }
+        // Failed to parse pool update
       }
     },
-    (error) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.error(`Pool subscription error for ${poolId}:`, error);
-      }
+    () => {
+      // Pool subscription error
     }
   );
 };
@@ -99,15 +159,11 @@ export const subscribeToActivity = (
         };
         onUpdate(update);
       } catch (error) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error('Failed to parse activity update:', error);
-        }
+        // Failed to parse activity update
       }
     },
-    (error) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Activity subscription error:', error);
-      }
+    () => {
+      // Activity subscription error
     }
   );
 };
@@ -133,15 +189,11 @@ export const subscribeToUser = (
         };
         onUpdate(update);
       } catch (error) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error('Failed to parse user update:', error);
-        }
+        // Failed to parse user update
       }
     },
-    (error) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.error(`User subscription error for ${userId}:`, error);
-      }
+    () => {
+      // User subscription error
     }
   );
 };
@@ -155,4 +207,71 @@ export const unsubscribeAll = (subscriptions: (Subscription | null)[]): void => 
       unsubscribe(sub);
     }
   });
+};
+
+/**
+ * Subscribe to Pump.fun mint token feed
+ */
+export const subscribeToPumpfunMintTokens = (
+  onUpdate: (update: PumpfunMintTokensEvent) => void
+): Subscription | null => {
+  const channel = 'pumpfun-mintTokens';
+
+  const subscription = subscribe(
+    channel,
+    (message) => {
+      if (!message) {
+        return;
+      }
+
+      try {
+        const data = message as PumpfunMintTokensEvent;
+        onUpdate(data);
+      } catch (error) {
+        // Failed to parse pumpfun mint tokens update
+      }
+    },
+    () => {
+      // Pumpfun mint tokens subscription error
+    }
+  );
+
+  return subscription;
+};
+
+/**
+ * Subscribe to Pump.fun token updates feed
+ */
+export const subscribeToPumpfunTokenUpdates = (
+  onUpdate: (update: PumpfunTokenUpdateEvent) => void
+): Subscription | null => {
+  const channel = 'pumpfun-tokenUpdates';
+
+  const subscription = subscribe(
+    channel,
+    (message) => {
+      if (!message) {
+        return;
+      }
+
+      try {
+        // Parse the message - it comes as the data directly from Centrifuge
+        const data = message as PumpfunTokenUpdateEvent;
+
+        // Normalize token/mint field
+        if (data.token && !data.mint) {
+          data.mint = data.token;
+        }
+
+        onUpdate(data);
+      } catch (error) {
+        // Failed to parse pumpfun token update
+      }
+    },
+    (error) => {
+      // Pumpfun token updates subscription error
+    }
+  );
+
+  return subscription;
 };

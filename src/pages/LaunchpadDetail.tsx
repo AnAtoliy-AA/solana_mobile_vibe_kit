@@ -28,6 +28,7 @@ import { useLivePool } from '../hooks/useLiveUpdates';
 import { useUIStore } from '../lib/stores/useUIStore';
 import { useMarketStore } from '../lib/stores/useMarketStore';
 import GlobalSettingsButton from '../components/settings/GlobalSettingsButton';
+import LastUpdated from '../components/launchpad/LastUpdated';
 import './LaunchpadDetail.css';
 
 const LaunchpadDetail: React.FC = () => {
@@ -164,7 +165,10 @@ const LaunchpadDetail: React.FC = () => {
               {/* Progress */}
               <div className="pool-detail-progress">
                 <div className="pool-progress-header">
-                  <span>Funding Progress</span>
+                  <span>
+                    Funding Progress
+                    <LastUpdated timestamp={livePool?.lastUpdated} />
+                  </span>
                   <span className="pool-progress-percentage">
                     {(displayPool.progress * 100).toFixed(0)}%
                   </span>
@@ -193,13 +197,19 @@ const LaunchpadDetail: React.FC = () => {
                   <IonCol size="6">
                     <div className="stat-item">
                       <div className="stat-label">Token Price</div>
-                      <div className="stat-value">${displayPool.tokenPrice}</div>
+                      <div className="stat-value">
+                        ${displayPool.tokenPrice}
+                        <LastUpdated timestamp={livePool?.lastUpdated} prefix="" />
+                      </div>
                     </div>
                   </IonCol>
                   <IonCol size="6">
                     <div className="stat-item">
                       <div className="stat-label">Total Value Locked</div>
-                      <div className="stat-value">${formatNumber(displayPool.tvl)}</div>
+                      <div className="stat-value">
+                        ${formatNumber(displayPool.tvl)}
+                        <LastUpdated timestamp={livePool?.lastUpdated} prefix="" />
+                      </div>
                     </div>
                   </IonCol>
                 </IonRow>
@@ -207,7 +217,10 @@ const LaunchpadDetail: React.FC = () => {
                   <IonCol size="6">
                     <div className="stat-item">
                       <div className="stat-label">Participants</div>
-                      <div className="stat-value">{displayPool.participants.toLocaleString()}</div>
+                      <div className="stat-value">
+                        {displayPool.participants.toLocaleString()}
+                        <LastUpdated timestamp={livePool?.lastUpdated} prefix="" />
+                      </div>
                     </div>
                   </IonCol>
                   <IonCol size="6">

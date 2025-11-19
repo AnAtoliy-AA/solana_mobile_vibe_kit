@@ -1,0 +1,49 @@
+.token-update-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--ion-color-medium);
+  font-weight: 500;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+.update-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--ion-color-success);
+  display: inline-block;
+}
+
+.update-time {
+  color: var(--ion-color-success);
+  font-weight: 600;
+}
+
+.update-details {
+  margin-left: 4px;
+  color: var(--ion-color-medium-shade);
+  font-size: 10px;
+}
+
+.token-update-time:hover {
+  color: var(--ion-color-primary);
+  cursor: help;
+}
+
+.token-update-time:hover .update-time {
+  color: var(--ion-color-primary);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .token-update-time {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .update-details {
+    color: rgba(255, 255, 255, 0.4);
+  }
+}

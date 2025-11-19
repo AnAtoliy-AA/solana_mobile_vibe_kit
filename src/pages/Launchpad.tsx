@@ -27,10 +27,11 @@ import {
 } from 'ionicons/icons';
 import { usePoolList } from '../hooks/usePools';
 import { useLiveActivity } from '../hooks/useLiveUpdates';
-import { Pool } from '../lib/api/types';
 import { useMarketStore } from '../lib/stores/useMarketStore';
+import type { PoolWithTimestamp } from '../lib/stores/useMarketStore';
 import { useTranslation } from '../lib/i18n/useTranslation';
 import Tooltip from '../components/launchpad/Tooltip';
+import LastUpdated from '../components/launchpad/LastUpdated';
 import GlobalSettingsButton from '../components/settings/GlobalSettingsButton';
 import './Launchpad.css';
 
@@ -59,19 +60,29 @@ const Launchpad: React.FC = () => {
 
   // Merge API pools with live WebSocket updates from store
   const mergedPools = useMemo(() => {
-    if (!pools) return [];
+    if (!pools) return livePoolsFromStore;
 
     // If store has no updates, return API pools as-is
     if (livePoolsFromStore.length === 0) return pools;
 
-    // Create a map of store pools for quick lookup
-    const storePoolsMap = new Map(livePoolsFromStore.map((p) => [p.id, p]));
+    // Create a set to track which pools we've already included
+    const includedPoolIds = new Set<string>();
+    const result: PoolWithTimestamp[] = [];
 
-    // Merge: use store data if available (it has live updates), otherwise use API data
-    return pools.map((apiPool) => {
-      const livePool = storePoolsMap.get(apiPool.id);
-      return livePool || apiPool;
+    // First, add all store pools (they have the latest data, including new WebSocket tokens)
+    livePoolsFromStore.forEach((storePool) => {
+      result.push(storePool);
+      includedPoolIds.add(storePool.id);
     });
+
+    // Then, add API pools that aren't in the store yet
+    pools.forEach((apiPool) => {
+      if (!includedPoolIds.has(apiPool.id)) {
+        result.push(apiPool);
+      }
+    });
+
+    return result;
   }, [pools, livePoolsFromStore]);
 
   const handleRefresh = async (event: CustomEvent) => {
@@ -126,7 +137,7 @@ const Launchpad: React.FC = () => {
     return `${Math.floor(diffHours / 24)}${t.daysAgo}`;
   };
 
-  const filteredPools = mergedPools?.filter((pool: Pool) => {
+  const filteredPools = mergedPools?.filter((pool: PoolWithTimestamp) => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
@@ -266,7 +277,7 @@ const Launchpad: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredPools.map((pool: Pool) => (
+                    {filteredPools.map((pool: PoolWithTimestamp) => (
                       <tr
                         key={pool.id}
                         className="token-row"
@@ -278,8 +289,12 @@ const Launchpad: React.FC = () => {
                             position="bottom"
                           >
                             <div className="token-name-cell">
-                              {pool.imageUrl && (
+                              {pool.imageUrl ? (
                                 <img src={pool.imageUrl} alt={pool.symbol} className="token-icon" />
+                              ) : (
+                                <div className="token-icon token-icon-placeholder">
+                                  {pool.symbol?.charAt(0) || '?'}
+                                </div>
                               )}
                               <div>
                                 <div className="token-name">{pool.name}</div>
@@ -328,10 +343,24 @@ const Launchpad: React.FC = () => {
                         </td>
                         <td className="market-cap">
                           <Tooltip
-                            content={`Market Capitalization\n\nTotal value of all tokens in circulation\n\nFull amount: ${getFullNumber(pool.tvl)}`}
+                            content={`Market Capitalization\n\nTotal value of all tokens in circulation\n\nFull amount: ${getFullNumber(pool.tvl)}${pool.lastUpdated ? `\n\nLast updated: ${new Date(pool.lastUpdated).toLocaleString()}` : ''}${pool.createdAt ? `\nAdded: ${new Date(pool.createdAt).toLocaleString()}` : ''}`}
                             position="bottom"
                           >
-                            <span className="metric-value bold">{formatNumber(pool.tvl)}</span>
+                            <div
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'flex-start',
+                              }}
+                            >
+                              <span className="metric-value bold">{formatNumber(pool.tvl)}</span>
+                              {pool.lastUpdated && (
+                                <LastUpdated timestamp={pool.lastUpdated} prefix="Updated" />
+                              )}
+                              {pool.createdAt && !pool.lastUpdated && (
+                                <LastUpdated timestamp={pool.createdAt} prefix="Since" />
+                              )}
+                            </div>
                           </Tooltip>
                         </td>
                         <td className="progress">
@@ -354,12 +383,26 @@ const Launchpad: React.FC = () => {
                         </td>
                         <td className="holders">
                           <Tooltip
-                            content={`Token Holders\n\nTotal unique wallet addresses holding this token\n\nCurrent count: ${pool.participants.toLocaleString()} holders`}
+                            content={`Token Holders\n\nTotal unique wallet addresses holding this token\n\nCurrent count: ${pool.participants.toLocaleString()} holders${pool.lastUpdated ? `\n\nLast updated: ${new Date(pool.lastUpdated).toLocaleString()}` : ''}${pool.createdAt ? `\nAdded: ${new Date(pool.createdAt).toLocaleString()}` : ''}`}
                             position="bottom"
                           >
-                            <span className="metric-value">
-                              {pool.participants.toLocaleString()}
-                            </span>
+                            <div
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'flex-start',
+                              }}
+                            >
+                              <span className="metric-value">
+                                {pool.participants.toLocaleString()}
+                              </span>
+                              {pool.lastUpdated && (
+                                <LastUpdated timestamp={pool.lastUpdated} prefix="Updated" />
+                              )}
+                              {pool.createdAt && !pool.lastUpdated && (
+                                <LastUpdated timestamp={pool.createdAt} prefix="Since" />
+                              )}
+                            </div>
                           </Tooltip>
                         </td>
                         <td className="time">
