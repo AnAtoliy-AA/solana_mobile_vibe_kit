@@ -110,10 +110,14 @@ const transformTokenToPool = (token: TokenFromAPI): Pool => {
 };
 
 /**
- * Get list of all pools/tokens
+ * Get list of all pools/tokens with pagination support
  * Uses POST /api/tokens endpoint as per Swagger documentation
  */
-export const getPoolList = async (status?: 'active' | 'upcoming' | 'finished'): Promise<Pool[]> => {
+export const getPoolList = async (
+  status?: 'active' | 'upcoming' | 'finished',
+  page = 0,
+  version = 1
+): Promise<Pool[]> => {
   if (USE_MOCK) {
     // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 300));
@@ -122,23 +126,14 @@ export const getPoolList = async (status?: 'active' | 'upcoming' | 'finished'): 
 
   try {
     // Build request body for POST /api/tokens
-    const requestBody: Record<string, string | number> = {
-      skip: 0,
-      take: 100, // Fetch up to 100 tokens
-    };
+    const urlEncodedData = new URLSearchParams();
+    urlEncodedData.append('page', String(page));
+    urlEncodedData.append('version', String(version));
 
     // Add status filter if provided
     if (status) {
-      requestBody.status = status;
+      urlEncodedData.append('status', status);
     }
-
-    // Use URLSearchParams object - axios will handle it correctly with application/x-www-form-urlencoded
-    const urlEncodedData = new URLSearchParams();
-    Object.entries(requestBody).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        urlEncodedData.append(key, String(value));
-      }
-    });
 
     const response = await apiClient.post<{
       tokens?: TokenFromAPI[] | Record<string, TokenFromAPI>;

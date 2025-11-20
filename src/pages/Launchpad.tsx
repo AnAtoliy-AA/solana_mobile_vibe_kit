@@ -25,7 +25,7 @@ import {
   swapHorizontalOutline,
   timeOutline,
 } from 'ionicons/icons';
-import { usePoolList } from '../hooks/usePools';
+import { usePoolListInfinite } from '../hooks/usePools';
 import { useLiveActivity } from '../hooks/useLiveUpdates';
 import { useMarketStore } from '../lib/stores/useMarketStore';
 import type { PoolWithTimestamp } from '../lib/stores/useMarketStore';
@@ -40,12 +40,19 @@ const Launchpad: React.FC = () => {
   const t = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'upcoming' | 'finished'>('all');
+  const loadMoreRef = React.useRef<HTMLDivElement>(null);
 
   // Enable live activity feed updates
   useLiveActivity();
 
   const status = activeTab === 'all' ? undefined : activeTab;
-  const { data: pools, isLoading, refetch } = usePoolList(status);
+  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage, refetch } =
+    usePoolListInfinite(status);
+
+  // Flatten all pages into single array
+  const pools = React.useMemo(() => {
+    return data?.pages.flat() || [];
+  }, [data]);
 
   // Get live-updated pools from market store (merged with API data)
   const livePoolsFromStore = useMarketStore((state) => state.pools);
@@ -57,6 +64,39 @@ const Launchpad: React.FC = () => {
       setPools(pools);
     }
   }, [pools, setPools]);
+
+  // Infinite scroll: Intersection Observer to detect when user scrolls to bottom
+  useEffect(() => {
+    // Check if IntersectionObserver is available (not available in tests)
+    if (typeof IntersectionObserver === 'undefined') {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      {
+        root: null,
+        rootMargin: '200px', // Start loading 200px before reaching bottom
+        threshold: 0.1,
+      }
+    );
+
+    const currentRef = loadMoreRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Merge API pools with live WebSocket updates from store
   const mergedPools = useMemo(() => {
@@ -470,6 +510,34 @@ const Launchpad: React.FC = () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Infinite scroll loading indicator */}
+              <div
+                ref={loadMoreRef}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: '32px',
+                  minHeight: '100px',
+                }}
+              >
+                {isFetchingNextPage && (
+                  <div style={{ textAlign: 'center' }}>
+                    <IonSpinner name="crescent" color="primary" />
+                    <IonText color="medium">
+                      <p style={{ marginTop: '12px' }}>Loading more tokens...</p>
+                    </IonText>
+                  </div>
+                )}
+                {!hasNextPage && filteredPools && filteredPools.length > 0 && (
+                  <IonText color="medium">
+                    <p style={{ textAlign: 'center', fontStyle: 'italic' }}>
+                      🎉 You&apos;ve reached the end! No more tokens to load.
+                    </p>
+                  </IonText>
+                )}
               </div>
             </div>
           ) : (

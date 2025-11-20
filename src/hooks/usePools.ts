@@ -1,21 +1,52 @@
 // React Query hooks for pools
 
 import React from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { getPoolList, getPoolDetail, participateInPool, getPoolStats } from '../lib/api/pools';
 import { ParticipationRequest } from '../lib/api/types';
 import { useMarketStore } from '../lib/stores/useMarketStore';
 import { useUIStore } from '../lib/stores/useUIStore';
 
 /**
- * Hook to fetch pool list
+ * Hook to fetch pool list with infinite scroll support
+ */
+export const usePoolListInfinite = (status?: 'active' | 'upcoming' | 'finished') => {
+  const setPools = useMarketStore((state) => state.setPools);
+
+  const query = useInfiniteQuery({
+    queryKey: ['pools-infinite', status],
+    queryFn: ({ pageParam = 0 }) => getPoolList(status, pageParam, 1),
+    getNextPageParam: (lastPage, allPages) => {
+      // If last page has no tokens, we've reached the end
+      if (lastPage.length === 0) {
+        return undefined;
+      }
+      // Return next page number
+      return allPages.length;
+    },
+    initialPageParam: 0,
+  });
+
+  // Flatten all pages into single array and update store
+  React.useEffect(() => {
+    if (query.data?.pages) {
+      const allPools = query.data.pages.flat();
+      setPools(allPools);
+    }
+  }, [query.data, setPools]);
+
+  return query;
+};
+
+/**
+ * Hook to fetch pool list (legacy - single page)
  */
 export const usePoolList = (status?: 'active' | 'upcoming' | 'finished') => {
   const setPools = useMarketStore((state) => state.setPools);
 
   const query = useQuery({
     queryKey: ['pools', status],
-    queryFn: () => getPoolList(status),
+    queryFn: () => getPoolList(status, 0, 1),
   });
 
   // Update store when data changes
