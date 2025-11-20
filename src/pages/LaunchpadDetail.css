@@ -44,6 +44,20 @@
   gap: 12px;
 }
 
+.pool-detail-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--theme-border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--theme-text-primary);
+  text-transform: uppercase;
+}
+
 .pool-detail-symbol {
   color: var(--theme-text-secondary);
   font-size: 0.9rem;

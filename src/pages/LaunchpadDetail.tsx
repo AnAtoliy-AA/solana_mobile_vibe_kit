@@ -32,6 +32,7 @@ import { useMarketStore } from '../lib/stores/useMarketStore';
 import GlobalSettingsButton from '../components/settings/GlobalSettingsButton';
 import LastUpdated from '../components/launchpad/LastUpdated';
 import './LaunchpadDetail.css';
+import { getTokenInitials } from '../lib/utils/text';
 
 interface RefreshOption {
   label: string;
@@ -54,6 +55,7 @@ const LaunchpadDetail: React.FC = () => {
   const [selectedRefreshInterval, setSelectedRefreshInterval] = React.useState<number>(0);
   const [isManualRefreshActive, setIsManualRefreshActive] = React.useState(false);
   const [lastRefreshedAt, setLastRefreshedAt] = React.useState<number | undefined>();
+  const [isHeroImageBroken, setIsHeroImageBroken] = React.useState(false);
 
   // Subscribe to live updates for this pool
   useLivePool(id);
@@ -249,7 +251,7 @@ const LaunchpadDetail: React.FC = () => {
             <IonCardHeader>
               <div className="pool-detail-header">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  {displayPool.imageUrl && (
+                  {displayPool.imageUrl && !isHeroImageBroken ? (
                     <img
                       src={displayPool.imageUrl}
                       alt={displayPool.symbol}
@@ -259,7 +261,12 @@ const LaunchpadDetail: React.FC = () => {
                         borderRadius: '50%',
                         objectFit: 'cover',
                       }}
+                      onError={() => setIsHeroImageBroken(true)}
                     />
+                  ) : (
+                    <div className="pool-detail-avatar">
+                      {getTokenInitials(displayPool.name, displayPool.symbol)}
+                    </div>
                   )}
                   <div>
                     <IonCardTitle>{displayPool.name}</IonCardTitle>

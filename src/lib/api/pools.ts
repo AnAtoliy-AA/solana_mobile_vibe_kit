@@ -9,6 +9,7 @@ import {
   TokenFromAPI,
   TokenHolder,
 } from './types';
+import { normalizeImageUrl } from '../utils/media';
 import { getFilteredPools, getPoolById } from './mocks';
 
 const USE_MOCK = process.env.REACT_APP_LAUNCHPAD_USE_MOCK === 'true';
@@ -65,6 +66,11 @@ const transformTokenToPool = (token: TokenFromAPI): Pool => {
     (token.priceUsd ? String(token.priceUsd) : undefined) ||
     (token.priceSol ? String(token.priceSol) : '0');
 
+  const imageCandidates = [token.photo, token.image, token.imageUrl, token.metaData?.image];
+  const normalizedImageUrl = imageCandidates
+    .map((candidate) => normalizeImageUrl(candidate))
+    .find(Boolean);
+
   return {
     id: token.token || token._id || token.id || `token-${Date.now()}-${Math.random()}`,
     name: token.name || token.symbol || 'Unknown Token',
@@ -80,7 +86,7 @@ const transformTokenToPool = (token: TokenFromAPI): Pool => {
     currentAmount,
     tokenPrice,
     tags: token.tags || [],
-    imageUrl: token.photo || token.image || token.imageUrl || token.metaData?.image,
+    imageUrl: normalizedImageUrl,
     websiteUrl: token.website || token.metaData?.website,
     twitterUrl: token.x || token.twitter || token.metaData?.twitter,
     discordUrl: token.discord || token.metaData?.discord,

@@ -2,6 +2,7 @@
 
 import { create } from 'zustand';
 import { Pool } from '../api/types';
+import { normalizeImageUrl } from '../utils/media';
 
 export interface PoolWithTimestamp extends Omit<Pool, 'createdAt' | 'updatedAt'> {
   lastUpdated?: number; // Timestamp in milliseconds - updates every time data changes
@@ -41,65 +42,6 @@ export interface WebSocketTokenData {
   topHoldersPercentage?: number;
   lastUpdated?: number;
 }
-
-/**
- * Safely validates and extracts image URL from metadata URI or photo field
- * Only allows trusted domains for security
- */
-const getSafeImageUrl = (metadataUri?: string, photo?: string): string | undefined => {
-  // List of trusted domains for images
-  const trustedDomains = [
-    'ipfs.io',
-    'gateway.pinata.cloud',
-    'cloudflare-ipfs.com',
-    'dweb.link',
-    'nftstorage.link',
-    'arweave.net',
-    'ar-io.net',
-  ];
-
-  // Helper to check if URL is from trusted domain
-  const isTrustedUrl = (url: string): boolean => {
-    try {
-      const urlObj = new URL(url);
-      return trustedDomains.some((domain) => urlObj.hostname.includes(domain));
-    } catch {
-      return false;
-    }
-  };
-
-  // First try metadataUri if available
-  if (metadataUri) {
-    try {
-      // Check if it's a valid URL
-      new URL(metadataUri);
-
-      // Only accept IPFS and Arweave URLs for metadata
-      if (isTrustedUrl(metadataUri)) {
-        // For IPFS URLs, assume they point directly to an image
-        // In production, you might want to fetch and parse JSON metadata
-        return metadataUri;
-      }
-    } catch (error) {
-      // Invalid metadataUri
-    }
-  }
-
-  // Fall back to photo field if metadataUri is not available or not trusted
-  if (photo) {
-    // If photo is a relative path like "/images/empty.gif", skip it
-    if (photo.startsWith('/')) {
-      return undefined;
-    }
-
-    // Check if photo URL is from trusted domain
-    if (isTrustedUrl(photo)) {
-      return photo;
-    }
-  }
-
-  return undefined;
-};
 
 interface MarketState {
   pools: PoolWithTimestamp[];
@@ -280,7 +222,8 @@ export const useMarketStore = create<MarketState>((set) => ({
         // Do NOT create pools for price updates of tokens we don't know about
 
         // Safely extract image URL from metadataUri or photo
-        const safeImageUrl = getSafeImageUrl(tokenData.metadataUri, tokenData.photo);
+        const safeImageUrl =
+          normalizeImageUrl(tokenData.metadataUri) || normalizeImageUrl(tokenData.photo);
 
         const newPool: PoolWithTimestamp = {
           id: tokenAddress,

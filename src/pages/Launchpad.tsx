@@ -35,6 +35,7 @@ import Tooltip from '../components/launchpad/Tooltip';
 import LastUpdated from '../components/launchpad/LastUpdated';
 import GlobalSettingsButton from '../components/settings/GlobalSettingsButton';
 import './Launchpad.css';
+import { getTokenInitials } from '../lib/utils/text';
 
 type SortOption = 'newest' | 'volume' | 'progress' | 'holders';
 type FilterOption = 'all' | 'hasTwitter' | 'hasWebsite' | 'highProgress';
@@ -47,6 +48,7 @@ const Launchpad: React.FC = () => {
   const [sortOption, setSortOption] = useState<SortOption>('newest');
   const [filterOption, setFilterOption] = useState<FilterOption>('all');
   const loadMoreRef = React.useRef<HTMLDivElement>(null);
+  const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
 
   // Enable live activity feed updates
   useLiveActivity();
@@ -151,6 +153,13 @@ const Launchpad: React.FC = () => {
   const copyToClipboard = (text: string, e: React.MouseEvent) => {
     e.stopPropagation();
     navigator.clipboard.writeText(text);
+  };
+
+  const handleImageError = (poolId: string) => {
+    setBrokenImages((prev) => ({
+      ...prev,
+      [poolId]: true,
+    }));
   };
 
   const openBlockExplorer = (address: string, e: React.MouseEvent) => {
@@ -417,15 +426,19 @@ const Launchpad: React.FC = () => {
                       <div className="card-overview">
                         <div className="card-header">
                           <div className="card-token">
-                            {pool.imageUrl ? (
+                            {pool.imageUrl && !brokenImages[pool.id] ? (
                               <img
                                 src={pool.imageUrl}
                                 alt={pool.symbol}
                                 className="card-token-avatar"
+                                onError={(event) => {
+                                  event.stopPropagation();
+                                  handleImageError(pool.id);
+                                }}
                               />
                             ) : (
                               <div className="card-token-avatar placeholder">
-                                {pool.symbol?.charAt(0) || '?'}
+                                {getTokenInitials(pool.name, pool.symbol)}
                               </div>
                             )}
                             <div>
