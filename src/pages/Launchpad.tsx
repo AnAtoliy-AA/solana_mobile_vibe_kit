@@ -36,11 +36,16 @@ import LastUpdated from '../components/launchpad/LastUpdated';
 import GlobalSettingsButton from '../components/settings/GlobalSettingsButton';
 import './Launchpad.css';
 
+type SortOption = 'newest' | 'volume' | 'progress' | 'holders';
+type FilterOption = 'all' | 'hasTwitter' | 'hasWebsite' | 'highProgress';
+
 const Launchpad: React.FC = () => {
   const history = useHistory();
   const t = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'upcoming' | 'finished'>('all');
+  const [sortOption, setSortOption] = useState<SortOption>('newest');
+  const [filterOption, setFilterOption] = useState<FilterOption>('all');
   const loadMoreRef = React.useRef<HTMLDivElement>(null);
 
   // Enable live activity feed updates
@@ -163,11 +168,6 @@ const Launchpad: React.FC = () => {
     return `$${value.toFixed(0)}`;
   };
 
-  const getFullNumber = (num: string | number) => {
-    const value = typeof num === 'string' ? parseFloat(num) : num;
-    return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  };
-
   const formatAddress = (address: string) => {
     if (!address) return 'N/A';
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
@@ -195,6 +195,77 @@ const Launchpad: React.FC = () => {
       pool.id.toLowerCase().includes(query)
     );
   });
+
+  const applyFilter = useMemo(() => {
+    if (!filteredPools) return [];
+    return filteredPools.filter((pool) => {
+      if (filterOption === 'hasTwitter') {
+        return Boolean(pool.twitterUrl);
+      }
+      if (filterOption === 'hasWebsite') {
+        return Boolean(pool.websiteUrl);
+      }
+      if (filterOption === 'highProgress') {
+        return pool.progress >= 0.5;
+      }
+      return true;
+    });
+  }, [filteredPools, filterOption]);
+
+  const preparedPools = useMemo(() => {
+    const parseNumeric = (value?: string | number) => {
+      if (typeof value === 'number') return value;
+      if (!value) return 0;
+      const parsed = parseFloat(value);
+      return Number.isFinite(parsed) ? parsed : 0;
+    };
+
+    return [...applyFilter].sort((a, b) => {
+      if (sortOption === 'volume') {
+        return parseNumeric(b.tvl) - parseNumeric(a.tvl);
+      }
+      if (sortOption === 'progress') {
+        return (b.progress || 0) - (a.progress || 0);
+      }
+      if (sortOption === 'holders') {
+        return (b.participants || 0) - (a.participants || 0);
+      }
+      const aTime = a.startTime ? new Date(a.startTime).getTime() : 0;
+      const bTime = b.startTime ? new Date(b.startTime).getTime() : 0;
+      return bTime - aTime;
+    });
+  }, [applyFilter, sortOption]);
+
+  const filterChips = [
+    { id: 'all' as FilterOption, label: 'All' },
+    { id: 'hasTwitter' as FilterOption, label: 'Has X' },
+    { id: 'hasWebsite' as FilterOption, label: 'Has Website' },
+    { id: 'highProgress' as FilterOption, label: '50%+ Raised' },
+  ];
+
+  const sortChips = [
+    { id: 'newest' as SortOption, label: 'Newest' },
+    { id: 'volume' as SortOption, label: 'Volume' },
+    { id: 'progress' as SortOption, label: 'Progress' },
+    { id: 'holders' as SortOption, label: 'Holders' },
+  ];
+
+  const handleChipKeyDown = (
+    event: React.KeyboardEvent<HTMLButtonElement>,
+    callback: () => void
+  ) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      callback();
+    }
+  };
+
+  const getStatusLabel = (status: Pool['status']) => {
+    if (status === 'active') return t.active;
+    if (status === 'upcoming') return t.upcoming;
+    if (status === 'finished') return t.finished;
+    return status;
+  };
 
   return (
     <IonPage>
@@ -277,256 +348,210 @@ const Launchpad: React.FC = () => {
                 <p>{t.loadingTokens}</p>
               </IonText>
             </div>
-          ) : filteredPools && filteredPools.length > 0 ? (
-            <div className="table-wrapper">
-              <div className="table-scroll-wrapper">
-                <table className="tokens-table">
-                  <thead>
-                    <tr>
-                      <th>
-                        <Tooltip content={t.tokenTooltip} position="bottom">
-                          {t.token}
-                        </Tooltip>
-                      </th>
-                      <th>
-                        <Tooltip content={t.contractTooltip} position="bottom">
-                          {t.contractAddress}
-                        </Tooltip>
-                      </th>
-                      <th>
-                        <Tooltip content={t.volumeTooltip} position="bottom">
-                          {t.volume24h}
-                        </Tooltip>
-                      </th>
-                      <th>
-                        <Tooltip content={t.marketCapTooltip} position="bottom">
-                          {t.marketCap}
-                        </Tooltip>
-                      </th>
-                      <th>
-                        <Tooltip content={t.progressTooltip} position="bottom">
-                          {t.progress}
-                        </Tooltip>
-                      </th>
-                      <th>
-                        <Tooltip content={t.holdersTooltip} position="bottom">
-                          {t.holders}
-                        </Tooltip>
-                      </th>
-                      <th>
-                        <Tooltip content={t.timeTooltip} position="bottom">
-                          {t.time}
-                        </Tooltip>
-                      </th>
-                      <th>
-                        <Tooltip content={t.actionsTooltip} position="bottom">
-                          {t.actions}
-                        </Tooltip>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredPools.map((pool: PoolWithTimestamp) => (
-                      <tr
-                        key={pool.id}
-                        className="token-row"
-                        onClick={() => handlePoolClick(pool.id)}
+          ) : preparedPools && preparedPools.length > 0 ? (
+            <>
+              <div className="launchpad-controls">
+                <div className="controls-group">
+                  <span className="controls-label">Sort</span>
+                  <div className="chip-group">
+                    {sortChips.map((chip) => (
+                      <button
+                        key={chip.id}
+                        type="button"
+                        className={`chip ${sortOption === chip.id ? 'active' : ''}`}
+                        aria-pressed={sortOption === chip.id}
+                        aria-label={`Sort by ${chip.label}`}
+                        onClick={() => setSortOption(chip.id)}
+                        onKeyDown={(event) =>
+                          handleChipKeyDown(event, () => setSortOption(chip.id))
+                        }
                       >
-                        <td className="token-info">
-                          <Tooltip
-                            content={`${pool.name} (${pool.symbol})\nClick to view details`}
-                            position="bottom"
-                          >
-                            <div className="token-name-cell">
-                              {pool.imageUrl ? (
-                                <img src={pool.imageUrl} alt={pool.symbol} className="token-icon" />
-                              ) : (
-                                <div className="token-icon token-icon-placeholder">
-                                  {pool.symbol?.charAt(0) || '?'}
-                                </div>
-                              )}
-                              <div>
-                                <div className="token-name">{pool.name}</div>
-                                <div className="token-symbol">{pool.symbol}</div>
-                              </div>
-                            </div>
-                          </Tooltip>
-                        </td>
-                        <td className="contract-address">
-                          <Tooltip
-                            content={`Full Address:\n${pool.id}\n\nClick icons to copy or view on blockchain explorer`}
-                            position="bottom"
-                          >
-                            <div className="address-cell">
-                              <span className="address-text">{formatAddress(pool.id)}</span>
-                              <Tooltip content={t.copyTooltip} position="bottom">
-                                <IonIcon
-                                  icon={copyOutline}
-                                  className="action-icon"
-                                  onClick={(e) => copyToClipboard(pool.id, e)}
-                                />
-                              </Tooltip>
-                              <Tooltip content={t.viewOnSolscan} position="bottom">
-                                <IonIcon
-                                  icon={openOutline}
-                                  className="action-icon"
-                                  onClick={(e) => openBlockExplorer(pool.id, e)}
-                                />
-                              </Tooltip>
-                            </div>
-                          </Tooltip>
-                        </td>
-                        <td className="volume">
-                          <Tooltip
-                            content={`24h Trading Volume\n\nTotal: ${getFullNumber(pool.tvl)}\nChange: +12.5% from previous 24h`}
-                            position="bottom"
-                          >
-                            <div className="metric-cell">
-                              <span className="metric-value">{formatNumber(pool.tvl)}</span>
-                              <span className="metric-change positive">
-                                <IonIcon icon={trendingUpOutline} />
-                                +12.5%
-                              </span>
-                            </div>
-                          </Tooltip>
-                        </td>
-                        <td className="market-cap">
-                          <Tooltip
-                            content={`Market Capitalization\n\nTotal value of all tokens in circulation\n\nFull amount: ${getFullNumber(pool.tvl)}${pool.lastUpdated ? `\n\nLast updated: ${new Date(pool.lastUpdated).toLocaleString()}` : ''}${pool.createdAt ? `\nAdded: ${new Date(pool.createdAt).toLocaleString()}` : ''}`}
-                            position="bottom"
-                          >
-                            <div
-                              style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'flex-start',
-                              }}
-                            >
-                              <span className="metric-value bold">{formatNumber(pool.tvl)}</span>
-                              {pool.lastUpdated && (
-                                <LastUpdated timestamp={pool.lastUpdated} prefix="Updated" />
-                              )}
-                              {pool.createdAt && !pool.lastUpdated && (
-                                <LastUpdated timestamp={pool.createdAt} prefix="Since" />
-                              )}
-                            </div>
-                          </Tooltip>
-                        </td>
-                        <td className="progress">
-                          <Tooltip
-                            content={`Launch Progress\n\nRaised: ${getFullNumber(pool.currentAmount)}\nTarget: ${getFullNumber(pool.targetAmount)}\nCompletion: ${(pool.progress * 100).toFixed(1)}%`}
-                            position="bottom"
-                          >
-                            <div className="progress-cell">
-                              <div className="progress-bar-container">
-                                <div
-                                  className="progress-bar-fill"
-                                  style={{ width: `${pool.progress * 100}%` }}
-                                />
-                              </div>
-                              <span className="progress-text">
-                                {(pool.progress * 100).toFixed(0)}%
-                              </span>
-                            </div>
-                          </Tooltip>
-                        </td>
-                        <td className="holders">
-                          <Tooltip
-                            content={`Token Holders\n\nTotal unique wallet addresses holding this token\n\nCurrent count: ${pool.participants.toLocaleString()} holders${pool.lastUpdated ? `\n\nLast updated: ${new Date(pool.lastUpdated).toLocaleString()}` : ''}${pool.createdAt ? `\nAdded: ${new Date(pool.createdAt).toLocaleString()}` : ''}`}
-                            position="bottom"
-                          >
-                            <div
-                              style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'flex-start',
-                              }}
-                            >
-                              <span className="metric-value">
-                                {pool.participants.toLocaleString()}
-                              </span>
-                              {pool.lastUpdated && (
-                                <LastUpdated timestamp={pool.lastUpdated} prefix="Updated" />
-                              )}
-                              {pool.createdAt && !pool.lastUpdated && (
-                                <LastUpdated timestamp={pool.createdAt} prefix="Since" />
-                              )}
-                            </div>
-                          </Tooltip>
-                        </td>
-                        <td className="time">
-                          <Tooltip
-                            content={`Launch Time\n\nStarted: ${new Date(pool.startTime).toLocaleString()}\nTime ago: ${getTimeAgo(pool.startTime)}`}
-                            position="bottom"
-                          >
-                            <div className="time-cell">
-                              <IonIcon icon={timeOutline} className="time-icon" />
-                              <span>{getTimeAgo(pool.startTime)}</span>
-                            </div>
-                          </Tooltip>
-                        </td>
-                        <td className="actions">
-                          <div className="action-buttons">
-                            <Tooltip content={t.tradeTooltip} position="bottom">
-                              <IonButton
-                                size="small"
-                                fill="solid"
-                                color="success"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                }}
-                              >
-                                <IonIcon icon={swapHorizontalOutline} slot="start" />
-                                {t.trade}
-                              </IonButton>
-                            </Tooltip>
-                            {pool.twitterUrl && (
-                              <Tooltip content={t.visitTwitter} position="bottom">
-                                <IonButton
-                                  size="small"
-                                  fill="clear"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    window.open(pool.twitterUrl, '_blank');
-                                  }}
-                                >
-                                  <IonIcon icon={logoTwitter} />
-                                </IonButton>
-                              </Tooltip>
-                            )}
-                            {pool.websiteUrl && (
-                              <Tooltip content={t.visitWebsite} position="bottom">
-                                <IonButton
-                                  size="small"
-                                  fill="clear"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    window.open(pool.websiteUrl, '_blank');
-                                  }}
-                                >
-                                  <IonIcon icon={globeOutline} />
-                                </IonButton>
-                              </Tooltip>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
+                        {chip.label}
+                      </button>
                     ))}
-                  </tbody>
-                </table>
+                  </div>
+                </div>
+                <div className="controls-group">
+                  <span className="controls-label">Filter</span>
+                  <div className="chip-group">
+                    {filterChips.map((chip) => (
+                      <button
+                        key={chip.id}
+                        type="button"
+                        className={`chip ${filterOption === chip.id ? 'active' : ''}`}
+                        aria-pressed={filterOption === chip.id}
+                        aria-label={`Filter ${chip.label}`}
+                        onClick={() =>
+                          setFilterOption((prev) => (prev === chip.id ? 'all' : chip.id))
+                        }
+                        onKeyDown={(event) =>
+                          handleChipKeyDown(event, () =>
+                            setFilterOption((prev) => (prev === chip.id ? 'all' : chip.id))
+                          )
+                        }
+                      >
+                        {chip.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              {/* Infinite scroll loading indicator */}
-              <div
-                ref={loadMoreRef}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  padding: '32px',
-                  minHeight: '100px',
-                }}
-              >
+              <div className="cards-grid">
+                {preparedPools.map((pool: PoolWithTimestamp) => (
+                  <article
+                    key={pool.id}
+                    className="launchpad-card"
+                    onClick={() => handlePoolClick(pool.id)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        handlePoolClick(pool.id);
+                      }
+                    }}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`Open details for ${pool.name}`}
+                  >
+                    <div className="card-body">
+                      <div className="card-overview">
+                        <div className="card-header">
+                          <div className="card-token">
+                            {pool.imageUrl ? (
+                              <img
+                                src={pool.imageUrl}
+                                alt={pool.symbol}
+                                className="card-token-avatar"
+                              />
+                            ) : (
+                              <div className="card-token-avatar placeholder">
+                                {pool.symbol?.charAt(0) || '?'}
+                              </div>
+                            )}
+                            <div>
+                              <p className="card-token-name">{pool.name}</p>
+                              <p className="card-token-symbol">{pool.symbol}</p>
+                            </div>
+                          </div>
+                          <span className={`status-pill status-${pool.status}`}>
+                            {getStatusLabel(pool.status)}
+                          </span>
+                        </div>
+
+                        <div className="card-address">
+                          <div className="card-address-text">{formatAddress(pool.id)}</div>
+                          <div className="card-address-actions">
+                            <Tooltip content={t.copyTooltip} position="bottom">
+                              <IonIcon
+                                icon={copyOutline}
+                                className="address-icon"
+                                onClick={(event) => copyToClipboard(pool.id, event)}
+                              />
+                            </Tooltip>
+                            <Tooltip content={t.viewOnSolscan} position="bottom">
+                              <IonIcon
+                                icon={openOutline}
+                                className="address-icon"
+                                onClick={(event) => openBlockExplorer(pool.id, event)}
+                              />
+                            </Tooltip>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="card-metrics">
+                        <div className="metric-block">
+                          <p className="metric-label">{t.volume24h}</p>
+                          <p className="metric-value">{formatNumber(pool.tvl)}</p>
+                          <p className="metric-footnote positive">
+                            <IonIcon icon={trendingUpOutline} />
+                            +12.5%
+                          </p>
+                        </div>
+                        <div className="metric-block">
+                          <p className="metric-label">{t.marketCap}</p>
+                          <p className="metric-value">{formatNumber(pool.tvl)}</p>
+                          {pool.lastUpdated ? (
+                            <LastUpdated timestamp={pool.lastUpdated} prefix="Updated" />
+                          ) : (
+                            pool.createdAt && (
+                              <LastUpdated timestamp={pool.createdAt} prefix="Since" />
+                            )
+                          )}
+                        </div>
+                        <div className="metric-block">
+                          <p className="metric-label">{t.holders}</p>
+                          <p className="metric-value">{pool.participants.toLocaleString()}</p>
+                          {pool.startTime && (
+                            <span className="metric-footnote">{getTimeAgo(pool.startTime)}</span>
+                          )}
+                        </div>
+                        <div className="metric-block">
+                          <p className="metric-label">{t.progress}</p>
+                          <p className="metric-value">{(pool.progress * 100).toFixed(0)}%</p>
+                          <div className="card-progress-bar">
+                            <div
+                              className="card-progress-fill"
+                              style={{ width: `${Math.min(pool.progress * 100, 100)}%` }}
+                            />
+                          </div>
+                          <p className="metric-footnote">
+                            {formatNumber(pool.currentAmount)} / {formatNumber(pool.targetAmount)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="card-footer">
+                      <div className="card-time">
+                        <IonIcon icon={timeOutline} />
+                        <span>{getTimeAgo(pool.startTime)}</span>
+                      </div>
+                      <div className="card-actions">
+                        <IonButton
+                          size="small"
+                          fill="solid"
+                          color="success"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                          }}
+                        >
+                          <IonIcon icon={swapHorizontalOutline} slot="start" />
+                          {t.trade}
+                        </IonButton>
+                        {pool.twitterUrl && (
+                          <IonButton
+                            size="small"
+                            fill="clear"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              window.open(pool.twitterUrl, '_blank');
+                            }}
+                            aria-label="Open Twitter"
+                          >
+                            <IonIcon icon={logoTwitter} />
+                          </IonButton>
+                        )}
+                        {pool.websiteUrl && (
+                          <IonButton
+                            size="small"
+                            fill="clear"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              window.open(pool.websiteUrl, '_blank');
+                            }}
+                            aria-label="Open website"
+                          >
+                            <IonIcon icon={globeOutline} />
+                          </IonButton>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              <div ref={loadMoreRef} className="load-more-trigger">
                 {isFetchingNextPage && (
                   <div style={{ textAlign: 'center' }}>
                     <IonSpinner name="crescent" color="primary" />
@@ -535,7 +560,7 @@ const Launchpad: React.FC = () => {
                     </IonText>
                   </div>
                 )}
-                {!hasNextPage && filteredPools && filteredPools.length > 0 && (
+                {!hasNextPage && preparedPools && preparedPools.length > 0 && (
                   <IonText color="medium">
                     <p style={{ textAlign: 'center', fontStyle: 'italic' }}>
                       🎉 You&apos;ve reached the end! No more tokens to load.
@@ -543,7 +568,7 @@ const Launchpad: React.FC = () => {
                   </IonText>
                 )}
               </div>
-            </div>
+            </>
           ) : (
             <div className="empty-state">
               <IonText color="medium">
