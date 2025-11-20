@@ -19,6 +19,28 @@ export interface Pool {
   websiteUrl?: string;
   twitterUrl?: string;
   discordUrl?: string;
+  telegramUrl?: string;
+
+  // Extended fields from API
+  pool?: string; // Pool address
+  creator?: string; // Creator wallet
+  supply?: number;
+  decimals?: number;
+  tokenType?: string;
+  priceSol?: number;
+  priceUsd?: number;
+  marketCapUsd?: number;
+  hardcap?: number;
+  buys?: number;
+  sells?: number;
+  txCount?: number;
+  volumeSol?: number;
+  volumeUsd?: number;
+  isMigrated?: boolean;
+  isCurrentlyLive?: boolean;
+  topHoldersList?: TokenHolder[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface PoolDetail extends Pool {
@@ -29,6 +51,7 @@ export interface PoolDetail extends Pool {
   participants: number;
   minParticipation?: string;
   maxParticipation?: string;
+  holders?: TokenHolder[]; // Complete holders list from API
 }
 
 export interface PricePoint {
@@ -118,14 +141,91 @@ export interface WebSocketMessageData {
   targetAmount?: string;
 }
 
+export interface TokenHolder {
+  wallet: string;
+  amount: number;
+  percentage: number;
+  _id: string;
+}
+
 export interface TokenFromAPI {
+  // Basic identifiers
   token?: string;
   _id?: string;
   id?: string;
+
+  // Token info
   name?: string;
   symbol?: string;
   ticker?: string;
   description?: string;
+  photo?: string; // IPFS image
+  metadataUri?: string;
+
+  // Token economics
+  supply?: number;
+  decimals?: number;
+  tokenType?: string;
+
+  // Pricing
+  price?: string | number;
+  priceSol?: number;
+  priceUsd?: number;
+  tokenPrice?: string;
+  marketCapUsd?: number;
+
+  // Pool info
+  pool?: string;
+  hardcap?: number;
+  creator?: string;
+  configAddress?: string | null;
+
+  // Progress & amounts
+  progress?: number;
+  progressSol?: number;
+  _balanceSol?: number; // Current raised in SOL
+  _balanceTokens?: number;
+  targetAmount?: string;
+  currentAmount?: string;
+  raisedAmount?: string;
+
+  // Trading stats
+  buys?: number;
+  sells?: number;
+  txCount?: number;
+  volumeSol?: number;
+  volumeUsd?: number;
+  holders?: number;
+
+  // Timestamps
+  mint_time?: number;
+  list_time?: number;
+  last_tx_time?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  startTime?: string;
+  endTime?: string;
+
+  // Migration
+  isMigrated?: boolean;
+  migrationPool?: string | null;
+
+  // Livestream
+  isCurrentlyLive?: boolean;
+  liveStartTime?: number | null;
+  numLivestreamParticipants?: number | null;
+
+  // Holders
+  topHoldersPercentage?: number;
+  topHoldersList?: TokenHolder[];
+  creatorSharePercentage?: number;
+
+  // Social & metadata
+  website?: string;
+  x?: string; // Twitter/X
+  telegram?: string;
+  twitter?: string;
+  discord?: string;
   metaData?: {
     description?: string;
     image?: string;
@@ -133,22 +233,16 @@ export interface TokenFromAPI {
     twitter?: string;
     discord?: string;
   };
+
+  // Draft status
+  isDraft?: boolean;
+
+  // Legacy fields
   status?: 'active' | 'upcoming' | 'finished';
-  progress?: number;
   tvl?: string;
   marketCap?: string;
   participants?: number;
-  startTime?: string;
-  endTime?: string;
-  targetAmount?: string;
-  currentAmount?: string;
-  raisedAmount?: string;
-  price?: string;
-  tokenPrice?: string;
   tags?: string[];
   image?: string;
   imageUrl?: string;
-  website?: string;
-  twitter?: string;
-  discord?: string;
 }

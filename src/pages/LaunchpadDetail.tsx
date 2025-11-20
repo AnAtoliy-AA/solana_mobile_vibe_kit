@@ -148,9 +148,32 @@ const LaunchpadDetail: React.FC = () => {
           <IonCard className="pool-detail-hero">
             <IonCardHeader>
               <div className="pool-detail-header">
-                <div>
-                  <IonCardTitle>{displayPool.name}</IonCardTitle>
-                  <p className="pool-detail-symbol">{displayPool.symbol}</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  {displayPool.imageUrl && (
+                    <img
+                      src={displayPool.imageUrl}
+                      alt={displayPool.symbol}
+                      style={{
+                        width: '64px',
+                        height: '64px',
+                        borderRadius: '50%',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  )}
+                  <div>
+                    <IonCardTitle>{displayPool.name}</IonCardTitle>
+                    <p className="pool-detail-symbol">{displayPool.symbol}</p>
+                    <p
+                      style={{
+                        fontSize: '0.75rem',
+                        color: 'var(--ion-color-medium)',
+                        marginTop: '4px',
+                      }}
+                    >
+                      {displayPool.id.slice(0, 8)}...{displayPool.id.slice(-6)}
+                    </p>
+                  </div>
                 </div>
                 <IonBadge color={getStatusColor(displayPool.status)}>
                   {displayPool.status.toUpperCase()}
@@ -160,6 +183,17 @@ const LaunchpadDetail: React.FC = () => {
             <IonCardContent>
               {displayPool.description && (
                 <p className="pool-detail-description">{displayPool.description}</p>
+              )}
+
+              {/* Tags */}
+              {displayPool.tags && displayPool.tags.length > 0 && (
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
+                  {displayPool.tags.map((tag, idx) => (
+                    <IonBadge key={idx} color="secondary" style={{ fontSize: '0.75rem' }}>
+                      {tag}
+                    </IonBadge>
+                  ))}
+                </div>
               )}
 
               {/* Progress */}
@@ -182,6 +216,47 @@ const LaunchpadDetail: React.FC = () => {
                     / ${formatNumber(displayPool.targetAmount)}
                   </span>
                 </div>
+              </div>
+            </IonCardContent>
+          </IonCard>
+
+          {/* Contract Address Card */}
+          <IonCard>
+            <IonCardHeader>
+              <IonCardTitle>Contract Address</IonCardTitle>
+            </IonCardHeader>
+            <IonCardContent>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <code
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    background: 'var(--ion-color-light)',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    wordBreak: 'break-all',
+                  }}
+                >
+                  {displayPool.id}
+                </code>
+                <IonButton
+                  size="small"
+                  fill="outline"
+                  onClick={() => {
+                    navigator.clipboard.writeText(displayPool.id);
+                  }}
+                >
+                  Copy
+                </IonButton>
+                <IonButton
+                  size="small"
+                  fill="solid"
+                  onClick={() => {
+                    window.open(`https://solscan.io/token/${displayPool.id}`, '_blank');
+                  }}
+                >
+                  View on Solscan
+                </IonButton>
               </div>
             </IonCardContent>
           </IonCard>
@@ -225,7 +300,21 @@ const LaunchpadDetail: React.FC = () => {
                   </IonCol>
                   <IonCol size="6">
                     <div className="stat-item">
-                      <div className="stat-label">Min/Max</div>
+                      <div className="stat-label">Target Amount</div>
+                      <div className="stat-value">${formatNumber(displayPool.targetAmount)}</div>
+                    </div>
+                  </IonCol>
+                </IonRow>
+                <IonRow>
+                  <IonCol size="6">
+                    <div className="stat-item">
+                      <div className="stat-label">Current Amount</div>
+                      <div className="stat-value">${formatNumber(displayPool.currentAmount)}</div>
+                    </div>
+                  </IonCol>
+                  <IonCol size="6">
+                    <div className="stat-item">
+                      <div className="stat-label">Min/Max Participation</div>
                       <div className="stat-value">
                         ${displayPool.minParticipation || '10'} - $
                         {displayPool.maxParticipation || '10K'}
@@ -236,6 +325,351 @@ const LaunchpadDetail: React.FC = () => {
               </IonGrid>
             </IonCardContent>
           </IonCard>
+
+          {/* Trading Statistics */}
+          {(displayPool.buys ||
+            displayPool.sells ||
+            displayPool.txCount ||
+            displayPool.volumeSol) && (
+            <IonCard>
+              <IonCardHeader>
+                <IonCardTitle>Trading Activity</IonCardTitle>
+              </IonCardHeader>
+              <IonCardContent>
+                <IonGrid>
+                  <IonRow>
+                    {displayPool.buys !== undefined && (
+                      <IonCol size="6">
+                        <div className="stat-item">
+                          <div className="stat-label">Buys</div>
+                          <div className="stat-value" style={{ color: 'var(--ion-color-success)' }}>
+                            {displayPool.buys.toLocaleString()}
+                          </div>
+                        </div>
+                      </IonCol>
+                    )}
+                    {displayPool.sells !== undefined && (
+                      <IonCol size="6">
+                        <div className="stat-item">
+                          <div className="stat-label">Sells</div>
+                          <div className="stat-value" style={{ color: 'var(--ion-color-danger)' }}>
+                            {displayPool.sells.toLocaleString()}
+                          </div>
+                        </div>
+                      </IonCol>
+                    )}
+                  </IonRow>
+                  <IonRow>
+                    {displayPool.txCount !== undefined && (
+                      <IonCol size="6">
+                        <div className="stat-item">
+                          <div className="stat-label">Total Transactions</div>
+                          <div className="stat-value">{displayPool.txCount.toLocaleString()}</div>
+                        </div>
+                      </IonCol>
+                    )}
+                    {displayPool.volumeSol !== undefined && (
+                      <IonCol size="6">
+                        <div className="stat-item">
+                          <div className="stat-label">Volume (SOL)</div>
+                          <div className="stat-value">
+                            {displayPool.volumeSol.toLocaleString(undefined, {
+                              maximumFractionDigits: 2,
+                            })}{' '}
+                            SOL
+                          </div>
+                        </div>
+                      </IonCol>
+                    )}
+                  </IonRow>
+                  {displayPool.volumeUsd !== undefined && (
+                    <IonRow>
+                      <IonCol size="12">
+                        <div className="stat-item">
+                          <div className="stat-label">Volume (USD)</div>
+                          <div className="stat-value">
+                            $
+                            {displayPool.volumeUsd.toLocaleString(undefined, {
+                              maximumFractionDigits: 2,
+                            })}
+                          </div>
+                        </div>
+                      </IonCol>
+                    </IonRow>
+                  )}
+                </IonGrid>
+              </IonCardContent>
+            </IonCard>
+          )}
+
+          {/* Token Economics */}
+          {(displayPool.supply || displayPool.decimals || displayPool.tokenType) && (
+            <IonCard>
+              <IonCardHeader>
+                <IonCardTitle>Token Economics</IonCardTitle>
+              </IonCardHeader>
+              <IonCardContent>
+                <IonGrid>
+                  <IonRow>
+                    {displayPool.supply && (
+                      <IonCol size="6">
+                        <div className="stat-item">
+                          <div className="stat-label">Total Supply</div>
+                          <div className="stat-value">
+                            {(
+                              displayPool.supply / Math.pow(10, displayPool.decimals || 0)
+                            ).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                          </div>
+                        </div>
+                      </IonCol>
+                    )}
+                    {displayPool.decimals !== undefined && (
+                      <IonCol size="6">
+                        <div className="stat-item">
+                          <div className="stat-label">Decimals</div>
+                          <div className="stat-value">{displayPool.decimals}</div>
+                        </div>
+                      </IonCol>
+                    )}
+                  </IonRow>
+                  {displayPool.tokenType && (
+                    <IonRow>
+                      <IonCol size="12">
+                        <div className="stat-item">
+                          <div className="stat-label">Token Type</div>
+                          <div className="stat-value">{displayPool.tokenType}</div>
+                        </div>
+                      </IonCol>
+                    </IonRow>
+                  )}
+                </IonGrid>
+              </IonCardContent>
+            </IonCard>
+          )}
+
+          {/* Pool & Creator Info */}
+          {(displayPool.pool || displayPool.creator) && (
+            <IonCard>
+              <IonCardHeader>
+                <IonCardTitle>Pool & Creator</IonCardTitle>
+              </IonCardHeader>
+              <IonCardContent>
+                {displayPool.pool && (
+                  <div style={{ marginBottom: '16px' }}>
+                    <div className="stat-label" style={{ marginBottom: '8px' }}>
+                      Pool Address
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <code
+                        style={{
+                          flex: 1,
+                          padding: '8px',
+                          background: 'var(--ion-color-light)',
+                          borderRadius: '4px',
+                          fontSize: '0.75rem',
+                          wordBreak: 'break-all',
+                        }}
+                      >
+                        {displayPool.pool}
+                      </code>
+                      <IonButton
+                        size="small"
+                        fill="clear"
+                        onClick={() => navigator.clipboard.writeText(displayPool.pool!)}
+                      >
+                        Copy
+                      </IonButton>
+                    </div>
+                  </div>
+                )}
+                {displayPool.creator && (
+                  <div>
+                    <div className="stat-label" style={{ marginBottom: '8px' }}>
+                      Creator
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <code
+                        style={{
+                          flex: 1,
+                          padding: '8px',
+                          background: 'var(--ion-color-light)',
+                          borderRadius: '4px',
+                          fontSize: '0.75rem',
+                          wordBreak: 'break-all',
+                        }}
+                      >
+                        {displayPool.creator}
+                      </code>
+                      <IonButton
+                        size="small"
+                        fill="clear"
+                        onClick={() => navigator.clipboard.writeText(displayPool.creator!)}
+                      >
+                        Copy
+                      </IonButton>
+                      <IonButton
+                        size="small"
+                        fill="clear"
+                        onClick={() =>
+                          window.open(`https://solscan.io/account/${displayPool.creator}`, '_blank')
+                        }
+                      >
+                        View
+                      </IonButton>
+                    </div>
+                  </div>
+                )}
+              </IonCardContent>
+            </IonCard>
+          )}
+
+          {/* Holders List */}
+          {(pool.holders && pool.holders.length > 0) ||
+          (displayPool.topHoldersList && displayPool.topHoldersList.length > 0) ? (
+            <IonCard>
+              <IonCardHeader>
+                <div
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                >
+                  <IonCardTitle>
+                    Holders ({pool.holders?.length || displayPool.topHoldersList?.length || 0})
+                  </IonCardTitle>
+                  <IonBadge color="primary">
+                    Total: {displayPool.participants.toLocaleString()}
+                  </IonBadge>
+                </div>
+              </IonCardHeader>
+              <IonCardContent>
+                <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                  {(pool.holders || displayPool.topHoldersList || []).map((holder, idx) => (
+                    <div
+                      key={holder._id}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px',
+                        background: idx % 2 === 0 ? 'var(--ion-color-light)' : 'transparent',
+                        borderRadius: '4px',
+                        marginBottom: '4px',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() =>
+                        window.open(`https://solscan.io/account/${holder.wallet}`, '_blank')
+                      }
+                    >
+                      <div style={{ flex: 1 }}>
+                        <div
+                          style={{ fontSize: '0.85rem', fontWeight: '500', marginBottom: '4px' }}
+                        >
+                          #{idx + 1}
+                        </div>
+                        <code
+                          style={{
+                            fontSize: '0.75rem',
+                            color: 'var(--ion-color-medium)',
+                            display: 'block',
+                            marginBottom: '4px',
+                          }}
+                        >
+                          {holder.wallet}
+                        </code>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--ion-color-medium)' }}>
+                          Click to view on Solscan
+                        </div>
+                      </div>
+                      <div style={{ textAlign: 'right', marginLeft: '16px' }}>
+                        <div
+                          style={{
+                            fontSize: '0.9rem',
+                            fontWeight: '600',
+                            color: 'var(--ion-color-primary)',
+                          }}
+                        >
+                          {(holder.percentage * 100).toFixed(2)}%
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--ion-color-medium)' }}>
+                          {holder.amount.toLocaleString()}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: '0.7rem',
+                            color: 'var(--ion-color-medium)',
+                            marginTop: '4px',
+                          }}
+                        >
+                          {displayPool.decimals
+                            ? (holder.amount / Math.pow(10, displayPool.decimals)).toLocaleString(
+                                undefined,
+                                {
+                                  maximumFractionDigits: 2,
+                                }
+                              )
+                            : holder.amount.toLocaleString()}{' '}
+                          tokens
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </IonCardContent>
+            </IonCard>
+          ) : null}
+
+          {/* Social Links */}
+          {(displayPool.websiteUrl ||
+            displayPool.twitterUrl ||
+            displayPool.discordUrl ||
+            displayPool.telegramUrl) && (
+            <IonCard>
+              <IonCardHeader>
+                <IonCardTitle>Social Links</IonCardTitle>
+              </IonCardHeader>
+              <IonCardContent>
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                  {displayPool.websiteUrl && (
+                    <IonButton
+                      expand="block"
+                      fill="outline"
+                      onClick={() => window.open(displayPool.websiteUrl, '_blank')}
+                    >
+                      Website
+                    </IonButton>
+                  )}
+                  {displayPool.twitterUrl && (
+                    <IonButton
+                      expand="block"
+                      fill="outline"
+                      color="primary"
+                      onClick={() => window.open(displayPool.twitterUrl, '_blank')}
+                    >
+                      Twitter
+                    </IonButton>
+                  )}
+                  {displayPool.telegramUrl && (
+                    <IonButton
+                      expand="block"
+                      fill="outline"
+                      color="secondary"
+                      onClick={() => window.open(displayPool.telegramUrl, '_blank')}
+                    >
+                      Telegram
+                    </IonButton>
+                  )}
+                  {displayPool.discordUrl && (
+                    <IonButton
+                      expand="block"
+                      fill="outline"
+                      color="tertiary"
+                      onClick={() => window.open(displayPool.discordUrl, '_blank')}
+                    >
+                      Discord
+                    </IonButton>
+                  )}
+                </div>
+              </IonCardContent>
+            </IonCard>
+          )}
 
           {/* Timeline */}
           {displayPool.timeline && (

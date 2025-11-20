@@ -3,9 +3,10 @@
 import { create } from 'zustand';
 import { Pool } from '../api/types';
 
-export interface PoolWithTimestamp extends Pool {
+export interface PoolWithTimestamp extends Omit<Pool, 'createdAt' | 'updatedAt'> {
   lastUpdated?: number; // Timestamp in milliseconds - updates every time data changes
   createdAt?: number; // Timestamp in milliseconds - set once when pool is first added
+  updatedAt?: string; // ISO string from API
 }
 
 export interface WebSocketTokenData {

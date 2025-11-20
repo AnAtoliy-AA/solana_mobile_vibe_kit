@@ -78,7 +78,12 @@ const Launchpad: React.FC = () => {
     // Then, add API pools that aren't in the store yet
     pools.forEach((apiPool) => {
       if (!includedPoolIds.has(apiPool.id)) {
-        result.push(apiPool);
+        // Convert Pool to PoolWithTimestamp
+        const poolWithTimestamp: PoolWithTimestamp = {
+          ...apiPool,
+          createdAt: apiPool.createdAt ? new Date(apiPool.createdAt).getTime() : undefined,
+        };
+        result.push(poolWithTimestamp);
       }
     });
 
@@ -137,7 +142,7 @@ const Launchpad: React.FC = () => {
     return `${Math.floor(diffHours / 24)}${t.daysAgo}`;
   };
 
-  const filteredPools = mergedPools?.filter((pool: PoolWithTimestamp) => {
+  const filteredPools = (mergedPools as PoolWithTimestamp[])?.filter((pool: PoolWithTimestamp) => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
