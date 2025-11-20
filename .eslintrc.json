@@ -45,5 +45,14 @@
         "varsIgnorePattern": "^_"
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["e2e/**/*.spec.ts"],
+      "rules": {
+        "testing-library/prefer-screen-queries": "off",
+        "@typescript-eslint/no-redeclare": "off"
+      }
+    }
+  ]
 }

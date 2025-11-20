@@ -61,7 +61,7 @@ const LaunchpadDetail: React.FC = () => {
   useLivePool(id);
 
   // Get live-updated pool data from store (if available)
-  const livePoolsFromStore = useMarketStore((state) => state.pools);
+  const livePoolsFromStore = useMarketStore((state) => state.pools) || [];
   const livePool = livePoolsFromStore.find((p) => p.id === id);
 
   // Merge live updates with pool detail data (price, tvl updates from WebSocket)
@@ -582,7 +582,12 @@ const LaunchpadDetail: React.FC = () => {
                       <IonButton
                         size="small"
                         fill="clear"
-                        onClick={() => navigator.clipboard.writeText(displayPool.pool!)}
+                        onClick={() => {
+                          if (!displayPool.pool) {
+                            return;
+                          }
+                          navigator.clipboard.writeText(displayPool.pool);
+                        }}
                       >
                         Copy
                       </IonButton>
@@ -610,7 +615,12 @@ const LaunchpadDetail: React.FC = () => {
                       <IonButton
                         size="small"
                         fill="clear"
-                        onClick={() => navigator.clipboard.writeText(displayPool.creator!)}
+                        onClick={() => {
+                          if (!displayPool.creator) {
+                            return;
+                          }
+                          navigator.clipboard.writeText(displayPool.creator);
+                        }}
                       >
                         Copy
                       </IonButton>

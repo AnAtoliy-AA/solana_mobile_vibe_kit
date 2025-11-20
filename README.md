@@ -50,17 +50,20 @@ src/
 ## 🛠 Technology Stack
 
 ### Core Technologies
+
 - **React 18.2** - UI library
 - **TypeScript 4.1** - Type safety
 - **Ionic 7.x** - UI components and navigation
 - **Capacitor 7.4** - Native capabilities
 
 ### Blockchain
+
 - **@solana/web3.js 1.98** - Solana JavaScript SDK
 - **@solana/wallet-adapter** - Wallet adapters
 - **@privy-io/react-auth 2.20** - Web3 authentication
 
 ### Mobile Development
+
 - **@capacitor/ios** - iOS platform
 - **@capacitor/android** - Android platform
 - **Cordova plugins** - Native capabilities
@@ -82,6 +85,7 @@ npm --version   # >= 8.0.0
 #### iOS Development Requirements
 
 **Ruby 3.4.5 and CocoaPods:**
+
 ```bash
 # Check current Ruby version
 ruby --version
@@ -147,7 +151,7 @@ npx cap open ios
 # Build web application
 npm run build
 
-# Sync with Android  
+# Sync with Android
 npx cap sync android
 npx cap open android
 ```
@@ -163,7 +167,7 @@ import { createSolanaSDK, defaultConfig } from './sdk';
 const sdk = createSolanaSDK({
   network: 'devnet',
   rpcEndpoint: 'https://api.devnet.solana.com',
-  commitment: 'confirmed'
+  commitment: 'confirmed',
 });
 
 // Initialize with auto-connect
@@ -179,8 +183,12 @@ await sdk.wallet.connectWallet('demo');
 // Connect custom wallet (Privy)
 await sdk.wallet.connectCustomWallet('Email Wallet', {
   publicKey: keypair.publicKey,
-  signTransaction: async (tx) => { /* ... */ },
-  signAllTransactions: async (txs) => { /* ... */ }
+  signTransaction: async (tx) => {
+    /* ... */
+  },
+  signAllTransactions: async (txs) => {
+    /* ... */
+  },
 });
 
 // Get balance
@@ -198,7 +206,7 @@ await sdk.wallet.disconnectWallet();
 const result = await sdk.transaction.sendSol({
   recipientAddress: 'recipient_public_key',
   amount: 1000000000, // 1 SOL in lamports
-  memo: 'Test transfer'
+  memo: 'Test transfer',
 });
 
 if (result.success) {
@@ -226,7 +234,7 @@ const transferResult = await sdk.token.transferToken({
   recipientAddress: 'recipient_address',
   amount: 1000000, // Considering decimals
   mint: 'token_mint_address',
-  decimals: 6
+  decimals: 6,
 });
 
 // Create token (demo)
@@ -234,7 +242,7 @@ const createResult = await sdk.token.createToken({
   name: 'MyToken',
   symbol: 'MTK',
   decimals: 9,
-  supply: 1000000
+  supply: 1000000,
 });
 ```
 
@@ -285,17 +293,20 @@ function WalletComponent() {
 ## 📱 UI Features
 
 ### Wallet Components
+
 - **Wallet Connection** - Email via Privy or demo mode
 - **Balance Display** - SOL with USD rate
 - **Address Copying** - Convenient public key copying
 - **Network Switching** - Mainnet, Testnet, Devnet
 
 ### Transaction Management
+
 - **Send SOL** - Form with validation
 - **Transaction History** - List of recent operations
 - **Transaction Status** - Confirmation tracking
 
 ### Token Operations
+
 - **Token List** - Display all balances
 - **Token Transfer** - SPL token sending form
 - **Token Creation** - Demo creation function
@@ -322,7 +333,7 @@ const config: CapacitorConfig = {
 ```typescript
 // In PrivyContext.tsx
 const config = {
-  appId: "your_privy_app_id",
+  appId: 'your_privy_app_id',
   appearance: {
     theme: 'light',
     accentColor: '#676FFF',
@@ -341,32 +352,35 @@ export const NETWORKS = {
   'mainnet-beta': {
     name: 'Mainnet',
     rpcUrl: 'https://api.mainnet-beta.solana.com',
-    chainId: 'mainnet-beta'
+    chainId: 'mainnet-beta',
   },
-  'testnet': {
-    name: 'Testnet', 
+  testnet: {
+    name: 'Testnet',
     rpcUrl: 'https://api.testnet.solana.com',
-    chainId: 'testnet'
+    chainId: 'testnet',
   },
-  'devnet': {
+  devnet: {
     name: 'Devnet',
-    rpcUrl: 'https://api.devnet.solana.com', 
-    chainId: 'devnet'
-  }
+    rpcUrl: 'https://api.devnet.solana.com',
+    chainId: 'devnet',
+  },
 };
 ```
 
 ## 🧪 Testing
 
 ```bash
-# Run tests
-npm test
+# Run unit/integration tests
+yarn test
 
 # Run with coverage
-npm test -- --coverage
+yarn test -- --coverage
+
+# Run end-to-end suite (Playwright)
+yarn test:e2e
 
 # Linting
-npm run lint
+yarn lint
 ```
 
 ## 📦 Build
@@ -438,7 +452,7 @@ class SolanaSDK {
   wallet: SolanaWalletManager;
   transaction: SolanaTransactionManager;
   token: SolanaTokenManager;
-  
+
   constructor(config: SolanaSDKConfig);
   getConfig(): SolanaSDKConfig;
   updateConfig(config: Partial<SolanaSDKConfig>): void;
@@ -453,16 +467,16 @@ class SolanaWalletManager {
   // Wallet connection
   connectWallet(type: 'phantom' | 'solflare' | 'demo'): Promise<void>;
   connectCustomWallet(name: string, adapter: CustomWalletAdapter): Promise<void>;
-  
+
   // State management
   disconnectWallet(): Promise<void>;
   getState(): WalletState;
   getBalance(): Promise<number>;
-  
+
   // Network
   switchNetwork(network: 'mainnet-beta' | 'testnet' | 'devnet'): void;
   getCurrentNetwork(): NetworkInfo;
-  
+
   // Events
   onStateChange(callback: (state: WalletState) => void): () => void;
 }
@@ -471,33 +485,36 @@ class SolanaWalletManager {
 ## 🚨 Known Issues
 
 1. **Ruby and CocoaPods on macOS** - Main iOS development issue
-   
+
    **Problem:** System Ruby version (2.6.x) is incompatible with CocoaPods 1.16+
+
    ```bash
    # Error you might see:
    # uninitialized constant ActiveSupport::LoggerThreadSafeLevel::Logger (NameError)
    ```
-   
+
    **Solution:**
+
    ```bash
    # 1. Install Ruby 3.4.5 via Homebrew
    brew install ruby
-   
+
    # 2. Add to ~/.zshrc or ~/.bash_profile
    echo 'export PATH="/opt/homebrew/opt/ruby/bin:$PATH"' >> ~/.zshrc
    source ~/.zshrc
-   
+
    # 3. Check Ruby version
    ruby --version  # Should show 3.4.5
-   
+
    # 4. Install CocoaPods
    gem install cocoapods
-   
+
    # 5. Install iOS dependencies
    cd ios/App && pod install
    ```
 
 2. **Android SDK** - Requires proper ANDROID_HOME setup
+
    ```bash
    export ANDROID_HOME=$HOME/Library/Android/sdk
    export PATH=$PATH:$ANDROID_HOME/emulator
@@ -506,6 +523,7 @@ class SolanaWalletManager {
    ```
 
 3. **iOS Simulator** - Requires Xcode 12+ on macOS
+
    ```bash
    # Configure correct Xcode path
    sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
@@ -542,6 +560,7 @@ Distributed under the MIT License. See `LICENSE` for details.
 ## 📚 Useful Links
 
 ### Project Documentation
+
 - [📖 API Documentation](docs/API.md) - Complete API documentation
 - [🛠 Troubleshooting Guide](docs/TROUBLESHOOTING.md) - Problem solving
 - [🚨 Ruby Setup Guide](RUBY_SETUP.md) - Quick Ruby setup for iOS
@@ -549,6 +568,7 @@ Distributed under the MIT License. See `LICENSE` for details.
 - [📋 Changelog](CHANGELOG.md) - Change history
 
 ### External Resources
+
 - [Solana Docs](https://docs.solana.com/)
 - [Ionic Docs](https://ionicframework.com/docs)
 - [Capacitor Docs](https://capacitorjs.com/docs)

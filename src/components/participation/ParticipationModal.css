@@ -1,0 +1,16 @@
+.participation-form {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.participation-form ion-input {
+  --padding-start: 12px;
+  --padding-end: 12px;
+}
+
+.form-error {
+  margin: 0;
+  font-size: 0.9rem;
+}

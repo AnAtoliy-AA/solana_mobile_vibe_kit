@@ -20,6 +20,7 @@ const GlobalSettingsButton: React.FC<GlobalSettingsButtonProps> = ({ slot = 'end
         fill="clear"
         slot={slot}
         className={className}
+        aria-label="Open settings"
       >
         <IonIcon icon={settingsOutline} slot="icon-only" />
       </IonButton>

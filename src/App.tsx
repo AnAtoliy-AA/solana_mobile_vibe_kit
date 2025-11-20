@@ -22,6 +22,8 @@ import { SolanaProvider } from './context/SolanaContext';
 import { PrivyProvider } from './context/PrivyContext';
 import { QueryProvider } from './context/QueryContext';
 import { useSettingsStore } from './lib/stores/useSettingsStore';
+import ParticipationModal from './components/participation/ParticipationModal';
+import ToastContainer from './components/ui/ToastContainer';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -64,6 +66,8 @@ const App: React.FC = () => (
       <ThemeInitializer>
         <PrivyProvider>
           <SolanaProvider>
+            <ParticipationModal />
+            <ToastContainer />
             <IonReactRouter basename={process.env.PUBLIC_URL || '/'}>
               <IonTabs>
                 <IonRouterOutlet>

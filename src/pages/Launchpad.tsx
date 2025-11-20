@@ -78,7 +78,7 @@ const Launchpad: React.FC = () => {
 
   // Sync API pools to store when they load
   useEffect(() => {
-    if (pools && pools.length > 0) {
+    if (pools && pools.length > 0 && typeof setPools === 'function') {
       setPools(pools);
     }
   }, [pools, setPools]);
@@ -118,7 +118,10 @@ const Launchpad: React.FC = () => {
 
   // Merge API pools with live WebSocket updates from store (deduplicated)
   const mergedPools = useMemo(() => {
-    if (!pools) return livePoolsFromStore;
+    const storePools = livePoolsFromStore ?? [];
+    if (!pools) {
+      return storePools;
+    }
 
     // Use a Map to ensure uniqueness by ID
     const poolMap = new Map<string, PoolWithTimestamp>();
@@ -133,7 +136,7 @@ const Launchpad: React.FC = () => {
     });
 
     // Then, merge in live store pools (they override API data with latest updates)
-    livePoolsFromStore.forEach((storePool) => {
+    storePools.forEach((storePool) => {
       poolMap.set(storePool.id, storePool);
     });
 
