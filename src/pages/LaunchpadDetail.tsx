@@ -21,6 +21,8 @@ import {
   IonGrid,
   IonRow,
   IonCol,
+  IonSelect,
+  IonSelectOption,
 } from '@ionic/react';
 import { useParams } from 'react-router-dom';
 import { usePoolDetail } from '../hooks/usePools';
@@ -31,10 +33,27 @@ import GlobalSettingsButton from '../components/settings/GlobalSettingsButton';
 import LastUpdated from '../components/launchpad/LastUpdated';
 import './LaunchpadDetail.css';
 
+interface RefreshOption {
+  label: string;
+  value: number;
+}
+
+const refreshOptions: RefreshOption[] = [
+  { label: 'Off', value: 0 },
+  { label: '5s', value: 5000 },
+  { label: '15s', value: 15000 },
+  { label: '60s', value: 60000 },
+  { label: '10m', value: 600000 },
+];
+
 const LaunchpadDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { data: pool, isLoading } = usePoolDetail(id);
+  const { data: pool, isLoading, refetch, isFetching } = usePoolDetail(id);
   const openParticipationModal = useUIStore((state) => state.openParticipationModal);
+  const addToast = useUIStore((state) => state.addToast);
+  const [selectedRefreshInterval, setSelectedRefreshInterval] = React.useState<number>(0);
+  const [isManualRefreshActive, setIsManualRefreshActive] = React.useState(false);
+  const [lastRefreshedAt, setLastRefreshedAt] = React.useState<number | undefined>();
 
   // Subscribe to live updates for this pool
   useLivePool(id);
@@ -85,6 +104,57 @@ const LaunchpadDetail: React.FC = () => {
       minute: '2-digit',
     });
   };
+
+  const handleManualRefresh = React.useCallback(async () => {
+    if (isManualRefreshActive) {
+      return;
+    }
+
+    setIsManualRefreshActive(true);
+    try {
+      const result = await refetch();
+      if (result.data) {
+        setLastRefreshedAt(Date.now());
+      }
+    } catch (error) {
+      console.error('Manual refresh failed', error);
+      addToast({
+        type: 'error',
+        message: 'Unable to refresh token details. Please try again.',
+      });
+    } finally {
+      setIsManualRefreshActive(false);
+    }
+  }, [addToast, isManualRefreshActive, refetch]);
+
+  React.useEffect(() => {
+    if (!selectedRefreshInterval) {
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      refetch()
+        .then((result) => {
+          if (result.data) {
+            setLastRefreshedAt(Date.now());
+          }
+        })
+        .catch((error) => {
+          console.error('Auto refresh failed', error);
+        });
+    }, selectedRefreshInterval);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [refetch, selectedRefreshInterval]);
+
+  React.useEffect(() => {
+    if (!pool) {
+      return;
+    }
+    setLastRefreshedAt(Date.now());
+  }, [pool]);
 
   if (isLoading || !displayPool) {
     return (
@@ -144,6 +214,36 @@ const LaunchpadDetail: React.FC = () => {
 
       <IonContent fullscreen>
         <div className="pool-detail-container">
+          <div className="pool-refresh-controls">
+            <div className="pool-refresh-actions">
+              <IonButton
+                color="primary"
+                onClick={handleManualRefresh}
+                disabled={isManualRefreshActive || isFetching}
+                aria-label="Refresh token details"
+              >
+                {(isManualRefreshActive || isFetching) && (
+                  <IonSpinner slot="start" name="crescent" />
+                )}
+                Refresh Now
+              </IonButton>
+
+              <IonSelect
+                value={selectedRefreshInterval}
+                interface="popover"
+                aria-label="Auto refresh frequency"
+                onIonChange={(event) => setSelectedRefreshInterval(event.detail.value)}
+              >
+                {refreshOptions.map((option) => (
+                  <IonSelectOption key={option.value} value={option.value}>
+                    {option.label}
+                  </IonSelectOption>
+                ))}
+              </IonSelect>
+            </div>
+            <LastUpdated timestamp={lastRefreshedAt || livePool?.lastUpdated} prefix="Refreshed" />
+          </div>
+
           {/* Hero Section */}
           <IonCard className="pool-detail-hero">
             <IonCardHeader>

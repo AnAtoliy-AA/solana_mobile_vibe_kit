@@ -5,6 +5,26 @@
   padding-bottom: 80px;
 }
 
+.pool-refresh-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.pool-refresh-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pool-refresh-actions ion-select {
+  min-width: 140px;
+}
+
 .pool-detail-loading,
 .pool-detail-error {
   display: flex;
