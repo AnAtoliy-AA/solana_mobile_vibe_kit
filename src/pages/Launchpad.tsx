@@ -29,6 +29,7 @@ import { usePoolListInfinite } from '../hooks/usePools';
 import { useLiveActivity } from '../hooks/useLiveUpdates';
 import { useMarketStore } from '../lib/stores/useMarketStore';
 import type { PoolWithTimestamp } from '../lib/stores/useMarketStore';
+import type { Pool } from '../lib/api/types';
 import { useTranslation } from '../lib/i18n/useTranslation';
 import Tooltip from '../components/launchpad/Tooltip';
 import LastUpdated from '../components/launchpad/LastUpdated';
@@ -49,9 +50,19 @@ const Launchpad: React.FC = () => {
   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage, refetch } =
     usePoolListInfinite(status);
 
-  // Flatten all pages into single array
+  // Flatten all pages into single array and deduplicate by ID
   const pools = React.useMemo(() => {
-    return data?.pages.flat() || [];
+    const allPools = data?.pages.flat() || [];
+
+    // Deduplicate tokens by ID (keep first occurrence)
+    const uniquePoolsMap = new Map<string, Pool>();
+    allPools.forEach((pool) => {
+      if (!uniquePoolsMap.has(pool.id)) {
+        uniquePoolsMap.set(pool.id, pool);
+      }
+    });
+
+    return Array.from(uniquePoolsMap.values());
   }, [data]);
 
   // Get live-updated pools from market store (merged with API data)
@@ -98,36 +109,29 @@ const Launchpad: React.FC = () => {
     };
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Merge API pools with live WebSocket updates from store
+  // Merge API pools with live WebSocket updates from store (deduplicated)
   const mergedPools = useMemo(() => {
     if (!pools) return livePoolsFromStore;
 
-    // If store has no updates, return API pools as-is
-    if (livePoolsFromStore.length === 0) return pools;
+    // Use a Map to ensure uniqueness by ID
+    const poolMap = new Map<string, PoolWithTimestamp>();
 
-    // Create a set to track which pools we've already included
-    const includedPoolIds = new Set<string>();
-    const result: PoolWithTimestamp[] = [];
-
-    // First, add all store pools (they have the latest data, including new WebSocket tokens)
-    livePoolsFromStore.forEach((storePool) => {
-      result.push(storePool);
-      includedPoolIds.add(storePool.id);
-    });
-
-    // Then, add API pools that aren't in the store yet
+    // First, add all API pools
     pools.forEach((apiPool) => {
-      if (!includedPoolIds.has(apiPool.id)) {
-        // Convert Pool to PoolWithTimestamp
-        const poolWithTimestamp: PoolWithTimestamp = {
-          ...apiPool,
-          createdAt: apiPool.createdAt ? new Date(apiPool.createdAt).getTime() : undefined,
-        };
-        result.push(poolWithTimestamp);
-      }
+      const poolWithTimestamp: PoolWithTimestamp = {
+        ...apiPool,
+        createdAt: apiPool.createdAt ? new Date(apiPool.createdAt).getTime() : undefined,
+      };
+      poolMap.set(apiPool.id, poolWithTimestamp);
     });
 
-    return result;
+    // Then, merge in live store pools (they override API data with latest updates)
+    livePoolsFromStore.forEach((storePool) => {
+      poolMap.set(storePool.id, storePool);
+    });
+
+    // Convert map back to array, maintaining insertion order
+    return Array.from(poolMap.values());
   }, [pools, livePoolsFromStore]);
 
   const handleRefresh = async (event: CustomEvent) => {
