@@ -117,7 +117,7 @@ test.describe('participation modal state handling', () => {
 
     await page.getByLabel('Wallet Address').fill('DemoWallet');
     await page.getByLabel('Amount').fill('3');
-    await page.getByRole('button', { name: /Participate in Pool/i }).click();
+    await page.getByRole('button', { name: 'Submit participation' }).click();
 
     await expect(page.getByText(/Successfully participated/i)).toBeVisible();
     await expect(page.getByText(/Wallet Address/i)).toBeHidden();
@@ -136,7 +136,7 @@ test.describe('participation modal state handling', () => {
     await page.getByRole('button', { name: /Participate in Pool/i }).click();
     await page.getByLabel('Wallet Address').fill('DemoWallet');
     await page.getByLabel('Amount').fill('3');
-    await page.getByRole('button', { name: /Participate in Pool/i }).click();
+    await page.getByRole('button', { name: 'Submit participation' }).click();
 
     await expect(page.getByText(/Cap reached/i)).toBeVisible();
     await expect(page.getByText(/Wallet Address/i)).toBeVisible();
