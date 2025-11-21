@@ -143,6 +143,10 @@ export interface Translations {
   darkTheme: string;
   oceanTheme: string;
   sunsetTheme: string;
+  neonCyanTheme: string;
+  neonPurpleTheme: string;
+  neonGreenTheme: string;
+  neonPinkTheme: string;
 
   // Wallet Page (Tab1)
   wallet: string;
@@ -418,6 +422,10 @@ export const translations: Record<'en' | 'de' | 'fr', Translations> = {
     darkTheme: 'Dark',
     oceanTheme: 'Ocean',
     sunsetTheme: 'Sunset',
+    neonCyanTheme: 'Neon Cyan',
+    neonPurpleTheme: 'Neon Purple',
+    neonGreenTheme: 'Neon Green',
+    neonPinkTheme: 'Neon Pink',
 
     // Wallet Page (Tab1)
     wallet: 'Wallet',
@@ -694,6 +702,10 @@ export const translations: Record<'en' | 'de' | 'fr', Translations> = {
     darkTheme: 'Dunkel',
     oceanTheme: 'Ozean',
     sunsetTheme: 'Sonnenuntergang',
+    neonCyanTheme: 'Neon Cyan',
+    neonPurpleTheme: 'Neon Lila',
+    neonGreenTheme: 'Neon Grün',
+    neonPinkTheme: 'Neon Rosa',
 
     // Wallet Page (Tab1)
     wallet: 'Wallet',
@@ -972,6 +984,10 @@ export const translations: Record<'en' | 'de' | 'fr', Translations> = {
     darkTheme: 'Sombre',
     oceanTheme: 'Océan',
     sunsetTheme: 'Coucher de Soleil',
+    neonCyanTheme: 'Néon Cyan',
+    neonPurpleTheme: 'Néon Violet',
+    neonGreenTheme: 'Néon Vert',
+    neonPinkTheme: 'Néon Rose',
 
     // Wallet Page (Tab1)
     wallet: 'Portefeuille',

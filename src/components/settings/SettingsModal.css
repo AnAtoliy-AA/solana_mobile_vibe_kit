@@ -1,5 +1,17 @@
 /* Settings Modal Styles */
 
+@keyframes neon-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.8;
+    filter: brightness(1.2);
+  }
+}
+
 .settings-modal {
   --height: 80%;
   --width: 90%;
@@ -72,6 +84,26 @@
   background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
 }
 
+.theme-preview-neon-cyan {
+  background: linear-gradient(135deg, #00ffff 0%, #00ffcc 50%, #00ccff 100%);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.theme-preview-neon-purple {
+  background: linear-gradient(135deg, #7b00ff 0%, #ff00ff 50%, #9d00ff 100%);
+  box-shadow: 0 0 10px rgba(123, 0, 255, 0.5);
+}
+
+.theme-preview-neon-green {
+  background: linear-gradient(135deg, #00ff88 0%, #39ff14 50%, #00ff41 100%);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.theme-preview-neon-pink {
+  background: linear-gradient(135deg, #ff0080 0%, #ff00ff 50%, #ff1493 100%);
+  box-shadow: 0 0 10px rgba(255, 0, 128, 0.5);
+}
+
 .settings-preview {
   padding: 20px;
 }
@@ -102,11 +134,15 @@
 .theme-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--theme-shadow-large);
+  border-color: var(--theme-secondary);
 }
 
 .theme-card.active {
   border-color: var(--theme-primary);
-  box-shadow: 0 0 0 3px rgba(var(--theme-primary-rgb), 0.2);
+  box-shadow:
+    0 0 0 3px rgba(var(--theme-primary-rgb), 0.3),
+    0 0 20px rgba(var(--theme-primary-rgb), 0.5);
+  animation: neon-pulse 2s ease-in-out infinite;
 }
 
 .theme-card-colors {
@@ -119,7 +155,12 @@
   flex: 1;
   height: 40px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(var(--theme-primary-rgb), 0.3);
+  transition: all 0.3s ease;
+}
+
+.theme-card:hover .theme-card-colors span {
+  box-shadow: 0 0 15px rgba(var(--theme-primary-rgb), 0.5);
 }
 
 .theme-card p {

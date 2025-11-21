@@ -4,7 +4,15 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export type Language = 'en' | 'de' | 'fr';
-export type Theme = 'default' | 'dark' | 'ocean' | 'sunset';
+export type Theme =
+  | 'default'
+  | 'dark'
+  | 'ocean'
+  | 'sunset'
+  | 'neon-cyan'
+  | 'neon-purple'
+  | 'neon-green'
+  | 'neon-pink';
 
 interface SettingsState {
   language: Language;
@@ -17,7 +25,7 @@ export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
       language: 'en',
-      theme: 'default',
+      theme: 'dark',
       setLanguage: (language: Language) => set({ language }),
       setTheme: (theme: Theme) => {
         set({ theme });

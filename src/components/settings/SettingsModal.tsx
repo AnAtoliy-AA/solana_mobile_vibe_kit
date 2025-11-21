@@ -99,6 +99,30 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                   {t.sunsetTheme}
                 </div>
               </IonSelectOption>
+              <IonSelectOption value="neon-cyan">
+                <div className="theme-option">
+                  <span className="theme-preview theme-preview-neon-cyan"></span>
+                  {t.neonCyanTheme}
+                </div>
+              </IonSelectOption>
+              <IonSelectOption value="neon-purple">
+                <div className="theme-option">
+                  <span className="theme-preview theme-preview-neon-purple"></span>
+                  {t.neonPurpleTheme}
+                </div>
+              </IonSelectOption>
+              <IonSelectOption value="neon-green">
+                <div className="theme-option">
+                  <span className="theme-preview theme-preview-neon-green"></span>
+                  {t.neonGreenTheme}
+                </div>
+              </IonSelectOption>
+              <IonSelectOption value="neon-pink">
+                <div className="theme-option">
+                  <span className="theme-preview theme-preview-neon-pink"></span>
+                  {t.neonPinkTheme}
+                </div>
+              </IonSelectOption>
             </IonSelect>
           </IonItem>
         </IonList>
@@ -149,6 +173,50 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                 <span style={{ background: '#fff5f0' }}></span>
               </div>
               <p>{t.sunsetTheme}</p>
+            </div>
+            <div
+              className={`theme-card ${theme === 'neon-cyan' ? 'active' : ''}`}
+              onClick={() => handleThemeChange('neon-cyan')}
+            >
+              <div className="theme-card-colors">
+                <span style={{ background: '#00ffff' }}></span>
+                <span style={{ background: '#00ffcc' }}></span>
+                <span style={{ background: '#00ccff' }}></span>
+              </div>
+              <p>{t.neonCyanTheme}</p>
+            </div>
+            <div
+              className={`theme-card ${theme === 'neon-purple' ? 'active' : ''}`}
+              onClick={() => handleThemeChange('neon-purple')}
+            >
+              <div className="theme-card-colors">
+                <span style={{ background: '#7b00ff' }}></span>
+                <span style={{ background: '#ff00ff' }}></span>
+                <span style={{ background: '#9d00ff' }}></span>
+              </div>
+              <p>{t.neonPurpleTheme}</p>
+            </div>
+            <div
+              className={`theme-card ${theme === 'neon-green' ? 'active' : ''}`}
+              onClick={() => handleThemeChange('neon-green')}
+            >
+              <div className="theme-card-colors">
+                <span style={{ background: '#00ff88' }}></span>
+                <span style={{ background: '#39ff14' }}></span>
+                <span style={{ background: '#00ff41' }}></span>
+              </div>
+              <p>{t.neonGreenTheme}</p>
+            </div>
+            <div
+              className={`theme-card ${theme === 'neon-pink' ? 'active' : ''}`}
+              onClick={() => handleThemeChange('neon-pink')}
+            >
+              <div className="theme-card-colors">
+                <span style={{ background: '#ff0080' }}></span>
+                <span style={{ background: '#ff00ff' }}></span>
+                <span style={{ background: '#ff1493' }}></span>
+              </div>
+              <p>{t.neonPinkTheme}</p>
             </div>
           </div>
         </div>
