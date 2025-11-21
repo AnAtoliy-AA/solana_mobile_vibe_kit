@@ -23,6 +23,9 @@ import {
   globeOutline,
   swapHorizontalOutline,
   timeOutline,
+  menuOutline,
+  closeOutline,
+  settingsOutline,
 } from 'ionicons/icons';
 import { usePoolListInfinite } from '../hooks/usePools';
 import { useLiveActivity } from '../hooks/useLiveUpdates';
@@ -33,6 +36,7 @@ import { useTranslation } from '../lib/i18n/useTranslation';
 import Tooltip from '../components/launchpad/Tooltip';
 import LastUpdated from '../components/launchpad/LastUpdated';
 import GlobalSettingsButton from '../components/settings/GlobalSettingsButton';
+import SettingsModal from '../components/settings/SettingsModal';
 import './Launchpad.css';
 import { getTokenInitials } from '../lib/utils/text';
 
@@ -46,8 +50,22 @@ const Launchpad: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'upcoming' | 'finished'>('all');
   const [sortOption, setSortOption] = useState<SortOption>('newest');
   const [filterOption, setFilterOption] = useState<FilterOption>('all');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const loadMoreRef = React.useRef<HTMLDivElement>(null);
   const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
+
+  // Close mobile menu on window resize to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 992) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Enable live activity feed updates
   useLiveActivity();
@@ -293,24 +311,91 @@ const Launchpad: React.FC = () => {
             <div className="navbar-brand">
               <span className="brand-icon">🚀</span>
               <span className="brand-text">Meme Launchpad</span>
+              <span className="brand-text-mobile">Launchpad</span>
             </div>
             <IonButtons className="navbar-menu">
-              <IonButton onClick={() => history.push('/launchpad')} className="nav-btn">
+              <IonButton
+                onClick={() => history.push('/launchpad')}
+                className="nav-btn nav-btn-desktop"
+              >
                 {t.home}
               </IonButton>
-              <IonButton className="nav-btn" disabled>
+              <IonButton className="nav-btn nav-btn-desktop" disabled>
                 {t.createMeme}
               </IonButton>
-              <IonButton className="nav-btn" disabled>
+              <IonButton className="nav-btn nav-btn-desktop" disabled>
                 <IonIcon icon={logoTwitter} slot="start" />
                 {t.mentionsOnX}
               </IonButton>
-              <GlobalSettingsButton className="nav-btn" />
-              <IonButton className="nav-btn nav-btn-login" fill="solid" color="primary" disabled>
+              <GlobalSettingsButton className="nav-btn nav-btn-desktop" />
+              <IonButton
+                className="nav-btn nav-btn-login nav-btn-desktop"
+                fill="solid"
+                color="primary"
+                disabled
+              >
                 {t.login}
+              </IonButton>
+              <IonButton
+                className="nav-btn nav-btn-mobile-menu"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+              >
+                <IonIcon icon={isMobileMenuOpen ? closeOutline : menuOutline} />
               </IonButton>
             </IonButtons>
           </div>
+          {isMobileMenuOpen && (
+            <div className="mobile-menu">
+              <IonButton
+                onClick={() => {
+                  history.push('/launchpad');
+                  setIsMobileMenuOpen(false);
+                }}
+                className="mobile-menu-item"
+                fill="clear"
+              >
+                {t.home}
+              </IonButton>
+              <IonButton
+                className="mobile-menu-item"
+                fill="clear"
+                disabled
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {t.createMeme}
+              </IonButton>
+              <IonButton
+                className="mobile-menu-item"
+                fill="clear"
+                disabled
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <IonIcon icon={logoTwitter} slot="start" />
+                {t.mentionsOnX}
+              </IonButton>
+              <IonButton
+                className="mobile-menu-item"
+                fill="clear"
+                onClick={() => {
+                  setIsSettingsOpen(true);
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                <IonIcon icon={settingsOutline} slot="start" />
+                {t.settings}
+              </IonButton>
+              <IonButton
+                className="mobile-menu-item mobile-menu-login"
+                fill="solid"
+                color="primary"
+                disabled
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {t.login}
+              </IonButton>
+            </div>
+          )}
         </IonToolbar>
 
         <IonToolbar className="launchpad-search-toolbar">
@@ -647,6 +732,7 @@ const Launchpad: React.FC = () => {
           )}
         </div>
       </IonContent>
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </IonPage>
   );
 };

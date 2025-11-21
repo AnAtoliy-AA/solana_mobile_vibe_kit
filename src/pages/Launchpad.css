@@ -42,6 +42,15 @@
   color: var(--theme-primary-contrast);
 }
 
+.brand-text-mobile {
+  display: none;
+  background: linear-gradient(90deg, var(--theme-primary-contrast), var(--theme-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: var(--theme-primary-contrast);
+}
+
 /* Ensure brand text gradient is visible on light theme */
 :root[data-theme='default'] .brand-text,
 :root:not([data-theme]) .brand-text {
@@ -79,6 +88,66 @@
   --background-hover: rgba(var(--theme-primary-rgb), 0.3);
   backdrop-filter: blur(10px);
   border-radius: 8px;
+}
+
+.nav-btn-mobile-menu {
+  display: none;
+}
+
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+  background: var(--theme-card-background);
+  border-top: 1px solid var(--theme-border-color);
+  animation: slideDown 0.3s ease-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-menu-item {
+  width: 100%;
+  justify-content: flex-start;
+  --color: var(--theme-text-primary);
+  font-weight: 500;
+  text-transform: none;
+  margin: 0;
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+.mobile-menu-item button,
+.mobile-menu-item ion-button {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.mobile-menu-item ion-icon {
+  margin-right: 12px;
+  font-size: 20px;
+}
+
+.mobile-menu-login {
+  margin-top: 8px;
+  --background: rgba(var(--theme-primary-rgb), 0.2);
+  --background-hover: rgba(var(--theme-primary-rgb), 0.3);
+  min-height: 44px;
+}
+
+.mobile-menu-item {
+  min-height: 44px;
+  touch-action: manipulation;
 }
 
 /* Search Toolbar */
@@ -125,6 +194,13 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tabs-container::-webkit-scrollbar {
+  display: none;
 }
 
 .tab-btn {
@@ -507,8 +583,15 @@
 
 /* Responsive Design */
 @media (max-width: 992px) {
-  .navbar-menu {
+  .nav-btn-desktop {
     display: none;
+  }
+
+  .nav-btn-mobile-menu {
+    display: block;
+    min-width: 44px;
+    min-height: 44px;
+    touch-action: manipulation;
   }
 
   .launchpad-controls {
@@ -531,12 +614,36 @@
   }
 
   .brand-text {
+    display: none;
+  }
+
+  .brand-text-mobile {
+    display: block;
     font-size: 18px;
+    font-weight: 700;
+  }
+
+  .brand-icon {
+    font-size: 24px;
+  }
+
+  .navbar-brand {
+    font-size: 18px;
+    gap: 8px;
   }
 
   .tab-btn {
-    padding: 10px 16px;
+    padding: 12px 16px;
     font-size: 14px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  .tabs-container {
+    gap: 4px;
+    padding: 0 12px;
   }
 
   .card-address {
@@ -547,6 +654,34 @@
   .card-footer {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .mobile-menu {
+    display: flex;
+  }
+
+  .launchpad-search-toolbar {
+    padding: 12px 0;
+  }
+
+  .launchpad-tabs-toolbar {
+    padding: 8px 0;
+  }
+
+  .modern-searchbar {
+    --padding-start: 12px;
+    --padding-end: 12px;
+  }
+
+  .launchpad-controls {
+    padding: 16px;
+  }
+
+  .chip {
+    padding: 10px 14px;
+    font-size: 12px;
+    min-height: 36px;
+    touch-action: manipulation;
   }
 }
 

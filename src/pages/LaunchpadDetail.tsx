@@ -243,6 +243,12 @@ const LaunchpadDetail: React.FC = () => {
       </IonHeader>
 
       <IonContent fullscreen className="launchpad-detail-content">
+        <IonHeader collapse="condense">
+          <IonToolbar>
+            <IonTitle size="large">{displayPool.symbol}</IonTitle>
+          </IonToolbar>
+        </IonHeader>
+
         <div className="pool-detail-container">
           <div className="pool-refresh-controls">
             <div className="pool-refresh-actions">
@@ -383,43 +389,34 @@ const LaunchpadDetail: React.FC = () => {
               </Tooltip>
             </IonCardHeader>
             <IonCardContent>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div className="contract-address-container">
                 <Tooltip content={t.contractTooltip} position="top">
-                  <code
-                    style={{
-                      flex: 1,
-                      padding: '12px',
-                      background: 'var(--ion-color-light)',
-                      borderRadius: '8px',
-                      fontSize: '0.85rem',
-                      wordBreak: 'break-all',
-                    }}
-                  >
-                    {displayPool.id}
-                  </code>
+                  <code className="contract-address-code">{displayPool.id}</code>
                 </Tooltip>
-                <Tooltip content={t.copyTooltip} position="top">
-                  <IonButton
-                    size="small"
-                    fill="outline"
-                    onClick={() => {
-                      navigator.clipboard.writeText(displayPool.id);
-                    }}
-                  >
-                    {t.copy}
-                  </IonButton>
-                </Tooltip>
-                <Tooltip content={t.viewOnSolscan} position="top">
-                  <IonButton
-                    size="small"
-                    fill="solid"
-                    onClick={() => {
-                      window.open(`https://solscan.io/token/${displayPool.id}`, '_blank');
-                    }}
-                  >
-                    {t.viewOnSolscan}
-                  </IonButton>
-                </Tooltip>
+                <div className="contract-address-actions">
+                  <Tooltip content={t.copyTooltip} position="top">
+                    <IonButton
+                      size="small"
+                      fill="outline"
+                      onClick={() => {
+                        navigator.clipboard.writeText(displayPool.id);
+                      }}
+                    >
+                      {t.copy}
+                    </IonButton>
+                  </Tooltip>
+                  <Tooltip content={t.viewOnSolscan} position="top">
+                    <IonButton
+                      size="small"
+                      fill="solid"
+                      onClick={() => {
+                        window.open(`https://solscan.io/token/${displayPool.id}`, '_blank');
+                      }}
+                    >
+                      {t.viewOnSolscan}
+                    </IonButton>
+                  </Tooltip>
+                </div>
               </div>
             </IonCardContent>
           </IonCard>
@@ -701,20 +698,9 @@ const LaunchpadDetail: React.FC = () => {
                         {t.poolAddress}
                       </div>
                     </Tooltip>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div className="pool-address-container">
                       <Tooltip content={t.poolAddressTooltip} position="top">
-                        <code
-                          style={{
-                            flex: 1,
-                            padding: '8px',
-                            background: 'var(--ion-color-light)',
-                            borderRadius: '4px',
-                            fontSize: '0.75rem',
-                            wordBreak: 'break-all',
-                          }}
-                        >
-                          {displayPool.pool}
-                        </code>
+                        <code className="pool-address-code">{displayPool.pool}</code>
                       </Tooltip>
                       <Tooltip content={t.copyTooltip} position="top">
                         <IonButton
@@ -740,20 +726,9 @@ const LaunchpadDetail: React.FC = () => {
                         {t.creator}
                       </div>
                     </Tooltip>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div className="pool-address-container">
                       <Tooltip content={t.creatorTooltip} position="top">
-                        <code
-                          style={{
-                            flex: 1,
-                            padding: '8px',
-                            background: 'var(--ion-color-light)',
-                            borderRadius: '4px',
-                            fontSize: '0.75rem',
-                            wordBreak: 'break-all',
-                          }}
-                        >
-                          {displayPool.creator}
-                        </code>
+                        <code className="pool-address-code">{displayPool.creator}</code>
                       </Tooltip>
                       <Tooltip content={t.copyTooltip} position="top">
                         <IonButton

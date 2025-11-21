@@ -5,7 +5,7 @@
 }
 
 .launchpad-detail-header ion-toolbar {
-  --background: transparent;
+  --background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-tertiary) 100%);
   --color: var(--theme-primary-contrast);
 }
 
@@ -204,11 +204,92 @@
   z-index: 10;
 }
 
+/* Contract Address Section */
+.contract-address-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.contract-address-code {
+  flex: 1;
+  padding: 12px;
+  background: var(--ion-color-light);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  word-break: break-all;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+
+.contract-address-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.contract-address-actions ion-button {
+  flex: 1;
+  min-width: 100px;
+}
+
+/* Pool Address Section */
+.pool-address-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.pool-address-code {
+  flex: 1;
+  padding: 8px;
+  background: var(--ion-color-light);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  word-break: break-all;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+
 /* Tablet and desktop */
 @media (min-width: 768px) {
   .pool-detail-action {
     position: relative;
     border-top: none;
     margin-top: 24px;
+  }
+
+  .contract-address-container {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .contract-address-code {
+    font-size: 0.9rem;
+  }
+
+  .contract-address-actions {
+    flex-wrap: nowrap;
+  }
+
+  .contract-address-actions ion-button {
+    flex: 0 0 auto;
+    min-width: auto;
+  }
+
+  .pool-address-container {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .pool-address-code {
+    font-size: 0.8rem;
   }
 }
