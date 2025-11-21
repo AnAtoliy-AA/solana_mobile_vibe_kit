@@ -12,6 +12,8 @@ import {
   IonProgressBar,
 } from '@ionic/react';
 import { Pool } from '../../lib/api/types';
+import { useTranslation } from '../../lib/i18n/useTranslation';
+import Tooltip from './Tooltip';
 import './PoolCard.css';
 
 interface PoolCardProps {
@@ -20,6 +22,8 @@ interface PoolCardProps {
 }
 
 const PoolCard: React.FC<PoolCardProps> = ({ pool, onClick }) => {
+  const t = useTranslation();
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
@@ -60,28 +64,53 @@ const PoolCard: React.FC<PoolCardProps> = ({ pool, onClick }) => {
 
         <div className="pool-stats">
           <div className="pool-stat">
-            <span className="pool-stat-label">TVL</span>
-            <span className="pool-stat-value">${formatNumber(pool.tvl)}</span>
+            <Tooltip content={t.marketCapTooltip} position="top">
+              <span className="pool-stat-label">TVL</span>
+            </Tooltip>
+            <Tooltip content={t.marketCapTooltip} position="top">
+              <span className="pool-stat-value">${formatNumber(pool.tvl)}</span>
+            </Tooltip>
           </div>
           <div className="pool-stat">
-            <span className="pool-stat-label">Price</span>
-            <span className="pool-stat-value">{formatPrice(pool.tokenPrice)}</span>
+            <Tooltip content={t.tokenPrice} position="top">
+              <span className="pool-stat-label">Price</span>
+            </Tooltip>
+            <Tooltip content={t.tokenPrice} position="top">
+              <span className="pool-stat-value">{formatPrice(pool.tokenPrice)}</span>
+            </Tooltip>
           </div>
           <div className="pool-stat">
-            <span className="pool-stat-label">Participants</span>
-            <span className="pool-stat-value">{pool.participants}</span>
+            <Tooltip content={t.holdersTooltip} position="top">
+              <span className="pool-stat-label">Participants</span>
+            </Tooltip>
+            <Tooltip content={t.holdersTooltip} position="top">
+              <span className="pool-stat-value">{pool.participants}</span>
+            </Tooltip>
           </div>
         </div>
 
         <div className="pool-progress">
           <div className="pool-progress-header">
-            <span>Progress</span>
-            <span>{(pool.progress * 100).toFixed(0)}%</span>
+            <Tooltip content={t.progressTooltip} position="top">
+              <span>Progress</span>
+            </Tooltip>
+            <Tooltip content={t.progressTooltip} position="top">
+              <span>{(pool.progress * 100).toFixed(0)}%</span>
+            </Tooltip>
           </div>
-          <IonProgressBar value={pool.progress} color="primary" />
+          <Tooltip content={t.progressTooltip} position="top">
+            <IonProgressBar value={pool.progress} color="primary" />
+          </Tooltip>
           <div className="pool-progress-amounts">
-            <span>${formatNumber(pool.currentAmount)}</span>
-            <span className="pool-progress-target">/ ${formatNumber(pool.targetAmount)}</span>
+            <Tooltip
+              content={`Current amount raised: $${formatNumber(pool.currentAmount)}`}
+              position="top"
+            >
+              <span>${formatNumber(pool.currentAmount)}</span>
+            </Tooltip>
+            <Tooltip content={`Target amount: $${formatNumber(pool.targetAmount)}`} position="top">
+              <span className="pool-progress-target">/ ${formatNumber(pool.targetAmount)}</span>
+            </Tooltip>
           </div>
         </div>
 

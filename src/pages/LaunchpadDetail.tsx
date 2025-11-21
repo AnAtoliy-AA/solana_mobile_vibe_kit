@@ -31,6 +31,8 @@ import { useUIStore } from '../lib/stores/useUIStore';
 import { useMarketStore } from '../lib/stores/useMarketStore';
 import GlobalSettingsButton from '../components/settings/GlobalSettingsButton';
 import LastUpdated from '../components/launchpad/LastUpdated';
+import Tooltip from '../components/launchpad/Tooltip';
+import { useTranslation } from '../lib/i18n/useTranslation';
 import './LaunchpadDetail.css';
 import { getTokenInitials } from '../lib/utils/text';
 
@@ -49,6 +51,7 @@ const refreshOptions: RefreshOption[] = [
 
 const LaunchpadDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const t = useTranslation();
   const { data: pool, isLoading, refetch, isFetching } = usePoolDetail(id);
   const openParticipationModal = useUIStore((state) => state.openParticipationModal);
   const addToast = useUIStore((state) => state.addToast);
@@ -70,10 +73,10 @@ const LaunchpadDetail: React.FC = () => {
     ? {
         ...pool,
         ...(livePool && {
-          tokenPrice: livePool.tokenPrice,
-          tvl: livePool.tvl,
-          currentAmount: livePool.currentAmount,
-          progress: livePool.progress,
+          ...(livePool.tokenPrice !== undefined && { tokenPrice: livePool.tokenPrice }),
+          ...(livePool.tvl !== undefined && { tvl: livePool.tvl }),
+          ...(livePool.currentAmount !== undefined && { currentAmount: livePool.currentAmount }),
+          ...(livePool.progress !== undefined && { progress: livePool.progress }),
         }),
       }
     : undefined;
@@ -95,6 +98,13 @@ const LaunchpadDetail: React.FC = () => {
     return parseFloat(num).toLocaleString('en-US', {
       maximumFractionDigits: 0,
     });
+  };
+
+  const formatPrice = (price: string | undefined): string => {
+    if (!price || price === 'undefined' || isNaN(parseFloat(price))) {
+      return '$0.0000';
+    }
+    return `$${parseFloat(price).toFixed(4)}`;
   };
 
   const formatDate = (dateString: string) => {
@@ -158,6 +168,11 @@ const LaunchpadDetail: React.FC = () => {
     setLastRefreshedAt(Date.now());
   }, [pool]);
 
+  const contentStyle: React.CSSProperties & Record<string, string> = {
+    '--offset-top': '0px',
+    '--padding-top': '0px',
+  };
+
   if (isLoading || !displayPool) {
     return (
       <IonPage>
@@ -170,7 +185,7 @@ const LaunchpadDetail: React.FC = () => {
             <GlobalSettingsButton />
           </IonToolbar>
         </IonHeader>
-        <IonContent className="launchpad-detail-content">
+        <IonContent className="launchpad-detail-content" style={contentStyle}>
           <div className="pool-detail-loading">
             <IonSpinner name="crescent" />
           </div>
@@ -191,7 +206,7 @@ const LaunchpadDetail: React.FC = () => {
             <GlobalSettingsButton />
           </IonToolbar>
         </IonHeader>
-        <IonContent className="launchpad-detail-content">
+        <IonContent className="launchpad-detail-content" style={contentStyle}>
           <div className="pool-detail-error">
             <IonText color="danger">
               <h2>Pool not found</h2>
@@ -214,7 +229,7 @@ const LaunchpadDetail: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen className="launchpad-detail-content">
+      <IonContent fullscreen className="launchpad-detail-content" style={contentStyle}>
         <div className="pool-detail-container">
           <div className="pool-refresh-controls">
             <div className="pool-refresh-actions">
@@ -306,22 +321,38 @@ const LaunchpadDetail: React.FC = () => {
               {/* Progress */}
               <div className="pool-detail-progress">
                 <div className="pool-progress-header">
-                  <span>
-                    Funding Progress
-                    <LastUpdated timestamp={livePool?.lastUpdated} />
-                  </span>
-                  <span className="pool-progress-percentage">
-                    {(displayPool.progress * 100).toFixed(0)}%
-                  </span>
+                  <Tooltip content={t.progressTooltip} position="top">
+                    <span>
+                      Funding Progress
+                      <LastUpdated timestamp={livePool?.lastUpdated} />
+                    </span>
+                  </Tooltip>
+                  <Tooltip content={t.progressTooltip} position="top">
+                    <span className="pool-progress-percentage">
+                      {(displayPool.progress * 100).toFixed(0)}%
+                    </span>
+                  </Tooltip>
                 </div>
-                <IonProgressBar value={displayPool.progress} color="primary" />
+                <Tooltip content={t.progressTooltip} position="top">
+                  <IonProgressBar value={displayPool.progress} color="primary" />
+                </Tooltip>
                 <div className="pool-progress-amounts">
-                  <span className="pool-amount-raised">
-                    ${formatNumber(displayPool.currentAmount)}
-                  </span>
-                  <span className="pool-amount-target">
-                    / ${formatNumber(displayPool.targetAmount)}
-                  </span>
+                  <Tooltip
+                    content={`Current amount raised: $${formatNumber(displayPool.currentAmount)}`}
+                    position="top"
+                  >
+                    <span className="pool-amount-raised">
+                      ${formatNumber(displayPool.currentAmount)}
+                    </span>
+                  </Tooltip>
+                  <Tooltip
+                    content={`Target amount: $${formatNumber(displayPool.targetAmount)}`}
+                    position="top"
+                  >
+                    <span className="pool-amount-target">
+                      / ${formatNumber(displayPool.targetAmount)}
+                    </span>
+                  </Tooltip>
                 </div>
               </div>
             </IonCardContent>
@@ -330,40 +361,48 @@ const LaunchpadDetail: React.FC = () => {
           {/* Contract Address Card */}
           <IonCard>
             <IonCardHeader>
-              <IonCardTitle>Contract Address</IonCardTitle>
+              <Tooltip content={t.contractTooltip} position="bottom">
+                <IonCardTitle>Contract Address</IonCardTitle>
+              </Tooltip>
             </IonCardHeader>
             <IonCardContent>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <code
-                  style={{
-                    flex: 1,
-                    padding: '12px',
-                    background: 'var(--ion-color-light)',
-                    borderRadius: '8px',
-                    fontSize: '0.85rem',
-                    wordBreak: 'break-all',
-                  }}
-                >
-                  {displayPool.id}
-                </code>
-                <IonButton
-                  size="small"
-                  fill="outline"
-                  onClick={() => {
-                    navigator.clipboard.writeText(displayPool.id);
-                  }}
-                >
-                  Copy
-                </IonButton>
-                <IonButton
-                  size="small"
-                  fill="solid"
-                  onClick={() => {
-                    window.open(`https://solscan.io/token/${displayPool.id}`, '_blank');
-                  }}
-                >
-                  View on Solscan
-                </IonButton>
+                <Tooltip content={t.contractTooltip} position="top">
+                  <code
+                    style={{
+                      flex: 1,
+                      padding: '12px',
+                      background: 'var(--ion-color-light)',
+                      borderRadius: '8px',
+                      fontSize: '0.85rem',
+                      wordBreak: 'break-all',
+                    }}
+                  >
+                    {displayPool.id}
+                  </code>
+                </Tooltip>
+                <Tooltip content={t.copyTooltip} position="top">
+                  <IonButton
+                    size="small"
+                    fill="outline"
+                    onClick={() => {
+                      navigator.clipboard.writeText(displayPool.id);
+                    }}
+                  >
+                    Copy
+                  </IonButton>
+                </Tooltip>
+                <Tooltip content={t.viewOnSolscan} position="top">
+                  <IonButton
+                    size="small"
+                    fill="solid"
+                    onClick={() => {
+                      window.open(`https://solscan.io/token/${displayPool.id}`, '_blank');
+                    }}
+                  >
+                    View on Solscan
+                  </IonButton>
+                </Tooltip>
               </div>
             </IonCardContent>
           </IonCard>
@@ -378,54 +417,93 @@ const LaunchpadDetail: React.FC = () => {
                 <IonRow>
                   <IonCol size="6">
                     <div className="stat-item">
-                      <div className="stat-label">Token Price</div>
-                      <div className="stat-value">
-                        ${displayPool.tokenPrice}
-                        <LastUpdated timestamp={livePool?.lastUpdated} prefix="" />
-                      </div>
+                      <Tooltip content={t.tokenPrice} position="top">
+                        <div className="stat-label">Token Price</div>
+                      </Tooltip>
+                      <Tooltip content={t.tokenPrice} position="top">
+                        <div className="stat-value">
+                          {formatPrice(displayPool.tokenPrice)}
+                          <LastUpdated timestamp={livePool?.lastUpdated} prefix="" />
+                        </div>
+                      </Tooltip>
                     </div>
                   </IonCol>
                   <IonCol size="6">
                     <div className="stat-item">
-                      <div className="stat-label">Total Value Locked</div>
-                      <div className="stat-value">
-                        ${formatNumber(displayPool.tvl)}
-                        <LastUpdated timestamp={livePool?.lastUpdated} prefix="" />
-                      </div>
-                    </div>
-                  </IonCol>
-                </IonRow>
-                <IonRow>
-                  <IonCol size="6">
-                    <div className="stat-item">
-                      <div className="stat-label">Participants</div>
-                      <div className="stat-value">
-                        {displayPool.participants.toLocaleString()}
-                        <LastUpdated timestamp={livePool?.lastUpdated} prefix="" />
-                      </div>
-                    </div>
-                  </IonCol>
-                  <IonCol size="6">
-                    <div className="stat-item">
-                      <div className="stat-label">Target Amount</div>
-                      <div className="stat-value">${formatNumber(displayPool.targetAmount)}</div>
+                      <Tooltip content={t.marketCapTooltip} position="top">
+                        <div className="stat-label">Total Value Locked</div>
+                      </Tooltip>
+                      <Tooltip content={t.marketCapTooltip} position="top">
+                        <div className="stat-value">
+                          ${formatNumber(displayPool.tvl)}
+                          <LastUpdated timestamp={livePool?.lastUpdated} prefix="" />
+                        </div>
+                      </Tooltip>
                     </div>
                   </IonCol>
                 </IonRow>
                 <IonRow>
                   <IonCol size="6">
                     <div className="stat-item">
-                      <div className="stat-label">Current Amount</div>
-                      <div className="stat-value">${formatNumber(displayPool.currentAmount)}</div>
+                      <Tooltip content={t.holdersTooltip} position="top">
+                        <div className="stat-label">Participants</div>
+                      </Tooltip>
+                      <Tooltip content={t.holdersTooltip} position="top">
+                        <div className="stat-value">
+                          {displayPool.participants.toLocaleString()}
+                          <LastUpdated timestamp={livePool?.lastUpdated} prefix="" />
+                        </div>
+                      </Tooltip>
                     </div>
                   </IonCol>
                   <IonCol size="6">
                     <div className="stat-item">
-                      <div className="stat-label">Min/Max Participation</div>
-                      <div className="stat-value">
-                        ${displayPool.minParticipation || '10'} - $
-                        {displayPool.maxParticipation || '10K'}
-                      </div>
+                      <Tooltip
+                        content={`Target fundraising amount: $${formatNumber(displayPool.targetAmount)}`}
+                        position="top"
+                      >
+                        <div className="stat-label">Target Amount</div>
+                      </Tooltip>
+                      <Tooltip
+                        content={`Target fundraising amount: $${formatNumber(displayPool.targetAmount)}`}
+                        position="top"
+                      >
+                        <div className="stat-value">${formatNumber(displayPool.targetAmount)}</div>
+                      </Tooltip>
+                    </div>
+                  </IonCol>
+                </IonRow>
+                <IonRow>
+                  <IonCol size="6">
+                    <div className="stat-item">
+                      <Tooltip
+                        content={`Current amount raised: $${formatNumber(displayPool.currentAmount)}`}
+                        position="top"
+                      >
+                        <div className="stat-label">Current Amount</div>
+                      </Tooltip>
+                      <Tooltip
+                        content={`Current amount raised: $${formatNumber(displayPool.currentAmount)}`}
+                        position="top"
+                      >
+                        <div className="stat-value">${formatNumber(displayPool.currentAmount)}</div>
+                      </Tooltip>
+                    </div>
+                  </IonCol>
+                  <IonCol size="6">
+                    <div className="stat-item">
+                      <Tooltip content={t.minMax} position="top">
+                        <div className="stat-label">Min/Max Participation</div>
+                      </Tooltip>
+                      <Tooltip
+                        content={`Minimum: $${displayPool.minParticipation || '10'}, Maximum: $${displayPool.maxParticipation || '10K'}`}
+                        position="top"
+                      >
+                        <div className="stat-value">
+                          ${displayPool.minParticipation || '10'} - $
+                          {displayPool.maxParticipation || '10K'}
+                        </div>
+                      </Tooltip>
                     </div>
                   </IonCol>
                 </IonRow>
@@ -448,20 +526,34 @@ const LaunchpadDetail: React.FC = () => {
                     {displayPool.buys !== undefined && (
                       <IonCol size="6">
                         <div className="stat-item">
-                          <div className="stat-label">Buys</div>
-                          <div className="stat-value" style={{ color: 'var(--ion-color-success)' }}>
-                            {displayPool.buys.toLocaleString()}
-                          </div>
+                          <Tooltip content="Number of buy transactions" position="top">
+                            <div className="stat-label">Buys</div>
+                          </Tooltip>
+                          <Tooltip content="Number of buy transactions" position="top">
+                            <div
+                              className="stat-value"
+                              style={{ color: 'var(--ion-color-success)' }}
+                            >
+                              {displayPool.buys.toLocaleString()}
+                            </div>
+                          </Tooltip>
                         </div>
                       </IonCol>
                     )}
                     {displayPool.sells !== undefined && (
                       <IonCol size="6">
                         <div className="stat-item">
-                          <div className="stat-label">Sells</div>
-                          <div className="stat-value" style={{ color: 'var(--ion-color-danger)' }}>
-                            {displayPool.sells.toLocaleString()}
-                          </div>
+                          <Tooltip content="Number of sell transactions" position="top">
+                            <div className="stat-label">Sells</div>
+                          </Tooltip>
+                          <Tooltip content="Number of sell transactions" position="top">
+                            <div
+                              className="stat-value"
+                              style={{ color: 'var(--ion-color-danger)' }}
+                            >
+                              {displayPool.sells.toLocaleString()}
+                            </div>
+                          </Tooltip>
                         </div>
                       </IonCol>
                     )}
@@ -470,21 +562,29 @@ const LaunchpadDetail: React.FC = () => {
                     {displayPool.txCount !== undefined && (
                       <IonCol size="6">
                         <div className="stat-item">
-                          <div className="stat-label">Total Transactions</div>
-                          <div className="stat-value">{displayPool.txCount.toLocaleString()}</div>
+                          <Tooltip content="Total number of transactions" position="top">
+                            <div className="stat-label">Total Transactions</div>
+                          </Tooltip>
+                          <Tooltip content="Total number of transactions" position="top">
+                            <div className="stat-value">{displayPool.txCount.toLocaleString()}</div>
+                          </Tooltip>
                         </div>
                       </IonCol>
                     )}
                     {displayPool.volumeSol !== undefined && (
                       <IonCol size="6">
                         <div className="stat-item">
-                          <div className="stat-label">Volume (SOL)</div>
-                          <div className="stat-value">
-                            {displayPool.volumeSol.toLocaleString(undefined, {
-                              maximumFractionDigits: 2,
-                            })}{' '}
-                            SOL
-                          </div>
+                          <Tooltip content={t.volumeTooltip} position="top">
+                            <div className="stat-label">Volume (SOL)</div>
+                          </Tooltip>
+                          <Tooltip content={t.volumeTooltip} position="top">
+                            <div className="stat-value">
+                              {displayPool.volumeSol.toLocaleString(undefined, {
+                                maximumFractionDigits: 2,
+                              })}{' '}
+                              SOL
+                            </div>
+                          </Tooltip>
                         </div>
                       </IonCol>
                     )}
@@ -493,13 +593,17 @@ const LaunchpadDetail: React.FC = () => {
                     <IonRow>
                       <IonCol size="12">
                         <div className="stat-item">
-                          <div className="stat-label">Volume (USD)</div>
-                          <div className="stat-value">
-                            $
-                            {displayPool.volumeUsd.toLocaleString(undefined, {
-                              maximumFractionDigits: 2,
-                            })}
-                          </div>
+                          <Tooltip content={t.volumeTooltip} position="top">
+                            <div className="stat-label">Volume (USD)</div>
+                          </Tooltip>
+                          <Tooltip content={t.volumeTooltip} position="top">
+                            <div className="stat-value">
+                              $
+                              {displayPool.volumeUsd.toLocaleString(undefined, {
+                                maximumFractionDigits: 2,
+                              })}
+                            </div>
+                          </Tooltip>
                         </div>
                       </IonCol>
                     </IonRow>
@@ -521,20 +625,28 @@ const LaunchpadDetail: React.FC = () => {
                     {displayPool.supply && (
                       <IonCol size="6">
                         <div className="stat-item">
-                          <div className="stat-label">Total Supply</div>
-                          <div className="stat-value">
-                            {(
-                              displayPool.supply / Math.pow(10, displayPool.decimals || 0)
-                            ).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                          </div>
+                          <Tooltip content="Total token supply" position="top">
+                            <div className="stat-label">Total Supply</div>
+                          </Tooltip>
+                          <Tooltip content="Total token supply" position="top">
+                            <div className="stat-value">
+                              {(
+                                displayPool.supply / Math.pow(10, displayPool.decimals || 0)
+                              ).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                            </div>
+                          </Tooltip>
                         </div>
                       </IonCol>
                     )}
                     {displayPool.decimals !== undefined && (
                       <IonCol size="6">
                         <div className="stat-item">
-                          <div className="stat-label">Decimals</div>
-                          <div className="stat-value">{displayPool.decimals}</div>
+                          <Tooltip content="Number of decimal places for the token" position="top">
+                            <div className="stat-label">Decimals</div>
+                          </Tooltip>
+                          <Tooltip content="Number of decimal places for the token" position="top">
+                            <div className="stat-value">{displayPool.decimals}</div>
+                          </Tooltip>
                         </div>
                       </IonCol>
                     )}
@@ -543,8 +655,12 @@ const LaunchpadDetail: React.FC = () => {
                     <IonRow>
                       <IonCol size="12">
                         <div className="stat-item">
-                          <div className="stat-label">Token Type</div>
-                          <div className="stat-value">{displayPool.tokenType}</div>
+                          <Tooltip content="Type of token (e.g., SPL Token)" position="top">
+                            <div className="stat-label">Token Type</div>
+                          </Tooltip>
+                          <Tooltip content="Type of token (e.g., SPL Token)" position="top">
+                            <div className="stat-value">{displayPool.tokenType}</div>
+                          </Tooltip>
                         </div>
                       </IonCol>
                     </IonRow>
@@ -563,76 +679,93 @@ const LaunchpadDetail: React.FC = () => {
               <IonCardContent>
                 {displayPool.pool && (
                   <div style={{ marginBottom: '16px' }}>
-                    <div className="stat-label" style={{ marginBottom: '8px' }}>
-                      Pool Address
-                    </div>
+                    <Tooltip content="Pool contract address" position="top">
+                      <div className="stat-label" style={{ marginBottom: '8px' }}>
+                        Pool Address
+                      </div>
+                    </Tooltip>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <code
-                        style={{
-                          flex: 1,
-                          padding: '8px',
-                          background: 'var(--ion-color-light)',
-                          borderRadius: '4px',
-                          fontSize: '0.75rem',
-                          wordBreak: 'break-all',
-                        }}
-                      >
-                        {displayPool.pool}
-                      </code>
-                      <IonButton
-                        size="small"
-                        fill="clear"
-                        onClick={() => {
-                          if (!displayPool.pool) {
-                            return;
-                          }
-                          navigator.clipboard.writeText(displayPool.pool);
-                        }}
-                      >
-                        Copy
-                      </IonButton>
+                      <Tooltip content="Pool contract address" position="top">
+                        <code
+                          style={{
+                            flex: 1,
+                            padding: '8px',
+                            background: 'var(--ion-color-light)',
+                            borderRadius: '4px',
+                            fontSize: '0.75rem',
+                            wordBreak: 'break-all',
+                          }}
+                        >
+                          {displayPool.pool}
+                        </code>
+                      </Tooltip>
+                      <Tooltip content={t.copyTooltip} position="top">
+                        <IonButton
+                          size="small"
+                          fill="clear"
+                          onClick={() => {
+                            if (!displayPool.pool) {
+                              return;
+                            }
+                            navigator.clipboard.writeText(displayPool.pool);
+                          }}
+                        >
+                          Copy
+                        </IonButton>
+                      </Tooltip>
                     </div>
                   </div>
                 )}
                 {displayPool.creator && (
                   <div>
-                    <div className="stat-label" style={{ marginBottom: '8px' }}>
-                      Creator
-                    </div>
+                    <Tooltip content="Creator wallet address" position="top">
+                      <div className="stat-label" style={{ marginBottom: '8px' }}>
+                        Creator
+                      </div>
+                    </Tooltip>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <code
-                        style={{
-                          flex: 1,
-                          padding: '8px',
-                          background: 'var(--ion-color-light)',
-                          borderRadius: '4px',
-                          fontSize: '0.75rem',
-                          wordBreak: 'break-all',
-                        }}
-                      >
-                        {displayPool.creator}
-                      </code>
-                      <IonButton
-                        size="small"
-                        fill="clear"
-                        onClick={() => {
-                          if (!displayPool.creator) {
-                            return;
+                      <Tooltip content="Creator wallet address" position="top">
+                        <code
+                          style={{
+                            flex: 1,
+                            padding: '8px',
+                            background: 'var(--ion-color-light)',
+                            borderRadius: '4px',
+                            fontSize: '0.75rem',
+                            wordBreak: 'break-all',
+                          }}
+                        >
+                          {displayPool.creator}
+                        </code>
+                      </Tooltip>
+                      <Tooltip content={t.copyTooltip} position="top">
+                        <IonButton
+                          size="small"
+                          fill="clear"
+                          onClick={() => {
+                            if (!displayPool.creator) {
+                              return;
+                            }
+                            navigator.clipboard.writeText(displayPool.creator);
+                          }}
+                        >
+                          Copy
+                        </IonButton>
+                      </Tooltip>
+                      <Tooltip content={t.viewOnSolscan} position="top">
+                        <IonButton
+                          size="small"
+                          fill="clear"
+                          onClick={() =>
+                            window.open(
+                              `https://solscan.io/account/${displayPool.creator}`,
+                              '_blank'
+                            )
                           }
-                          navigator.clipboard.writeText(displayPool.creator);
-                        }}
-                      >
-                        Copy
-                      </IonButton>
-                      <IonButton
-                        size="small"
-                        fill="clear"
-                        onClick={() =>
-                          window.open(`https://solscan.io/account/${displayPool.creator}`, '_blank')
-                        }
-                      >
-                        View
-                      </IonButton>
+                        >
+                          View
+                        </IonButton>
+                      </Tooltip>
                     </div>
                   </div>
                 )}
@@ -745,43 +878,51 @@ const LaunchpadDetail: React.FC = () => {
               <IonCardContent>
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                   {displayPool.websiteUrl && (
-                    <IonButton
-                      expand="block"
-                      fill="outline"
-                      onClick={() => window.open(displayPool.websiteUrl, '_blank')}
-                    >
-                      Website
-                    </IonButton>
+                    <Tooltip content={t.visitWebsite} position="top">
+                      <IonButton
+                        expand="block"
+                        fill="outline"
+                        onClick={() => window.open(displayPool.websiteUrl, '_blank')}
+                      >
+                        Website
+                      </IonButton>
+                    </Tooltip>
                   )}
                   {displayPool.twitterUrl && (
-                    <IonButton
-                      expand="block"
-                      fill="outline"
-                      color="primary"
-                      onClick={() => window.open(displayPool.twitterUrl, '_blank')}
-                    >
-                      Twitter
-                    </IonButton>
+                    <Tooltip content={t.visitTwitter} position="top">
+                      <IonButton
+                        expand="block"
+                        fill="outline"
+                        color="primary"
+                        onClick={() => window.open(displayPool.twitterUrl, '_blank')}
+                      >
+                        Twitter
+                      </IonButton>
+                    </Tooltip>
                   )}
                   {displayPool.telegramUrl && (
-                    <IonButton
-                      expand="block"
-                      fill="outline"
-                      color="secondary"
-                      onClick={() => window.open(displayPool.telegramUrl, '_blank')}
-                    >
-                      Telegram
-                    </IonButton>
+                    <Tooltip content="Visit Telegram channel" position="top">
+                      <IonButton
+                        expand="block"
+                        fill="outline"
+                        color="secondary"
+                        onClick={() => window.open(displayPool.telegramUrl, '_blank')}
+                      >
+                        Telegram
+                      </IonButton>
+                    </Tooltip>
                   )}
                   {displayPool.discordUrl && (
-                    <IonButton
-                      expand="block"
-                      fill="outline"
-                      color="tertiary"
-                      onClick={() => window.open(displayPool.discordUrl, '_blank')}
-                    >
-                      Discord
-                    </IonButton>
+                    <Tooltip content="Visit Discord server" position="top">
+                      <IonButton
+                        expand="block"
+                        fill="outline"
+                        color="tertiary"
+                        onClick={() => window.open(displayPool.discordUrl, '_blank')}
+                      >
+                        Discord
+                      </IonButton>
+                    </Tooltip>
                   )}
                 </div>
               </IonCardContent>
@@ -796,21 +937,35 @@ const LaunchpadDetail: React.FC = () => {
               </IonCardHeader>
               <IonCardContent>
                 <div className="timeline-item">
-                  <span className="timeline-label">Start Date:</span>
-                  <span className="timeline-value">
-                    {formatDate(displayPool.timeline.startDate)}
-                  </span>
+                  <Tooltip content={t.startDate} position="top">
+                    <span className="timeline-label">Start Date:</span>
+                  </Tooltip>
+                  <Tooltip content={t.startDate} position="top">
+                    <span className="timeline-value">
+                      {formatDate(displayPool.timeline.startDate)}
+                    </span>
+                  </Tooltip>
                 </div>
                 <div className="timeline-item">
-                  <span className="timeline-label">End Date:</span>
-                  <span className="timeline-value">{formatDate(displayPool.timeline.endDate)}</span>
+                  <Tooltip content={t.endDate} position="top">
+                    <span className="timeline-label">End Date:</span>
+                  </Tooltip>
+                  <Tooltip content={t.endDate} position="top">
+                    <span className="timeline-value">
+                      {formatDate(displayPool.timeline.endDate)}
+                    </span>
+                  </Tooltip>
                 </div>
                 {displayPool.timeline.distributionDate && (
                   <div className="timeline-item">
-                    <span className="timeline-label">Distribution:</span>
-                    <span className="timeline-value">
-                      {formatDate(displayPool.timeline.distributionDate)}
-                    </span>
+                    <Tooltip content={t.distribution} position="top">
+                      <span className="timeline-label">Distribution:</span>
+                    </Tooltip>
+                    <Tooltip content={t.distribution} position="top">
+                      <span className="timeline-value">
+                        {formatDate(displayPool.timeline.distributionDate)}
+                      </span>
+                    </Tooltip>
                   </div>
                 )}
               </IonCardContent>

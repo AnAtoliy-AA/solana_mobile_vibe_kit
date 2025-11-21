@@ -436,34 +436,43 @@ const Launchpad: React.FC = () => {
                     <div className="card-body">
                       <div className="card-overview">
                         <div className="card-header">
-                          <div className="card-token">
-                            {pool.imageUrl && !brokenImages[pool.id] ? (
-                              <img
-                                src={pool.imageUrl}
-                                alt={pool.symbol}
-                                className="card-token-avatar"
-                                onError={(event) => {
-                                  event.stopPropagation();
-                                  handleImageError(pool.id);
-                                }}
-                              />
-                            ) : (
-                              <div className="card-token-avatar placeholder">
-                                {getTokenInitials(pool.name, pool.symbol)}
+                          <Tooltip content={t.tokenTooltip} position="top">
+                            <div className="card-token">
+                              {pool.imageUrl && !brokenImages[pool.id] ? (
+                                <img
+                                  src={pool.imageUrl}
+                                  alt={pool.symbol}
+                                  className="card-token-avatar"
+                                  onError={(event) => {
+                                    event.stopPropagation();
+                                    handleImageError(pool.id);
+                                  }}
+                                />
+                              ) : (
+                                <div className="card-token-avatar placeholder">
+                                  {getTokenInitials(pool.name, pool.symbol)}
+                                </div>
+                              )}
+                              <div>
+                                <p className="card-token-name">{pool.name}</p>
+                                <p className="card-token-symbol">{pool.symbol}</p>
                               </div>
-                            )}
-                            <div>
-                              <p className="card-token-name">{pool.name}</p>
-                              <p className="card-token-symbol">{pool.symbol}</p>
                             </div>
-                          </div>
-                          <span className={`status-pill status-${pool.status}`}>
-                            {getStatusLabel(pool.status)}
-                          </span>
+                          </Tooltip>
+                          <Tooltip
+                            content={`Status: ${getStatusLabel(pool.status)}`}
+                            position="top"
+                          >
+                            <span className={`status-pill status-${pool.status}`}>
+                              {getStatusLabel(pool.status)}
+                            </span>
+                          </Tooltip>
                         </div>
 
                         <div className="card-address">
-                          <div className="card-address-text">{formatAddress(pool.id)}</div>
+                          <Tooltip content={t.contractTooltip} position="top">
+                            <div className="card-address-text">{formatAddress(pool.id)}</div>
+                          </Tooltip>
                           <div className="card-address-actions">
                             <Tooltip content={t.copyTooltip} position="bottom">
                               <IonIcon
@@ -485,16 +494,24 @@ const Launchpad: React.FC = () => {
 
                       <div className="card-metrics">
                         <div className="metric-block">
-                          <p className="metric-label">{t.volume24h}</p>
-                          <p className="metric-value">
-                            {pool.volumeUsd && pool.volumeUsd > 0
-                              ? formatNumber(pool.volumeUsd)
-                              : formatNumber(pool.tvl)}
-                          </p>
+                          <Tooltip content={t.volumeTooltip} position="top">
+                            <p className="metric-label">{t.volume24h}</p>
+                          </Tooltip>
+                          <Tooltip content={t.volumeTooltip} position="top">
+                            <p className="metric-value">
+                              {pool.volumeUsd && pool.volumeUsd > 0
+                                ? formatNumber(pool.volumeUsd)
+                                : formatNumber(pool.tvl)}
+                            </p>
+                          </Tooltip>
                         </div>
                         <div className="metric-block">
-                          <p className="metric-label">{t.marketCap}</p>
-                          <p className="metric-value">{formatNumber(pool.tvl)}</p>
+                          <Tooltip content={t.marketCapTooltip} position="top">
+                            <p className="metric-label">{t.marketCap}</p>
+                          </Tooltip>
+                          <Tooltip content={t.marketCapTooltip} position="top">
+                            <p className="metric-value">{formatNumber(pool.tvl)}</p>
+                          </Tooltip>
                           {(() => {
                             if (pool.lastUpdated) {
                               return <LastUpdated timestamp={pool.lastUpdated} prefix="Updated" />;
@@ -506,71 +523,96 @@ const Launchpad: React.FC = () => {
                           })()}
                         </div>
                         <div className="metric-block">
-                          <p className="metric-label">{t.holders}</p>
-                          <p className="metric-value">{pool.participants.toLocaleString()}</p>
+                          <Tooltip content={t.holdersTooltip} position="top">
+                            <p className="metric-label">{t.holders}</p>
+                          </Tooltip>
+                          <Tooltip content={t.holdersTooltip} position="top">
+                            <p className="metric-value">{pool.participants.toLocaleString()}</p>
+                          </Tooltip>
                           {pool.startTime && (
-                            <span className="metric-footnote">{getTimeAgo(pool.startTime)}</span>
+                            <Tooltip content={t.timeTooltip} position="top">
+                              <span className="metric-footnote">{getTimeAgo(pool.startTime)}</span>
+                            </Tooltip>
                           )}
                         </div>
                         <div className="metric-block">
-                          <p className="metric-label">{t.progress}</p>
-                          <p className="metric-value">{(pool.progress * 100).toFixed(0)}%</p>
-                          <div className="card-progress-bar">
-                            <div
-                              className="card-progress-fill"
-                              style={{ width: `${Math.min(pool.progress * 100, 100)}%` }}
-                            />
-                          </div>
-                          <p className="metric-footnote">
-                            {formatNumber(pool.currentAmount)} / {formatNumber(pool.targetAmount)}
-                          </p>
+                          <Tooltip content={t.progressTooltip} position="top">
+                            <p className="metric-label">{t.progress}</p>
+                          </Tooltip>
+                          <Tooltip content={t.progressTooltip} position="top">
+                            <p className="metric-value">{(pool.progress * 100).toFixed(0)}%</p>
+                          </Tooltip>
+                          <Tooltip content={t.progressTooltip} position="top">
+                            <div className="card-progress-bar">
+                              <div
+                                className="card-progress-fill"
+                                style={{ width: `${Math.min(pool.progress * 100, 100)}%` }}
+                              />
+                            </div>
+                          </Tooltip>
+                          <Tooltip
+                            content={`Current: ${formatNumber(pool.currentAmount)} / Target: ${formatNumber(pool.targetAmount)}`}
+                            position="top"
+                          >
+                            <p className="metric-footnote">
+                              {formatNumber(pool.currentAmount)} / {formatNumber(pool.targetAmount)}
+                            </p>
+                          </Tooltip>
                         </div>
                       </div>
                     </div>
 
                     <div className="card-footer">
-                      <div className="card-time">
-                        <IonIcon icon={timeOutline} />
-                        <span>{getTimeAgo(pool.startTime)}</span>
-                      </div>
+                      <Tooltip content={t.timeTooltip} position="top">
+                        <div className="card-time">
+                          <IonIcon icon={timeOutline} />
+                          <span>{getTimeAgo(pool.startTime)}</span>
+                        </div>
+                      </Tooltip>
                       <div className="card-actions">
                         {pool.twitterUrl && (
-                          <IonButton
-                            size="small"
-                            fill="clear"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              window.open(pool.twitterUrl, '_blank');
-                            }}
-                            aria-label="Open Twitter"
-                          >
-                            <IonIcon icon={logoTwitter} />
-                          </IonButton>
+                          <Tooltip content={t.visitTwitter} position="top">
+                            <IonButton
+                              size="small"
+                              fill="clear"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                window.open(pool.twitterUrl, '_blank');
+                              }}
+                              aria-label="Open Twitter"
+                            >
+                              <IonIcon icon={logoTwitter} />
+                            </IonButton>
+                          </Tooltip>
                         )}
                         {pool.websiteUrl && (
+                          <Tooltip content={t.visitWebsite} position="top">
+                            <IonButton
+                              size="small"
+                              fill="clear"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                window.open(pool.websiteUrl, '_blank');
+                              }}
+                              aria-label="Open website"
+                            >
+                              <IonIcon icon={globeOutline} />
+                            </IonButton>
+                          </Tooltip>
+                        )}
+                        <Tooltip content={t.tradeTooltip} position="top">
                           <IonButton
                             size="small"
-                            fill="clear"
+                            fill="solid"
+                            color="success"
                             onClick={(event) => {
                               event.stopPropagation();
-                              window.open(pool.websiteUrl, '_blank');
                             }}
-                            aria-label="Open website"
                           >
-                            <IonIcon icon={globeOutline} />
+                            <IonIcon icon={swapHorizontalOutline} slot="start" />
+                            {t.trade}
                           </IonButton>
-                        )}
-                        <IonButton
-                          size="small"
-                          fill="solid"
-                          color="success"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                          }}
-                        >
-                          <IonIcon icon={swapHorizontalOutline} slot="start" />
-                          {t.trade}
-                        </IonButton>
+                        </Tooltip>
                       </div>
                     </div>
                   </article>

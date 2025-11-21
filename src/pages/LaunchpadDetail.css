@@ -20,10 +20,9 @@
 }
 
 .pool-detail-container {
-  padding: 16px;
+  padding: 16px 16px 80px;
   max-width: 900px;
   margin: 0 auto;
-  padding-bottom: 80px;
   background: var(--theme-background);
 }
 
@@ -137,14 +136,16 @@
   font-size: 0.75rem;
   color: var(--theme-text-secondary);
   text-transform: uppercase;
-  margin-bottom: 4px;
+  margin-bottom: 16px;
 }
 
 .stat-value {
   display: block;
   font-size: 1.1rem;
   font-weight: 600;
+  padding-left: 8px;
   color: var(--theme-text-primary);
+  margin-top: 12px;
 }
 
 .timeline-item {
