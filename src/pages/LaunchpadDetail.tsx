@@ -306,9 +306,14 @@ const LaunchpadDetail: React.FC = () => {
                       {getTokenInitials(displayPool.name, displayPool.symbol)}
                     </div>
                   )}
-                  <div>
+                  <div className="pool-detail-token-info">
                     <IonCardTitle>{displayPool.name}</IonCardTitle>
-                    <p className="pool-detail-symbol">{displayPool.symbol}</p>
+                    <div className="pool-detail-meta">
+                      <p className="pool-detail-symbol">{displayPool.symbol}</p>
+                      <IonBadge color={getStatusColor(displayPool.status)}>
+                        {getStatusLabel(displayPool.status)}
+                      </IonBadge>
+                    </div>
                     <p
                       style={{
                         fontSize: '0.75rem',
@@ -320,9 +325,6 @@ const LaunchpadDetail: React.FC = () => {
                     </p>
                   </div>
                 </div>
-                <IonBadge color={getStatusColor(displayPool.status)}>
-                  {getStatusLabel(displayPool.status)}
-                </IonBadge>
               </div>
             </IonCardHeader>
             <IonCardContent>

@@ -538,19 +538,21 @@ const Launchpad: React.FC = () => {
                                   {getTokenInitials(pool.name, pool.symbol)}
                                 </div>
                               )}
-                              <div>
+                              <div className="card-token-info">
                                 <p className="card-token-name">{pool.name}</p>
-                                <p className="card-token-symbol">{pool.symbol}</p>
+                                <div className="card-token-meta">
+                                  <p className="card-token-symbol">{pool.symbol}</p>
+                                  <Tooltip
+                                    content={`Status: ${getStatusLabel(pool.status)}`}
+                                    position="top"
+                                  >
+                                    <span className={`status-pill status-${pool.status}`}>
+                                      {getStatusLabel(pool.status)}
+                                    </span>
+                                  </Tooltip>
+                                </div>
                               </div>
                             </div>
-                          </Tooltip>
-                          <Tooltip
-                            content={`Status: ${getStatusLabel(pool.status)}`}
-                            position="top"
-                          >
-                            <span className={`status-pill status-${pool.status}`}>
-                              {getStatusLabel(pool.status)}
-                            </span>
                           </Tooltip>
                         </div>
 
