@@ -1,5 +1,6 @@
 /* eslint-disable testing-library/prefer-screen-queries */
 import { test, expect } from '@playwright/test';
+import assert from 'assert';
 
 test.beforeEach(async ({ page }) => {
   await page.route('**/tokens', async (route, request) => {
@@ -80,5 +81,5 @@ test('manual refresh triggers request', async ({ page }) => {
   await page.goto('/launchpad/mock-token');
   const refreshButton = page.getByRole('button', { name: /Refresh Now/i });
   await refreshButton.click();
-  await expect(detailCalls).toBeGreaterThanOrEqual(1);
+  assert(detailCalls >= 1, `Expected detailCalls to be >= 1, but got ${detailCalls}`);
 });

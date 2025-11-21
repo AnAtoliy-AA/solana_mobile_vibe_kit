@@ -1,6 +1,7 @@
 /* eslint-disable testing-library/prefer-screen-queries */
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
+import { strict as assert } from 'assert';
 
 type TokenResponse = {
   data: Array<Record<string, unknown>>;
@@ -85,7 +86,11 @@ test.describe('participation submission flow', () => {
     await page.getByRole('button', { name: 'Submit participation' }).click();
 
     await expect(page.getByText('Successfully participated with 2 SOL')).toBeVisible();
-    expect(participateCalls).toBe(1);
+    assert.strictEqual(
+      participateCalls,
+      1,
+      'Expected participate endpoint to be called exactly once'
+    );
   });
 });
 
