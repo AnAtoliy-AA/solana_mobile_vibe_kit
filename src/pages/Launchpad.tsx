@@ -1,6 +1,6 @@
 // Launchpad main page - Modern dashboard with table view
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   IonPage,
   IonHeader,
@@ -42,6 +42,13 @@ import SettingsModal from '../components/settings/SettingsModal';
 import './Launchpad.css';
 import { getTokenInitials } from '../lib/utils/text';
 import { calculatePercentageChange } from '../lib/utils/changeCalculators';
+import {
+  formatNumber,
+  formatAddress,
+  getCreatedAtTimestamp,
+  parseNumeric,
+} from '../lib/utils/formatters';
+import { useDebounce } from '../hooks/useDebounce';
 
 type SortOption = 'newest' | 'volume' | 'progress' | 'holders';
 type FilterOption = 'all' | 'hasTwitter' | 'hasWebsite' | 'highProgress';
@@ -50,6 +57,7 @@ const Launchpad: React.FC = () => {
   const history = useHistory();
   const t = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300); // Debounce search for performance
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'upcoming' | 'finished'>('all');
   const [sortOption, setSortOption] = useState<SortOption>('newest');
   const [filterOption, setFilterOption] = useState<FilterOption>('all');
@@ -93,8 +101,9 @@ const Launchpad: React.FC = () => {
   }, [data]);
 
   // Get live-updated pools from market store (merged with API data)
-  const livePoolsFromStore = useMarketStore((state) => state.pools);
-  const setPools = useMarketStore((state) => state.setPools);
+  // Optimized selectors - only subscribe to specific data
+  const livePoolsFromStore = useMarketStore(useCallback((state) => state.pools, []));
+  const setPools = useMarketStore(useCallback((state) => state.setPools, []));
 
   // Sync API pools to store when they load
   useEffect(() => {
@@ -164,76 +173,79 @@ const Launchpad: React.FC = () => {
     return Array.from(poolMap.values());
   }, [pools, livePoolsFromStore]);
 
-  const handleRefresh = async (event: CustomEvent) => {
-    await refetch();
-    event.detail.complete();
-  };
+  // Memoized event handlers to prevent re-creation on every render
+  const handleRefresh = useCallback(
+    async (event: CustomEvent) => {
+      await refetch();
+      event.detail.complete();
+    },
+    [refetch]
+  );
 
-  const handlePoolClick = (poolId: string) => {
-    history.push(`/launchpad/${poolId}`);
-  };
+  const handlePoolClick = useCallback(
+    (poolId: string) => {
+      history.push(`/launchpad/${poolId}`);
+    },
+    [history]
+  );
 
-  const copyToClipboard = (text: string, e: React.MouseEvent) => {
+  const copyToClipboard = useCallback((text: string, e: React.MouseEvent) => {
     e.stopPropagation();
     navigator.clipboard.writeText(text);
-  };
+  }, []);
 
-  const handleImageError = (poolId: string) => {
+  const handleImageError = useCallback((poolId: string) => {
     setBrokenImages((prev) => ({
       ...prev,
       [poolId]: true,
     }));
-  };
+  }, []);
 
-  const openBlockExplorer = (address: string, e: React.MouseEvent) => {
+  const openBlockExplorer = useCallback((address: string, e: React.MouseEvent) => {
     e.stopPropagation();
     window.open(`https://solscan.io/token/${address}`, '_blank');
-  };
+  }, []);
 
-  const formatNumber = (num: string | number) => {
-    const value = typeof num === 'string' ? parseFloat(num) : num;
-    if (value >= 1000000) {
-      return `$${(value / 1000000).toFixed(2)}M`;
-    } else if (value >= 1000) {
-      return `$${(value / 1000).toFixed(1)}K`;
-    }
-    return `$${value.toFixed(0)}`;
-  };
+  // Memoized helper function for time display
+  const getTimeAgo = useCallback(
+    (date: string) => {
+      const now = new Date();
+      const past = new Date(date);
+      const diffMs = now.getTime() - past.getTime();
+      const diffMins = Math.floor(diffMs / 60000);
 
-  const formatAddress = (address: string) => {
-    if (!address) return 'N/A';
-    return `${address.slice(0, 4)}...${address.slice(-4)}`;
-  };
+      if (diffMins < 1) return t.justNow;
+      if (diffMins < 60) return `${diffMins}${t.minutesAgo}`;
+      const diffHours = Math.floor(diffMins / 60);
+      if (diffHours < 24) return `${diffHours}${t.hoursAgo}`;
+      return `${Math.floor(diffHours / 24)}${t.daysAgo}`;
+    },
+    [t]
+  );
 
-  const getTimeAgo = (date: string) => {
-    const now = new Date();
-    const past = new Date(date);
-    const diffMs = now.getTime() - past.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
+  // Memoized getStatusLabel function
+  const getStatusLabel = useCallback(
+    (status: Pool['status']) => {
+      if (status === 'active') return t.active;
+      if (status === 'upcoming') return t.upcoming;
+      if (status === 'finished') return t.finished;
+      return status;
+    },
+    [t]
+  );
 
-    if (diffMins < 1) return t.justNow;
-    if (diffMins < 60) return `${diffMins}${t.minutesAgo}`;
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}${t.hoursAgo}`;
-    return `${Math.floor(diffHours / 24)}${t.daysAgo}`;
-  };
-
-  const getCreatedAtTimestamp = (createdAt?: number | string): number | undefined => {
-    if (!createdAt) return undefined;
-    if (typeof createdAt === 'number') return createdAt;
-    const timestamp = new Date(createdAt).getTime();
-    return Number.isNaN(timestamp) ? undefined : timestamp;
-  };
-
-  const filteredPools = (mergedPools as PoolWithTimestamp[])?.filter((pool: PoolWithTimestamp) => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      pool.name.toLowerCase().includes(query) ||
-      pool.symbol.toLowerCase().includes(query) ||
-      pool.id.toLowerCase().includes(query)
-    );
-  });
+  // Memoized filtered pools with debounced search
+  const filteredPools = useMemo(() => {
+    return (mergedPools as PoolWithTimestamp[])?.filter((pool: PoolWithTimestamp) => {
+      if (!debouncedSearchQuery) return true;
+      const query = debouncedSearchQuery.toLowerCase();
+      return (
+        pool.name.toLowerCase().includes(query) ||
+        pool.symbol.toLowerCase().includes(query) ||
+        pool.id.toLowerCase().includes(query)
+      );
+    });
+  }, [mergedPools, debouncedSearchQuery]);
 
   const applyFilter = useMemo(() => {
     if (!filteredPools) return [];
@@ -251,14 +263,8 @@ const Launchpad: React.FC = () => {
     });
   }, [filteredPools, filterOption]);
 
+  // Memoized sorting of pools (imported parseNumeric from formatters)
   const preparedPools = useMemo(() => {
-    const parseNumeric = (value?: string | number) => {
-      if (typeof value === 'number') return value;
-      if (!value) return 0;
-      const parsed = parseFloat(value);
-      return Number.isFinite(parsed) ? parsed : 0;
-    };
-
     return [...applyFilter].sort((a, b) => {
       if (sortOption === 'volume') {
         return parseNumeric(b.tvl) - parseNumeric(a.tvl);
@@ -289,22 +295,15 @@ const Launchpad: React.FC = () => {
     { id: 'holders' as SortOption, label: 'Holders' },
   ];
 
-  const handleChipKeyDown = (
-    event: React.KeyboardEvent<HTMLButtonElement>,
-    callback: () => void
-  ) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      callback();
-    }
-  };
-
-  const getStatusLabel = (status: Pool['status']) => {
-    if (status === 'active') return t.active;
-    if (status === 'upcoming') return t.upcoming;
-    if (status === 'finished') return t.finished;
-    return status;
-  };
+  const handleChipKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLButtonElement>, callback: () => void) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        callback();
+      }
+    },
+    []
+  );
 
   return (
     <IonPage>
