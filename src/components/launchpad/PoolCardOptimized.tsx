@@ -133,6 +133,7 @@ const PoolCardOptimized: React.FC<PoolCardProps> = React.memo(
                     : formatNumber(pool.tvl)}
                 </p>
               </Tooltip>
+              {pool.lastUpdated && <LastUpdated timestamp={pool.lastUpdated} prefix="Updated" />}
             </div>
             <div className="metric-block">
               <Tooltip content={t.marketCapTooltip} position="top">
@@ -187,11 +188,19 @@ const PoolCardOptimized: React.FC<PoolCardProps> = React.memo(
               {pool.participantsHistory && pool.participantsHistory.length > 2 && (
                 <TrendChart data={pool.participantsHistory} height={20} />
               )}
-              {pool.startTime && (
-                <Tooltip content={t.timeTooltip} position="top">
-                  <span className="metric-footnote">{getTimeAgo(pool.startTime)}</span>
-                </Tooltip>
-              )}
+              {(() => {
+                if (pool.lastUpdated) {
+                  return <LastUpdated timestamp={pool.lastUpdated} prefix="Updated" />;
+                }
+                if (pool.startTime) {
+                  return (
+                    <Tooltip content={t.timeTooltip} position="top">
+                      <span className="metric-footnote">{getTimeAgo(pool.startTime)}</span>
+                    </Tooltip>
+                  );
+                }
+                return null;
+              })()}
             </div>
             <div className="metric-block">
               <Tooltip content={t.progressTooltip} position="top">
