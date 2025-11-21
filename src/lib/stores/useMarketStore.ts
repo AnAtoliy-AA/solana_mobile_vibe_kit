@@ -8,6 +8,15 @@ export interface PoolWithTimestamp extends Omit<Pool, 'createdAt' | 'updatedAt'>
   lastUpdated?: number; // Timestamp in milliseconds - updates every time data changes
   createdAt?: number; // Timestamp in milliseconds - set once when pool is first added
   updatedAt?: string; // ISO string from API
+  // Previous values for calculating changes
+  previousPrice?: string;
+  previousTvl?: string;
+  previousParticipants?: number;
+  previousProgress?: number;
+  // Historical data for trends (last 10 values)
+  priceHistory?: number[];
+  tvlHistory?: number[];
+  participantsHistory?: number[];
 }
 
 export interface WebSocketTokenData {
@@ -89,59 +98,85 @@ export const useMarketStore = create<MarketState>((set) => ({
 
   updatePoolPrice: (poolId, price) =>
     set((state) => ({
-      pools: state.pools.map((pool) =>
-        pool.id === poolId
-          ? {
-              ...pool,
-              tokenPrice: price,
-              lastUpdated: Date.now(),
-              createdAt: pool.createdAt || Date.now(),
-            }
-          : pool
-      ),
+      pools: state.pools.map((pool) => {
+        if (pool.id === poolId) {
+          const priceNum = parseFloat(price);
+          const previousPrice = pool.tokenPrice;
+          const priceHistory = pool.priceHistory || [];
+          const newHistory = [...priceHistory, priceNum].slice(-10); // Keep last 10 values
+
+          return {
+            ...pool,
+            tokenPrice: price,
+            previousPrice,
+            priceHistory: newHistory,
+            lastUpdated: Date.now(),
+            createdAt: pool.createdAt || Date.now(),
+          };
+        }
+        return pool;
+      }),
     })),
 
   updatePoolTvl: (poolId, tvl) =>
     set((state) => ({
-      pools: state.pools.map((pool) =>
-        pool.id === poolId
-          ? {
-              ...pool,
-              tvl,
-              currentAmount: tvl,
-              lastUpdated: Date.now(),
-              createdAt: pool.createdAt || Date.now(),
-            }
-          : pool
-      ),
+      pools: state.pools.map((pool) => {
+        if (pool.id === poolId) {
+          const tvlNum = parseFloat(tvl);
+          const previousTvl = pool.tvl;
+          const tvlHistory = pool.tvlHistory || [];
+          const newHistory = [...tvlHistory, tvlNum].slice(-10);
+
+          return {
+            ...pool,
+            tvl,
+            currentAmount: tvl,
+            previousTvl,
+            tvlHistory: newHistory,
+            lastUpdated: Date.now(),
+            createdAt: pool.createdAt || Date.now(),
+          };
+        }
+        return pool;
+      }),
     })),
 
   updatePoolProgress: (poolId, progress) =>
     set((state) => ({
-      pools: state.pools.map((pool) =>
-        pool.id === poolId
-          ? {
-              ...pool,
-              progress,
-              lastUpdated: Date.now(),
-              createdAt: pool.createdAt || Date.now(),
-            }
-          : pool
-      ),
+      pools: state.pools.map((pool) => {
+        if (pool.id === poolId) {
+          const previousProgress = pool.progress;
+          return {
+            ...pool,
+            progress,
+            previousProgress,
+            lastUpdated: Date.now(),
+            createdAt: pool.createdAt || Date.now(),
+          };
+        }
+        return pool;
+      }),
     })),
 
   updatePoolParticipants: (poolId, participants) =>
     set((state) => ({
-      pools: state.pools.map((pool) =>
-        pool.id === poolId
-          ? {
-              ...pool,
-              participants,
-              lastUpdated: Date.now(),
-              createdAt: pool.createdAt || Date.now(),
-            }
-          : pool
-      ),
+      pools: state.pools.map((pool) => {
+        if (pool.id === poolId) {
+          const previousParticipants = pool.participants;
+          const participantsHistory = pool.participantsHistory || [];
+          const newHistory = [...participantsHistory, participants].slice(-10);
+
+          return {
+            ...pool,
+            participants,
+            previousParticipants,
+            participantsHistory: newHistory,
+            lastUpdated: Date.now(),
+            createdAt: pool.createdAt || Date.now(),
+          };
+        }
+        return pool;
+      }),
     })),
 
   updatePoolStatus: (poolId, status) =>
@@ -192,25 +227,47 @@ export const useMarketStore = create<MarketState>((set) => ({
         const updatedPools = [...state.pools];
         const existingPool = updatedPools[existingPoolIndex];
 
+        // Prepare historical tracking
+        const updates: Partial<PoolWithTimestamp> = {};
+
+        // Track TVL/Market Cap changes
+        if (tokenData.marketCapUsd !== undefined || tokenData.marketCap !== undefined) {
+          const newTvl = String(tokenData.marketCapUsd || tokenData.marketCap);
+          const tvlNum = parseFloat(newTvl);
+          const tvlHistory = existingPool.tvlHistory || [];
+          updates.tvl = newTvl;
+          updates.currentAmount = newTvl;
+          updates.previousTvl = existingPool.tvl;
+          updates.tvlHistory = [...tvlHistory, tvlNum].slice(-10);
+        }
+
+        // Track price changes
+        if (tokenData.priceUsd !== undefined || tokenData.price !== undefined) {
+          const newPrice = String(tokenData.priceUsd || tokenData.price);
+          const priceNum = parseFloat(newPrice);
+          const priceHistory = existingPool.priceHistory || [];
+          updates.tokenPrice = newPrice;
+          updates.previousPrice = existingPool.tokenPrice;
+          updates.priceHistory = [...priceHistory, priceNum].slice(-10);
+        }
+
+        // Track holders/participants changes
+        if (tokenData.holders !== undefined) {
+          const participantsHistory = existingPool.participantsHistory || [];
+          updates.participants = tokenData.holders;
+          updates.previousParticipants = existingPool.participants;
+          updates.participantsHistory = [...participantsHistory, tokenData.holders].slice(-10);
+        }
+
+        // Track progress changes
+        if (tokenData.progress !== undefined) {
+          updates.progress = tokenData.progress;
+          updates.previousProgress = existingPool.progress;
+        }
+
         updatedPools[existingPoolIndex] = {
           ...existingPool,
-          // Update market cap if provided (prefer USD values)
-          ...((tokenData.marketCapUsd !== undefined || tokenData.marketCap !== undefined) && {
-            tvl: String(tokenData.marketCapUsd || tokenData.marketCap),
-            currentAmount: String(tokenData.marketCapUsd || tokenData.marketCap),
-          }),
-          // Update price if provided (prefer USD values)
-          ...((tokenData.priceUsd !== undefined || tokenData.price !== undefined) && {
-            tokenPrice: String(tokenData.priceUsd || tokenData.price),
-          }),
-          // Update holders/participants if provided
-          ...(tokenData.holders !== undefined && {
-            participants: tokenData.holders,
-          }),
-          // Update progress if provided
-          ...(tokenData.progress !== undefined && {
-            progress: tokenData.progress,
-          }),
+          ...updates,
           // Update timestamp
           lastUpdated: Date.now(),
           createdAt: existingPool.createdAt || Date.now(),

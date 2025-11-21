@@ -686,7 +686,161 @@
 }
 
 .metric-footnote.positive {
-  color: var(--theme-success);
+  color: var(--ion-color-success);
+}
+
+.metric-footnote.negative {
+  color: var(--ion-color-danger);
+}
+
+/* Change Indicators */
+.metric-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.02em;
+  transition: all 0.3s ease;
+}
+
+.metric-change.positive {
+  color: var(--ion-color-success);
+  background: rgba(var(--ion-color-success-rgb), 0.12);
+  border: 1px solid rgba(var(--ion-color-success-rgb), 0.3);
+}
+
+.metric-change.negative {
+  color: var(--ion-color-danger);
+  background: rgba(var(--ion-color-danger-rgb), 0.12);
+  border: 1px solid rgba(var(--ion-color-danger-rgb), 0.3);
+}
+
+.metric-change.neutral {
+  color: var(--theme-text-tertiary);
+  background: rgba(var(--ion-color-medium-rgb), 0.12);
+  border: 1px solid rgba(var(--ion-color-medium-rgb), 0.3);
+}
+
+/* Change Arrow Icons */
+.change-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 12px;
+  font-weight: 900;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.change-arrow.up {
+  color: var(--ion-color-success);
+}
+
+.change-arrow.down {
+  color: var(--ion-color-danger);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+/* Inline change indicator for values */
+.metric-value-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.metric-value-change.positive {
+  color: var(--ion-color-success);
+}
+
+.metric-value-change.negative {
+  color: var(--ion-color-danger);
+}
+
+/* Mini Trend Indicator */
+.trend-indicator {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 20px;
+  margin-top: 4px;
+}
+
+.trend-bar {
+  flex: 1;
+  min-width: 2px;
+  background: rgba(var(--theme-primary-rgb), 0.3);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.trend-bar.positive {
+  background: var(--ion-color-success);
+}
+
+.trend-bar.negative {
+  background: var(--ion-color-danger);
+}
+
+.trend-bar.neutral {
+  background: rgba(var(--theme-text-tertiary-rgb), 0.3);
+}
+
+/* Price change badge */
+.price-change-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.price-change-badge.positive {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--ion-color-success-rgb), 0.15),
+    rgba(var(--ion-color-success-rgb), 0.1)
+  );
+  color: var(--ion-color-success);
+  border: 1px solid rgba(var(--ion-color-success-rgb), 0.3);
+  box-shadow: 0 2px 8px rgba(var(--ion-color-success-rgb), 0.2);
+}
+
+.price-change-badge.negative {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--ion-color-danger-rgb), 0.15),
+    rgba(var(--ion-color-danger-rgb), 0.1)
+  );
+  color: var(--ion-color-danger);
+  border: 1px solid rgba(var(--ion-color-danger-rgb), 0.3);
+  box-shadow: 0 2px 8px rgba(var(--ion-color-danger-rgb), 0.2);
+}
+
+.price-change-badge:hover {
+  transform: scale(1.05);
 }
 
 .card-progress-bar {

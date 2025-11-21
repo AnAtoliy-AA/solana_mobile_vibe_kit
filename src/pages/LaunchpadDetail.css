@@ -262,6 +262,162 @@
   letter-spacing: -0.02em;
 }
 
+/* Change Indicators for Detail Page */
+.stat-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 8px;
+  letter-spacing: 0.02em;
+  margin-left: 12px;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.stat-change.positive {
+  color: var(--ion-color-success);
+  background: rgba(var(--ion-color-success-rgb), 0.15);
+  border: 1px solid rgba(var(--ion-color-success-rgb), 0.3);
+}
+
+.stat-change.negative {
+  color: var(--ion-color-danger);
+  background: rgba(var(--ion-color-danger-rgb), 0.15);
+  border: 1px solid rgba(var(--ion-color-danger-rgb), 0.3);
+}
+
+.stat-change:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Change Arrow */
+.change-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-size: 14px;
+  font-weight: 900;
+  animation: pulse-detail 2s ease-in-out infinite;
+}
+
+.change-arrow.up {
+  color: var(--ion-color-success);
+}
+
+.change-arrow.down {
+  color: var(--ion-color-danger);
+}
+
+@keyframes pulse-detail {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.15);
+  }
+}
+
+/* Trend Chart Container */
+.trend-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 40px;
+  margin-top: 12px;
+  padding: 8px;
+  background: rgba(var(--theme-primary-rgb), 0.04);
+  border-radius: 8px;
+  border: 1px solid rgba(var(--theme-primary-rgb), 0.1);
+}
+
+.trend-bar {
+  flex: 1;
+  min-width: 3px;
+  background: rgba(var(--theme-primary-rgb), 0.3);
+  border-radius: 2px;
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.trend-bar.positive {
+  background: linear-gradient(
+    to top,
+    var(--ion-color-success),
+    rgba(var(--ion-color-success-rgb), 0.7)
+  );
+}
+
+.trend-bar.negative {
+  background: linear-gradient(
+    to top,
+    var(--ion-color-danger),
+    rgba(var(--ion-color-danger-rgb), 0.7)
+  );
+}
+
+.trend-bar:hover {
+  opacity: 0.8;
+  transform: scaleY(1.1);
+}
+
+/* Price Change Badge */
+.price-change-large {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-top: 8px;
+  transition: all 0.3s ease;
+}
+
+.price-change-large.positive {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--ion-color-success-rgb), 0.2),
+    rgba(var(--ion-color-success-rgb), 0.15)
+  );
+  color: var(--ion-color-success);
+  border: 2px solid rgba(var(--ion-color-success-rgb), 0.4);
+  box-shadow: 0 4px 12px rgba(var(--ion-color-success-rgb), 0.2);
+}
+
+.price-change-large.negative {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--ion-color-danger-rgb), 0.2),
+    rgba(var(--ion-color-danger-rgb), 0.15)
+  );
+  color: var(--ion-color-danger);
+  border: 2px solid rgba(var(--ion-color-danger-rgb), 0.4);
+  box-shadow: 0 4px 12px rgba(var(--ion-color-danger-rgb), 0.2);
+}
+
+.price-change-large:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Value with change indicator */
+.value-with-change {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .timeline-item {
   display: flex;
   justify-content: space-between;

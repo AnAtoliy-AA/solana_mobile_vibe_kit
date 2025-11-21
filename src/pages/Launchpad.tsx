@@ -35,10 +35,13 @@ import type { Pool } from '../lib/api/types';
 import { useTranslation } from '../lib/i18n/useTranslation';
 import Tooltip from '../components/launchpad/Tooltip';
 import LastUpdated from '../components/launchpad/LastUpdated';
+import ChangeIndicator from '../components/launchpad/ChangeIndicator';
+import TrendChart from '../components/launchpad/TrendChart';
 import GlobalSettingsButton from '../components/settings/GlobalSettingsButton';
 import SettingsModal from '../components/settings/SettingsModal';
 import './Launchpad.css';
 import { getTokenInitials } from '../lib/utils/text';
+import { calculatePercentageChange } from '../lib/utils/changeCalculators';
 
 type SortOption = 'newest' | 'volume' | 'progress' | 'holders';
 type FilterOption = 'all' | 'hasTwitter' | 'hasWebsite' | 'highProgress';
@@ -597,8 +600,21 @@ const Launchpad: React.FC = () => {
                             <p className="metric-label">{t.marketCap}</p>
                           </Tooltip>
                           <Tooltip content={t.marketCapTooltip} position="top">
-                            <p className="metric-value">{formatNumber(pool.tvl)}</p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <p className="metric-value">{formatNumber(pool.tvl)}</p>
+                              {pool.previousTvl && pool.lastUpdated && (
+                                <ChangeIndicator
+                                  change={calculatePercentageChange(pool.tvl, pool.previousTvl)}
+                                  size="small"
+                                  showPercent={true}
+                                  showArrow={true}
+                                />
+                              )}
+                            </div>
                           </Tooltip>
+                          {pool.tvlHistory && pool.tvlHistory.length > 2 && (
+                            <TrendChart data={pool.tvlHistory} height={20} />
+                          )}
                           {(() => {
                             if (pool.lastUpdated) {
                               return <LastUpdated timestamp={pool.lastUpdated} prefix="Updated" />;
@@ -614,8 +630,24 @@ const Launchpad: React.FC = () => {
                             <p className="metric-label">{t.holders}</p>
                           </Tooltip>
                           <Tooltip content={t.holdersTooltip} position="top">
-                            <p className="metric-value">{pool.participants.toLocaleString()}</p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <p className="metric-value">{pool.participants.toLocaleString()}</p>
+                              {pool.previousParticipants !== undefined && pool.lastUpdated && (
+                                <ChangeIndicator
+                                  change={calculatePercentageChange(
+                                    pool.participants,
+                                    pool.previousParticipants
+                                  )}
+                                  size="small"
+                                  showPercent={true}
+                                  showArrow={true}
+                                />
+                              )}
+                            </div>
                           </Tooltip>
+                          {pool.participantsHistory && pool.participantsHistory.length > 2 && (
+                            <TrendChart data={pool.participantsHistory} height={20} />
+                          )}
                           {pool.startTime && (
                             <Tooltip content={t.timeTooltip} position="top">
                               <span className="metric-footnote">{getTimeAgo(pool.startTime)}</span>

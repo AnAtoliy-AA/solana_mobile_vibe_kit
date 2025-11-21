@@ -32,9 +32,12 @@ import { useMarketStore } from '../lib/stores/useMarketStore';
 import GlobalSettingsButton from '../components/settings/GlobalSettingsButton';
 import LastUpdated from '../components/launchpad/LastUpdated';
 import Tooltip from '../components/launchpad/Tooltip';
+import ChangeIndicator from '../components/launchpad/ChangeIndicator';
+import TrendChart from '../components/launchpad/TrendChart';
 import { useTranslation } from '../lib/i18n/useTranslation';
 import './LaunchpadDetail.css';
 import { getTokenInitials } from '../lib/utils/text';
+import { calculatePercentageChange } from '../lib/utils/changeCalculators';
 
 interface RefreshOption {
   label: string;
@@ -79,6 +82,21 @@ const LaunchpadDetail: React.FC = () => {
           ...(livePool.tvl !== undefined && { tvl: livePool.tvl }),
           ...(livePool.currentAmount !== undefined && { currentAmount: livePool.currentAmount }),
           ...(livePool.progress !== undefined && { progress: livePool.progress }),
+          ...(livePool.participants !== undefined && { participants: livePool.participants }),
+          // Include historical data for change tracking
+          ...(livePool.previousPrice !== undefined && { previousPrice: livePool.previousPrice }),
+          ...(livePool.previousTvl !== undefined && { previousTvl: livePool.previousTvl }),
+          ...(livePool.previousParticipants !== undefined && {
+            previousParticipants: livePool.previousParticipants,
+          }),
+          ...(livePool.previousProgress !== undefined && {
+            previousProgress: livePool.previousProgress,
+          }),
+          ...(livePool.priceHistory && { priceHistory: livePool.priceHistory }),
+          ...(livePool.tvlHistory && { tvlHistory: livePool.tvlHistory }),
+          ...(livePool.participantsHistory && {
+            participantsHistory: livePool.participantsHistory,
+          }),
         }),
       }
     : undefined;
@@ -438,10 +456,33 @@ const LaunchpadDetail: React.FC = () => {
                       </Tooltip>
                       <Tooltip content={t.tokenPrice} position="top">
                         <div className="stat-value">
-                          {formatPrice(displayPool.tokenPrice)}
+                          <div className="value-with-change">
+                            <span>{formatPrice(displayPool.tokenPrice)}</span>
+                            {displayPool.previousPrice && livePool?.lastUpdated && (
+                              <ChangeIndicator
+                                change={calculatePercentageChange(
+                                  displayPool.tokenPrice,
+                                  displayPool.previousPrice
+                                )}
+                                size="medium"
+                                showPercent={true}
+                                showArrow={true}
+                              />
+                            )}
+                          </div>
                           <LastUpdated timestamp={livePool?.lastUpdated} prefix="" />
                         </div>
                       </Tooltip>
+                      {displayPool.priceHistory &&
+                        displayPool.priceHistory.length > 2 &&
+                        (() => {
+                          const history = displayPool.priceHistory;
+                          const data =
+                            Array.isArray(history) && typeof history[0] === 'object'
+                              ? (history as Array<{ price: number }>).map((p) => p.price)
+                              : (history as number[]);
+                          return <TrendChart data={data} height={30} />;
+                        })()}
                     </div>
                   </IonCol>
                   <IonCol size="6">
@@ -451,10 +492,26 @@ const LaunchpadDetail: React.FC = () => {
                       </Tooltip>
                       <Tooltip content={t.tvlTooltip} position="top">
                         <div className="stat-value">
-                          ${formatNumber(displayPool.tvl)}
+                          <div className="value-with-change">
+                            <span>${formatNumber(displayPool.tvl)}</span>
+                            {displayPool.previousTvl && livePool?.lastUpdated && (
+                              <ChangeIndicator
+                                change={calculatePercentageChange(
+                                  displayPool.tvl,
+                                  displayPool.previousTvl
+                                )}
+                                size="medium"
+                                showPercent={true}
+                                showArrow={true}
+                              />
+                            )}
+                          </div>
                           <LastUpdated timestamp={livePool?.lastUpdated} prefix="" />
                         </div>
                       </Tooltip>
+                      {displayPool.tvlHistory && displayPool.tvlHistory.length > 2 && (
+                        <TrendChart data={displayPool.tvlHistory} height={30} />
+                      )}
                     </div>
                   </IonCol>
                 </IonRow>
@@ -466,10 +523,28 @@ const LaunchpadDetail: React.FC = () => {
                       </Tooltip>
                       <Tooltip content={t.holdersTooltip} position="top">
                         <div className="stat-value">
-                          {displayPool.participants.toLocaleString()}
+                          <div className="value-with-change">
+                            <span>{displayPool.participants.toLocaleString()}</span>
+                            {displayPool.previousParticipants !== undefined &&
+                              livePool?.lastUpdated && (
+                                <ChangeIndicator
+                                  change={calculatePercentageChange(
+                                    displayPool.participants,
+                                    displayPool.previousParticipants
+                                  )}
+                                  size="medium"
+                                  showPercent={true}
+                                  showArrow={true}
+                                />
+                              )}
+                          </div>
                           <LastUpdated timestamp={livePool?.lastUpdated} prefix="" />
                         </div>
                       </Tooltip>
+                      {displayPool.participantsHistory &&
+                        displayPool.participantsHistory.length > 2 && (
+                          <TrendChart data={displayPool.participantsHistory} height={30} />
+                        )}
                     </div>
                   </IonCol>
                   <IonCol size="6">
