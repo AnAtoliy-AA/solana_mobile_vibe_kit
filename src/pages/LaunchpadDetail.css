@@ -1,8 +1,30 @@
+/* Header styling with theme */
+.launchpad-detail-header {
+  --background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-tertiary) 100%);
+  box-shadow: var(--theme-shadow-large);
+}
+
+.launchpad-detail-header ion-toolbar {
+  --background: transparent;
+  --color: var(--theme-primary-contrast);
+}
+
+.launchpad-detail-header ion-title {
+  color: var(--theme-primary-contrast);
+}
+
+/* Content background with theme */
+.launchpad-detail-content {
+  --background: var(--theme-background);
+  --color: var(--theme-text-primary);
+}
+
 .pool-detail-container {
   padding: 16px;
   max-width: 900px;
   margin: 0 auto;
   padding-bottom: 80px;
+  background: var(--theme-background);
 }
 
 .pool-refresh-controls {
@@ -31,6 +53,8 @@
   align-items: center;
   justify-content: center;
   height: 50vh;
+  background: var(--theme-background);
+  color: var(--theme-text-primary);
 }
 
 .pool-detail-hero {

@@ -161,7 +161,7 @@ const LaunchpadDetail: React.FC = () => {
   if (isLoading || !displayPool) {
     return (
       <IonPage>
-        <IonHeader>
+        <IonHeader className="launchpad-detail-header">
           <IonToolbar>
             <IonButtons slot="start">
               <IonBackButton defaultHref="/launchpad" />
@@ -170,7 +170,7 @@ const LaunchpadDetail: React.FC = () => {
             <GlobalSettingsButton />
           </IonToolbar>
         </IonHeader>
-        <IonContent>
+        <IonContent className="launchpad-detail-content">
           <div className="pool-detail-loading">
             <IonSpinner name="crescent" />
           </div>
@@ -182,7 +182,7 @@ const LaunchpadDetail: React.FC = () => {
   if (!pool) {
     return (
       <IonPage>
-        <IonHeader>
+        <IonHeader className="launchpad-detail-header">
           <IonToolbar>
             <IonButtons slot="start">
               <IonBackButton defaultHref="/launchpad" />
@@ -191,7 +191,7 @@ const LaunchpadDetail: React.FC = () => {
             <GlobalSettingsButton />
           </IonToolbar>
         </IonHeader>
-        <IonContent>
+        <IonContent className="launchpad-detail-content">
           <div className="pool-detail-error">
             <IonText color="danger">
               <h2>Pool not found</h2>
@@ -204,7 +204,7 @@ const LaunchpadDetail: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
+      <IonHeader className="launchpad-detail-header">
         <IonToolbar>
           <IonButtons slot="start">
             <IonBackButton defaultHref="/launchpad" />
@@ -214,7 +214,7 @@ const LaunchpadDetail: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen>
+      <IonContent fullscreen className="launchpad-detail-content">
         <div className="pool-detail-container">
           <div className="pool-refresh-controls">
             <div className="pool-refresh-actions">

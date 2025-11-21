@@ -17,7 +17,6 @@ import {
 } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {
-  trendingUpOutline,
   copyOutline,
   openOutline,
   logoTwitter,
@@ -198,6 +197,13 @@ const Launchpad: React.FC = () => {
     return `${Math.floor(diffHours / 24)}${t.daysAgo}`;
   };
 
+  const getCreatedAtTimestamp = (createdAt?: number | string): number | undefined => {
+    if (!createdAt) return undefined;
+    if (typeof createdAt === 'number') return createdAt;
+    const timestamp = new Date(createdAt).getTime();
+    return Number.isNaN(timestamp) ? undefined : timestamp;
+  };
+
   const filteredPools = (mergedPools as PoolWithTimestamp[])?.filter((pool: PoolWithTimestamp) => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
@@ -292,13 +298,15 @@ const Launchpad: React.FC = () => {
               <IonButton onClick={() => history.push('/launchpad')} className="nav-btn">
                 {t.home}
               </IonButton>
-              <IonButton className="nav-btn">{t.createMeme}</IonButton>
-              <IonButton className="nav-btn">
+              <IonButton className="nav-btn" disabled>
+                {t.createMeme}
+              </IonButton>
+              <IonButton className="nav-btn" disabled>
                 <IonIcon icon={logoTwitter} slot="start" />
                 {t.mentionsOnX}
               </IonButton>
               <GlobalSettingsButton className="nav-btn" />
-              <IonButton className="nav-btn nav-btn-login" fill="solid" color="primary">
+              <IonButton className="nav-btn nav-btn-login" fill="solid" color="primary" disabled>
                 {t.login}
               </IonButton>
             </IonButtons>
@@ -478,22 +486,24 @@ const Launchpad: React.FC = () => {
                       <div className="card-metrics">
                         <div className="metric-block">
                           <p className="metric-label">{t.volume24h}</p>
-                          <p className="metric-value">{formatNumber(pool.tvl)}</p>
-                          <p className="metric-footnote positive">
-                            <IonIcon icon={trendingUpOutline} />
-                            +12.5%
+                          <p className="metric-value">
+                            {pool.volumeUsd && pool.volumeUsd > 0
+                              ? formatNumber(pool.volumeUsd)
+                              : formatNumber(pool.tvl)}
                           </p>
                         </div>
                         <div className="metric-block">
                           <p className="metric-label">{t.marketCap}</p>
                           <p className="metric-value">{formatNumber(pool.tvl)}</p>
-                          {pool.lastUpdated ? (
-                            <LastUpdated timestamp={pool.lastUpdated} prefix="Updated" />
-                          ) : (
-                            pool.createdAt && (
-                              <LastUpdated timestamp={pool.createdAt} prefix="Since" />
-                            )
-                          )}
+                          {(() => {
+                            if (pool.lastUpdated) {
+                              return <LastUpdated timestamp={pool.lastUpdated} prefix="Updated" />;
+                            }
+                            const createdAtTimestamp = getCreatedAtTimestamp(pool.createdAt);
+                            return createdAtTimestamp ? (
+                              <LastUpdated timestamp={createdAtTimestamp} prefix="Since" />
+                            ) : null;
+                          })()}
                         </div>
                         <div className="metric-block">
                           <p className="metric-label">{t.holders}</p>
@@ -524,17 +534,6 @@ const Launchpad: React.FC = () => {
                         <span>{getTimeAgo(pool.startTime)}</span>
                       </div>
                       <div className="card-actions">
-                        <IonButton
-                          size="small"
-                          fill="solid"
-                          color="success"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                          }}
-                        >
-                          <IonIcon icon={swapHorizontalOutline} slot="start" />
-                          {t.trade}
-                        </IonButton>
                         {pool.twitterUrl && (
                           <IonButton
                             size="small"
@@ -561,6 +560,17 @@ const Launchpad: React.FC = () => {
                             <IonIcon icon={globeOutline} />
                           </IonButton>
                         )}
+                        <IonButton
+                          size="small"
+                          fill="solid"
+                          color="success"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                          }}
+                        >
+                          <IonIcon icon={swapHorizontalOutline} slot="start" />
+                          {t.trade}
+                        </IonButton>
                       </div>
                     </div>
                   </article>
