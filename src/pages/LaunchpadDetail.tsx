@@ -41,14 +41,6 @@ interface RefreshOption {
   value: number;
 }
 
-const refreshOptions: RefreshOption[] = [
-  { label: 'Off', value: 0 },
-  { label: '5s', value: 5000 },
-  { label: '15s', value: 15000 },
-  { label: '60s', value: 60000 },
-  { label: '10m', value: 600000 },
-];
-
 const LaunchpadDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const t = useTranslation();
@@ -59,6 +51,16 @@ const LaunchpadDetail: React.FC = () => {
   const [isManualRefreshActive, setIsManualRefreshActive] = React.useState(false);
   const [lastRefreshedAt, setLastRefreshedAt] = React.useState<number | undefined>();
   const [isHeroImageBroken, setIsHeroImageBroken] = React.useState(false);
+  const refreshOptions = React.useMemo<RefreshOption[]>(
+    () => [
+      { label: t.refreshIntervalOff, value: 0 },
+      { label: t.refreshInterval5s, value: 5000 },
+      { label: t.refreshInterval15s, value: 15000 },
+      { label: t.refreshInterval60s, value: 60000 },
+      { label: t.refreshInterval10m, value: 600000 },
+    ],
+    [t]
+  );
 
   // Subscribe to live updates for this pool
   useLivePool(id);
@@ -93,6 +95,22 @@ const LaunchpadDetail: React.FC = () => {
         return 'primary';
     }
   };
+
+  const getStatusLabel = React.useCallback(
+    (status: string) => {
+      switch (status) {
+        case 'active':
+          return t.active;
+        case 'upcoming':
+          return t.upcoming;
+        case 'finished':
+          return t.finished;
+        default:
+          return status;
+      }
+    },
+    [t]
+  );
 
   const formatNumber = (num: string) => {
     return parseFloat(num).toLocaleString('en-US', {
@@ -132,12 +150,12 @@ const LaunchpadDetail: React.FC = () => {
       console.error('Manual refresh failed', error);
       addToast({
         type: 'error',
-        message: 'Unable to refresh token details. Please try again.',
+        message: t.manualRefreshError,
       });
     } finally {
       setIsManualRefreshActive(false);
     }
-  }, [addToast, isManualRefreshActive, refetch]);
+  }, [addToast, isManualRefreshActive, refetch, t]);
 
   React.useEffect(() => {
     if (!selectedRefreshInterval) {
@@ -168,11 +186,6 @@ const LaunchpadDetail: React.FC = () => {
     setLastRefreshedAt(Date.now());
   }, [pool]);
 
-  const contentStyle: React.CSSProperties & Record<string, string> = {
-    '--offset-top': '0px',
-    '--padding-top': '0px',
-  };
-
   if (isLoading || !displayPool) {
     return (
       <IonPage>
@@ -181,11 +194,11 @@ const LaunchpadDetail: React.FC = () => {
             <IonButtons slot="start">
               <IonBackButton defaultHref="/launchpad" />
             </IonButtons>
-            <IonTitle>Loading...</IonTitle>
+            <IonTitle>{t.loading}</IonTitle>
             <GlobalSettingsButton />
           </IonToolbar>
         </IonHeader>
-        <IonContent className="launchpad-detail-content" style={contentStyle}>
+        <IonContent className="launchpad-detail-content">
           <div className="pool-detail-loading">
             <IonSpinner name="crescent" />
           </div>
@@ -202,14 +215,14 @@ const LaunchpadDetail: React.FC = () => {
             <IonButtons slot="start">
               <IonBackButton defaultHref="/launchpad" />
             </IonButtons>
-            <IonTitle>Pool Not Found</IonTitle>
+            <IonTitle>{t.poolNotFound}</IonTitle>
             <GlobalSettingsButton />
           </IonToolbar>
         </IonHeader>
-        <IonContent className="launchpad-detail-content" style={contentStyle}>
+        <IonContent className="launchpad-detail-content">
           <div className="pool-detail-error">
             <IonText color="danger">
-              <h2>Pool not found</h2>
+              <h2>{t.poolNotFound}</h2>
             </IonText>
           </div>
         </IonContent>
@@ -229,26 +242,27 @@ const LaunchpadDetail: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen className="launchpad-detail-content" style={contentStyle}>
+      <IonContent fullscreen className="launchpad-detail-content">
         <div className="pool-detail-container">
           <div className="pool-refresh-controls">
             <div className="pool-refresh-actions">
-              <IonButton
-                color="primary"
-                onClick={handleManualRefresh}
-                disabled={isManualRefreshActive || isFetching}
-                aria-label="Refresh token details"
-              >
-                {(isManualRefreshActive || isFetching) && (
-                  <IonSpinner slot="start" name="crescent" />
-                )}
-                Refresh Now
-              </IonButton>
-
+              <Tooltip content={t.refreshTokenTooltip} position="top">
+                <IonButton
+                  color="primary"
+                  onClick={handleManualRefresh}
+                  disabled={isManualRefreshActive || isFetching}
+                  aria-label={t.refreshTokenDetails}
+                >
+                  {(isManualRefreshActive || isFetching) && (
+                    <IonSpinner slot="start" name="crescent" />
+                  )}
+                  {t.refreshNow}
+                </IonButton>
+              </Tooltip>
               <IonSelect
                 value={selectedRefreshInterval}
                 interface="popover"
-                aria-label="Auto refresh frequency"
+                aria-label={t.autoRefreshLabel}
                 onIonChange={(event) => setSelectedRefreshInterval(event.detail.value)}
               >
                 {refreshOptions.map((option) => (
@@ -258,7 +272,10 @@ const LaunchpadDetail: React.FC = () => {
                 ))}
               </IonSelect>
             </div>
-            <LastUpdated timestamp={lastRefreshedAt || livePool?.lastUpdated} prefix="Refreshed" />
+            <LastUpdated
+              timestamp={lastRefreshedAt || livePool?.lastUpdated}
+              prefix={t.refreshedPrefix}
+            />
           </div>
 
           {/* Hero Section */}
@@ -298,7 +315,7 @@ const LaunchpadDetail: React.FC = () => {
                   </div>
                 </div>
                 <IonBadge color={getStatusColor(displayPool.status)}>
-                  {displayPool.status.toUpperCase()}
+                  {getStatusLabel(displayPool.status)}
                 </IonBadge>
               </div>
             </IonCardHeader>
@@ -323,8 +340,8 @@ const LaunchpadDetail: React.FC = () => {
                 <div className="pool-progress-header">
                   <Tooltip content={t.progressTooltip} position="top">
                     <span>
-                      Funding Progress
-                      <LastUpdated timestamp={livePool?.lastUpdated} />
+                      {t.fundingProgress}
+                      <LastUpdated timestamp={livePool?.lastUpdated} prefix={t.refreshedPrefix} />
                     </span>
                   </Tooltip>
                   <Tooltip content={t.progressTooltip} position="top">
@@ -338,7 +355,7 @@ const LaunchpadDetail: React.FC = () => {
                 </Tooltip>
                 <div className="pool-progress-amounts">
                   <Tooltip
-                    content={`Current amount raised: $${formatNumber(displayPool.currentAmount)}`}
+                    content={`${t.currentAmountTooltip}: $${formatNumber(displayPool.currentAmount)}`}
                     position="top"
                   >
                     <span className="pool-amount-raised">
@@ -346,7 +363,7 @@ const LaunchpadDetail: React.FC = () => {
                     </span>
                   </Tooltip>
                   <Tooltip
-                    content={`Target amount: $${formatNumber(displayPool.targetAmount)}`}
+                    content={`${t.targetAmountTooltip}: $${formatNumber(displayPool.targetAmount)}`}
                     position="top"
                   >
                     <span className="pool-amount-target">
@@ -362,7 +379,7 @@ const LaunchpadDetail: React.FC = () => {
           <IonCard>
             <IonCardHeader>
               <Tooltip content={t.contractTooltip} position="bottom">
-                <IonCardTitle>Contract Address</IonCardTitle>
+                <IonCardTitle>{t.contractAddress}</IonCardTitle>
               </Tooltip>
             </IonCardHeader>
             <IonCardContent>
@@ -389,7 +406,7 @@ const LaunchpadDetail: React.FC = () => {
                       navigator.clipboard.writeText(displayPool.id);
                     }}
                   >
-                    Copy
+                    {t.copy}
                   </IonButton>
                 </Tooltip>
                 <Tooltip content={t.viewOnSolscan} position="top">
@@ -400,7 +417,7 @@ const LaunchpadDetail: React.FC = () => {
                       window.open(`https://solscan.io/token/${displayPool.id}`, '_blank');
                     }}
                   >
-                    View on Solscan
+                    {t.viewOnSolscan}
                   </IonButton>
                 </Tooltip>
               </div>
@@ -410,7 +427,7 @@ const LaunchpadDetail: React.FC = () => {
           {/* Stats Grid */}
           <IonCard>
             <IonCardHeader>
-              <IonCardTitle>Statistics</IonCardTitle>
+              <IonCardTitle>{t.statistics}</IonCardTitle>
             </IonCardHeader>
             <IonCardContent>
               <IonGrid>
@@ -418,7 +435,7 @@ const LaunchpadDetail: React.FC = () => {
                   <IonCol size="6">
                     <div className="stat-item">
                       <Tooltip content={t.tokenPrice} position="top">
-                        <div className="stat-label">Token Price</div>
+                        <div className="stat-label">{t.tokenPrice}</div>
                       </Tooltip>
                       <Tooltip content={t.tokenPrice} position="top">
                         <div className="stat-value">
@@ -430,10 +447,10 @@ const LaunchpadDetail: React.FC = () => {
                   </IonCol>
                   <IonCol size="6">
                     <div className="stat-item">
-                      <Tooltip content={t.marketCapTooltip} position="top">
-                        <div className="stat-label">Total Value Locked</div>
+                      <Tooltip content={t.tvlTooltip} position="top">
+                        <div className="stat-label">{t.totalValueLocked}</div>
                       </Tooltip>
-                      <Tooltip content={t.marketCapTooltip} position="top">
+                      <Tooltip content={t.tvlTooltip} position="top">
                         <div className="stat-value">
                           ${formatNumber(displayPool.tvl)}
                           <LastUpdated timestamp={livePool?.lastUpdated} prefix="" />
@@ -446,7 +463,7 @@ const LaunchpadDetail: React.FC = () => {
                   <IonCol size="6">
                     <div className="stat-item">
                       <Tooltip content={t.holdersTooltip} position="top">
-                        <div className="stat-label">Participants</div>
+                        <div className="stat-label">{t.participants}</div>
                       </Tooltip>
                       <Tooltip content={t.holdersTooltip} position="top">
                         <div className="stat-value">
@@ -459,13 +476,13 @@ const LaunchpadDetail: React.FC = () => {
                   <IonCol size="6">
                     <div className="stat-item">
                       <Tooltip
-                        content={`Target fundraising amount: $${formatNumber(displayPool.targetAmount)}`}
+                        content={`${t.targetAmountTooltip}: $${formatNumber(displayPool.targetAmount)}`}
                         position="top"
                       >
-                        <div className="stat-label">Target Amount</div>
+                        <div className="stat-label">{t.targetAmount}</div>
                       </Tooltip>
                       <Tooltip
-                        content={`Target fundraising amount: $${formatNumber(displayPool.targetAmount)}`}
+                        content={`${t.targetAmountTooltip}: $${formatNumber(displayPool.targetAmount)}`}
                         position="top"
                       >
                         <div className="stat-value">${formatNumber(displayPool.targetAmount)}</div>
@@ -477,13 +494,13 @@ const LaunchpadDetail: React.FC = () => {
                   <IonCol size="6">
                     <div className="stat-item">
                       <Tooltip
-                        content={`Current amount raised: $${formatNumber(displayPool.currentAmount)}`}
+                        content={`${t.currentAmountTooltip}: $${formatNumber(displayPool.currentAmount)}`}
                         position="top"
                       >
-                        <div className="stat-label">Current Amount</div>
+                        <div className="stat-label">{t.currentAmount}</div>
                       </Tooltip>
                       <Tooltip
-                        content={`Current amount raised: $${formatNumber(displayPool.currentAmount)}`}
+                        content={`${t.currentAmountTooltip}: $${formatNumber(displayPool.currentAmount)}`}
                         position="top"
                       >
                         <div className="stat-value">${formatNumber(displayPool.currentAmount)}</div>
@@ -492,11 +509,11 @@ const LaunchpadDetail: React.FC = () => {
                   </IonCol>
                   <IonCol size="6">
                     <div className="stat-item">
-                      <Tooltip content={t.minMax} position="top">
-                        <div className="stat-label">Min/Max Participation</div>
+                      <Tooltip content={t.minMaxParticipation} position="top">
+                        <div className="stat-label">{t.minMaxParticipation}</div>
                       </Tooltip>
                       <Tooltip
-                        content={`Minimum: $${displayPool.minParticipation || '10'}, Maximum: $${displayPool.maxParticipation || '10K'}`}
+                        content={`${t.minimumLabel}: $${displayPool.minParticipation || '10'}, ${t.maximumLabel}: $${displayPool.maxParticipation || '10K'}`}
                         position="top"
                       >
                         <div className="stat-value">
@@ -518,7 +535,7 @@ const LaunchpadDetail: React.FC = () => {
             displayPool.volumeSol) && (
             <IonCard>
               <IonCardHeader>
-                <IonCardTitle>Trading Activity</IonCardTitle>
+                <IonCardTitle>{t.tradingActivity}</IonCardTitle>
               </IonCardHeader>
               <IonCardContent>
                 <IonGrid>
@@ -526,10 +543,10 @@ const LaunchpadDetail: React.FC = () => {
                     {displayPool.buys !== undefined && (
                       <IonCol size="6">
                         <div className="stat-item">
-                          <Tooltip content="Number of buy transactions" position="top">
-                            <div className="stat-label">Buys</div>
+                          <Tooltip content={t.buysTooltip} position="top">
+                            <div className="stat-label">{t.buys}</div>
                           </Tooltip>
-                          <Tooltip content="Number of buy transactions" position="top">
+                          <Tooltip content={t.buysTooltip} position="top">
                             <div
                               className="stat-value"
                               style={{ color: 'var(--ion-color-success)' }}
@@ -543,10 +560,10 @@ const LaunchpadDetail: React.FC = () => {
                     {displayPool.sells !== undefined && (
                       <IonCol size="6">
                         <div className="stat-item">
-                          <Tooltip content="Number of sell transactions" position="top">
-                            <div className="stat-label">Sells</div>
+                          <Tooltip content={t.sellsTooltip} position="top">
+                            <div className="stat-label">{t.sells}</div>
                           </Tooltip>
-                          <Tooltip content="Number of sell transactions" position="top">
+                          <Tooltip content={t.sellsTooltip} position="top">
                             <div
                               className="stat-value"
                               style={{ color: 'var(--ion-color-danger)' }}
@@ -562,10 +579,10 @@ const LaunchpadDetail: React.FC = () => {
                     {displayPool.txCount !== undefined && (
                       <IonCol size="6">
                         <div className="stat-item">
-                          <Tooltip content="Total number of transactions" position="top">
-                            <div className="stat-label">Total Transactions</div>
+                          <Tooltip content={t.totalTransactionsTooltip} position="top">
+                            <div className="stat-label">{t.totalTransactions}</div>
                           </Tooltip>
-                          <Tooltip content="Total number of transactions" position="top">
+                          <Tooltip content={t.totalTransactionsTooltip} position="top">
                             <div className="stat-value">{displayPool.txCount.toLocaleString()}</div>
                           </Tooltip>
                         </div>
@@ -575,7 +592,7 @@ const LaunchpadDetail: React.FC = () => {
                       <IonCol size="6">
                         <div className="stat-item">
                           <Tooltip content={t.volumeTooltip} position="top">
-                            <div className="stat-label">Volume (SOL)</div>
+                            <div className="stat-label">{t.volumeSol}</div>
                           </Tooltip>
                           <Tooltip content={t.volumeTooltip} position="top">
                             <div className="stat-value">
@@ -594,7 +611,7 @@ const LaunchpadDetail: React.FC = () => {
                       <IonCol size="12">
                         <div className="stat-item">
                           <Tooltip content={t.volumeTooltip} position="top">
-                            <div className="stat-label">Volume (USD)</div>
+                            <div className="stat-label">{t.volumeUsd}</div>
                           </Tooltip>
                           <Tooltip content={t.volumeTooltip} position="top">
                             <div className="stat-value">
@@ -617,7 +634,7 @@ const LaunchpadDetail: React.FC = () => {
           {(displayPool.supply || displayPool.decimals || displayPool.tokenType) && (
             <IonCard>
               <IonCardHeader>
-                <IonCardTitle>Token Economics</IonCardTitle>
+                <IonCardTitle>{t.tokenEconomics}</IonCardTitle>
               </IonCardHeader>
               <IonCardContent>
                 <IonGrid>
@@ -625,10 +642,10 @@ const LaunchpadDetail: React.FC = () => {
                     {displayPool.supply && (
                       <IonCol size="6">
                         <div className="stat-item">
-                          <Tooltip content="Total token supply" position="top">
-                            <div className="stat-label">Total Supply</div>
+                          <Tooltip content={t.totalSupplyTooltip} position="top">
+                            <div className="stat-label">{t.totalSupply}</div>
                           </Tooltip>
-                          <Tooltip content="Total token supply" position="top">
+                          <Tooltip content={t.totalSupplyTooltip} position="top">
                             <div className="stat-value">
                               {(
                                 displayPool.supply / Math.pow(10, displayPool.decimals || 0)
@@ -641,10 +658,10 @@ const LaunchpadDetail: React.FC = () => {
                     {displayPool.decimals !== undefined && (
                       <IonCol size="6">
                         <div className="stat-item">
-                          <Tooltip content="Number of decimal places for the token" position="top">
-                            <div className="stat-label">Decimals</div>
+                          <Tooltip content={t.decimalsTooltip} position="top">
+                            <div className="stat-label">{t.decimalsLabel}</div>
                           </Tooltip>
-                          <Tooltip content="Number of decimal places for the token" position="top">
+                          <Tooltip content={t.decimalsTooltip} position="top">
                             <div className="stat-value">{displayPool.decimals}</div>
                           </Tooltip>
                         </div>
@@ -655,10 +672,10 @@ const LaunchpadDetail: React.FC = () => {
                     <IonRow>
                       <IonCol size="12">
                         <div className="stat-item">
-                          <Tooltip content="Type of token (e.g., SPL Token)" position="top">
-                            <div className="stat-label">Token Type</div>
+                          <Tooltip content={t.tokenTypeTooltip} position="top">
+                            <div className="stat-label">{t.tokenTypeLabel}</div>
                           </Tooltip>
-                          <Tooltip content="Type of token (e.g., SPL Token)" position="top">
+                          <Tooltip content={t.tokenTypeTooltip} position="top">
                             <div className="stat-value">{displayPool.tokenType}</div>
                           </Tooltip>
                         </div>
@@ -674,18 +691,18 @@ const LaunchpadDetail: React.FC = () => {
           {(displayPool.pool || displayPool.creator) && (
             <IonCard>
               <IonCardHeader>
-                <IonCardTitle>Pool & Creator</IonCardTitle>
+                <IonCardTitle>{t.poolAndCreator}</IonCardTitle>
               </IonCardHeader>
               <IonCardContent>
                 {displayPool.pool && (
                   <div style={{ marginBottom: '16px' }}>
-                    <Tooltip content="Pool contract address" position="top">
+                    <Tooltip content={t.poolAddressTooltip} position="top">
                       <div className="stat-label" style={{ marginBottom: '8px' }}>
-                        Pool Address
+                        {t.poolAddress}
                       </div>
                     </Tooltip>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Tooltip content="Pool contract address" position="top">
+                      <Tooltip content={t.poolAddressTooltip} position="top">
                         <code
                           style={{
                             flex: 1,
@@ -710,7 +727,7 @@ const LaunchpadDetail: React.FC = () => {
                             navigator.clipboard.writeText(displayPool.pool);
                           }}
                         >
-                          Copy
+                          {t.copy}
                         </IonButton>
                       </Tooltip>
                     </div>
@@ -718,13 +735,13 @@ const LaunchpadDetail: React.FC = () => {
                 )}
                 {displayPool.creator && (
                   <div>
-                    <Tooltip content="Creator wallet address" position="top">
+                    <Tooltip content={t.creatorTooltip} position="top">
                       <div className="stat-label" style={{ marginBottom: '8px' }}>
-                        Creator
+                        {t.creator}
                       </div>
                     </Tooltip>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Tooltip content="Creator wallet address" position="top">
+                      <Tooltip content={t.creatorTooltip} position="top">
                         <code
                           style={{
                             flex: 1,
@@ -749,7 +766,7 @@ const LaunchpadDetail: React.FC = () => {
                             navigator.clipboard.writeText(displayPool.creator);
                           }}
                         >
-                          Copy
+                          {t.copy}
                         </IonButton>
                       </Tooltip>
                       <Tooltip content={t.viewOnSolscan} position="top">
@@ -763,7 +780,7 @@ const LaunchpadDetail: React.FC = () => {
                             )
                           }
                         >
-                          View
+                          {t.view}
                         </IonButton>
                       </Tooltip>
                     </div>
@@ -782,10 +799,10 @@ const LaunchpadDetail: React.FC = () => {
                   style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                 >
                   <IonCardTitle>
-                    Holders ({pool.holders?.length || displayPool.topHoldersList?.length || 0})
+                    {t.holders} ({pool.holders?.length || displayPool.topHoldersList?.length || 0})
                   </IonCardTitle>
                   <IonBadge color="primary">
-                    Total: {displayPool.participants.toLocaleString()}
+                    {t.totalLabel} {displayPool.participants.toLocaleString()}
                   </IonBadge>
                 </div>
               </IonCardHeader>
@@ -825,7 +842,7 @@ const LaunchpadDetail: React.FC = () => {
                           {holder.wallet}
                         </code>
                         <div style={{ fontSize: '0.7rem', color: 'var(--ion-color-medium)' }}>
-                          Click to view on Solscan
+                          {t.holdersClickHint}
                         </div>
                       </div>
                       <div style={{ textAlign: 'right', marginLeft: '16px' }}>
@@ -856,7 +873,7 @@ const LaunchpadDetail: React.FC = () => {
                                 }
                               )
                             : holder.amount.toLocaleString()}{' '}
-                          tokens
+                          {t.tokenUnit}
                         </div>
                       </div>
                     </div>
@@ -873,7 +890,7 @@ const LaunchpadDetail: React.FC = () => {
             displayPool.telegramUrl) && (
             <IonCard>
               <IonCardHeader>
-                <IonCardTitle>Social Links</IonCardTitle>
+                <IonCardTitle>{t.socialLinks}</IonCardTitle>
               </IonCardHeader>
               <IonCardContent>
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
@@ -884,7 +901,7 @@ const LaunchpadDetail: React.FC = () => {
                         fill="outline"
                         onClick={() => window.open(displayPool.websiteUrl, '_blank')}
                       >
-                        Website
+                        {t.website}
                       </IonButton>
                     </Tooltip>
                   )}
@@ -896,31 +913,31 @@ const LaunchpadDetail: React.FC = () => {
                         color="primary"
                         onClick={() => window.open(displayPool.twitterUrl, '_blank')}
                       >
-                        Twitter
+                        {t.twitter}
                       </IonButton>
                     </Tooltip>
                   )}
                   {displayPool.telegramUrl && (
-                    <Tooltip content="Visit Telegram channel" position="top">
+                    <Tooltip content={t.visitTelegram} position="top">
                       <IonButton
                         expand="block"
                         fill="outline"
                         color="secondary"
                         onClick={() => window.open(displayPool.telegramUrl, '_blank')}
                       >
-                        Telegram
+                        {t.telegram}
                       </IonButton>
                     </Tooltip>
                   )}
                   {displayPool.discordUrl && (
-                    <Tooltip content="Visit Discord server" position="top">
+                    <Tooltip content={t.visitDiscord} position="top">
                       <IonButton
                         expand="block"
                         fill="outline"
                         color="tertiary"
                         onClick={() => window.open(displayPool.discordUrl, '_blank')}
                       >
-                        Discord
+                        {t.discord}
                       </IonButton>
                     </Tooltip>
                   )}
@@ -933,12 +950,12 @@ const LaunchpadDetail: React.FC = () => {
           {displayPool.timeline && (
             <IonCard>
               <IonCardHeader>
-                <IonCardTitle>Timeline</IonCardTitle>
+                <IonCardTitle>{t.timeline}</IonCardTitle>
               </IonCardHeader>
               <IonCardContent>
                 <div className="timeline-item">
                   <Tooltip content={t.startDate} position="top">
-                    <span className="timeline-label">Start Date:</span>
+                    <span className="timeline-label">{`${t.startDate}:`}</span>
                   </Tooltip>
                   <Tooltip content={t.startDate} position="top">
                     <span className="timeline-value">
@@ -948,7 +965,7 @@ const LaunchpadDetail: React.FC = () => {
                 </div>
                 <div className="timeline-item">
                   <Tooltip content={t.endDate} position="top">
-                    <span className="timeline-label">End Date:</span>
+                    <span className="timeline-label">{`${t.endDate}:`}</span>
                   </Tooltip>
                   <Tooltip content={t.endDate} position="top">
                     <span className="timeline-value">
@@ -959,7 +976,7 @@ const LaunchpadDetail: React.FC = () => {
                 {displayPool.timeline.distributionDate && (
                   <div className="timeline-item">
                     <Tooltip content={t.distribution} position="top">
-                      <span className="timeline-label">Distribution:</span>
+                      <span className="timeline-label">{`${t.distribution}:`}</span>
                     </Tooltip>
                     <Tooltip content={t.distribution} position="top">
                       <span className="timeline-value">
@@ -976,7 +993,7 @@ const LaunchpadDetail: React.FC = () => {
           {displayPool.faq && displayPool.faq.length > 0 && (
             <IonCard>
               <IonCardHeader>
-                <IonCardTitle>FAQ</IonCardTitle>
+                <IonCardTitle>{t.faq}</IonCardTitle>
               </IonCardHeader>
               <IonCardContent>
                 {displayPool.faq.map((item, index) => (
@@ -997,7 +1014,7 @@ const LaunchpadDetail: React.FC = () => {
                 size="large"
                 onClick={() => openParticipationModal(displayPool.id)}
               >
-                Participate in Pool
+                {t.participateInPool}
               </IonButton>
             </div>
           )}

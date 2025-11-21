@@ -46,6 +46,25 @@ export interface Translations {
   trade: string;
   participate: string;
   participateInPool: string;
+  copy: string;
+  view: string;
+  refreshNow: string;
+  autoRefreshLabel: string;
+  refreshTokenDetails: string;
+  refreshIntervalOff: string;
+  refreshInterval5s: string;
+  refreshInterval15s: string;
+  refreshInterval60s: string;
+  refreshInterval10m: string;
+  manualRefreshError: string;
+  refreshedPrefix: string;
+  socialLinks: string;
+  website: string;
+  twitter: string;
+  telegram: string;
+  discord: string;
+  visitTelegram: string;
+  visitDiscord: string;
 
   // Loading/Empty states
   loading: string;
@@ -58,14 +77,48 @@ export interface Translations {
   statistics: string;
   tokenPrice: string;
   totalValueLocked: string;
+  tvlTooltip: string;
   participants: string;
   minMax: string;
+  minMaxParticipation: string;
   timeline: string;
   startDate: string;
   endDate: string;
   distribution: string;
   faq: string;
   poolNotFound: string;
+  refreshTokenTooltip: string;
+  targetAmount: string;
+  currentAmount: string;
+  currentAmountTooltip: string;
+  targetAmountTooltip: string;
+  tradingActivity: string;
+  buys: string;
+  sells: string;
+  totalTransactions: string;
+  volumeSol: string;
+  volumeUsd: string;
+  buysTooltip: string;
+  sellsTooltip: string;
+  totalTransactionsTooltip: string;
+  tokenEconomics: string;
+  totalSupply: string;
+  totalSupplyTooltip: string;
+  decimalsLabel: string;
+  decimalsTooltip: string;
+  tokenTypeLabel: string;
+  tokenTypeTooltip: string;
+  poolAndCreator: string;
+  poolAddress: string;
+  poolAddressTooltip: string;
+  creator: string;
+  creatorTooltip: string;
+  holdersClickHint: string;
+  totalLabel: string;
+  viewOnSolscanHint: string;
+  tokenUnit: string;
+  minimumLabel: string;
+  maximumLabel: string;
 
   // Time
   justNow: string;
@@ -268,6 +321,25 @@ export const translations: Record<'en' | 'de' | 'fr', Translations> = {
     trade: 'Trade',
     participate: 'Participate',
     participateInPool: 'Participate in Pool',
+    copy: 'Copy',
+    view: 'View',
+    refreshNow: 'Refresh Now',
+    autoRefreshLabel: 'Auto refresh frequency',
+    refreshTokenDetails: 'Refresh token details',
+    refreshIntervalOff: 'Off',
+    refreshInterval5s: '5s',
+    refreshInterval15s: '15s',
+    refreshInterval60s: '60s',
+    refreshInterval10m: '10m',
+    manualRefreshError: 'Unable to refresh token details. Please try again.',
+    refreshedPrefix: 'Refreshed',
+    socialLinks: 'Social Links',
+    website: 'Website',
+    twitter: 'Twitter',
+    telegram: 'Telegram',
+    discord: 'Discord',
+    visitTelegram: 'Visit Telegram channel',
+    visitDiscord: 'Visit Discord server',
 
     // Loading/Empty states
     loading: 'Loading...',
@@ -280,14 +352,48 @@ export const translations: Record<'en' | 'de' | 'fr', Translations> = {
     statistics: 'Statistics',
     tokenPrice: 'Token Price',
     totalValueLocked: 'Total Value Locked',
+    tvlTooltip: 'Total value of assets locked in the pool',
     participants: 'Participants',
     minMax: 'Min/Max',
+    minMaxParticipation: 'Min/Max Participation',
     timeline: 'Timeline',
     startDate: 'Start Date',
     endDate: 'End Date',
     distribution: 'Distribution',
     faq: 'FAQ',
     poolNotFound: 'Pool not found',
+    refreshTokenTooltip: 'Refresh token details',
+    targetAmount: 'Target Amount',
+    currentAmount: 'Current Amount',
+    currentAmountTooltip: 'Current amount raised',
+    targetAmountTooltip: 'Target fundraising amount',
+    tradingActivity: 'Trading Activity',
+    buys: 'Buys',
+    sells: 'Sells',
+    totalTransactions: 'Total Transactions',
+    volumeSol: 'Volume (SOL)',
+    volumeUsd: 'Volume (USD)',
+    buysTooltip: 'Number of buy transactions',
+    sellsTooltip: 'Number of sell transactions',
+    totalTransactionsTooltip: 'Total number of transactions',
+    tokenEconomics: 'Token Economics',
+    totalSupply: 'Total Supply',
+    totalSupplyTooltip: 'Total token supply',
+    decimalsLabel: 'Decimals',
+    decimalsTooltip: 'Number of decimal places for the token',
+    tokenTypeLabel: 'Token Type',
+    tokenTypeTooltip: 'Type of token (e.g., SPL Token)',
+    poolAndCreator: 'Pool & Creator',
+    poolAddress: 'Pool Address',
+    poolAddressTooltip: 'Pool contract address',
+    creator: 'Creator',
+    creatorTooltip: 'Creator wallet address',
+    holdersClickHint: 'Click to view on Solscan',
+    totalLabel: 'Total:',
+    viewOnSolscanHint: 'View on Solscan',
+    tokenUnit: 'tokens',
+    minimumLabel: 'Minimum',
+    maximumLabel: 'Maximum',
 
     // Time
     justNow: 'Just now',
@@ -491,6 +597,25 @@ export const translations: Record<'en' | 'de' | 'fr', Translations> = {
     trade: 'Handeln',
     participate: 'Teilnehmen',
     participateInPool: 'Am Pool teilnehmen',
+    copy: 'Kopieren',
+    view: 'Anzeigen',
+    refreshNow: 'Jetzt aktualisieren',
+    autoRefreshLabel: 'Automatische Aktualisierung',
+    refreshTokenDetails: 'Token-Details aktualisieren',
+    refreshIntervalOff: 'Aus',
+    refreshInterval5s: '5s',
+    refreshInterval15s: '15s',
+    refreshInterval60s: '60s',
+    refreshInterval10m: '10 Min.',
+    manualRefreshError: 'Token-Details konnten nicht aktualisiert werden. Bitte erneut versuchen.',
+    refreshedPrefix: 'Aktualisiert',
+    socialLinks: 'Soziale Links',
+    website: 'Website',
+    twitter: 'Twitter',
+    telegram: 'Telegram',
+    discord: 'Discord',
+    visitTelegram: 'Telegram-Kanal besuchen',
+    visitDiscord: 'Discord-Server besuchen',
 
     // Loading/Empty states
     loading: 'Lädt...',
@@ -503,14 +628,48 @@ export const translations: Record<'en' | 'de' | 'fr', Translations> = {
     statistics: 'Statistiken',
     tokenPrice: 'Token-Preis',
     totalValueLocked: 'Gesamt gesperrter Wert',
+    tvlTooltip: 'Gesamter Wert der im Pool gesperrten Vermögenswerte',
     participants: 'Teilnehmer',
     minMax: 'Min/Max',
+    minMaxParticipation: 'Min/Max Teilnahme',
     timeline: 'Zeitplan',
     startDate: 'Startdatum',
     endDate: 'Enddatum',
     distribution: 'Verteilung',
     faq: 'FAQ',
     poolNotFound: 'Pool nicht gefunden',
+    refreshTokenTooltip: 'Token-Details aktualisieren',
+    targetAmount: 'Zielbetrag',
+    currentAmount: 'Aktueller Betrag',
+    currentAmountTooltip: 'Aktueller eingesammelter Betrag',
+    targetAmountTooltip: 'Zielbetrag der Finanzierung',
+    tradingActivity: 'Handelsaktivität',
+    buys: 'Käufe',
+    sells: 'Verkäufe',
+    totalTransactions: 'Gesamttransaktionen',
+    volumeSol: 'Volumen (SOL)',
+    volumeUsd: 'Volumen (USD)',
+    buysTooltip: 'Anzahl der Kauftransaktionen',
+    sellsTooltip: 'Anzahl der Verkaufstransaktionen',
+    totalTransactionsTooltip: 'Gesamtzahl der Transaktionen',
+    tokenEconomics: 'Token-Ökonomie',
+    totalSupply: 'Gesamtangebot',
+    totalSupplyTooltip: 'Gesamtes Token-Angebot',
+    decimalsLabel: 'Dezimalstellen',
+    decimalsTooltip: 'Anzahl der Dezimalstellen des Tokens',
+    tokenTypeLabel: 'Tokentyp',
+    tokenTypeTooltip: 'Art des Tokens (z. B. SPL Token)',
+    poolAndCreator: 'Pool & Ersteller',
+    poolAddress: 'Pool-Adresse',
+    poolAddressTooltip: 'Pool-Vertragsadresse',
+    creator: 'Ersteller',
+    creatorTooltip: 'Wallet-Adresse des Erstellers',
+    holdersClickHint: 'Zum Anzeigen auf Solscan klicken',
+    totalLabel: 'Gesamt:',
+    viewOnSolscanHint: 'Auf Solscan ansehen',
+    tokenUnit: 'Token',
+    minimumLabel: 'Minimum',
+    maximumLabel: 'Maximum',
 
     // Time
     justNow: 'Gerade eben',
@@ -715,6 +874,25 @@ export const translations: Record<'en' | 'de' | 'fr', Translations> = {
     trade: 'Échanger',
     participate: 'Participer',
     participateInPool: 'Participer au Pool',
+    copy: 'Copier',
+    view: 'Voir',
+    refreshNow: 'Actualiser maintenant',
+    autoRefreshLabel: "Fréquence d'actualisation auto",
+    refreshTokenDetails: 'Actualiser les détails du token',
+    refreshIntervalOff: 'Arrêt',
+    refreshInterval5s: '5s',
+    refreshInterval15s: '15s',
+    refreshInterval60s: '60s',
+    refreshInterval10m: '10 min',
+    manualRefreshError: "Impossible d'actualiser les détails du token. Réessayez.",
+    refreshedPrefix: 'Actualisé',
+    socialLinks: 'Liens sociaux',
+    website: 'Site web',
+    twitter: 'Twitter',
+    telegram: 'Telegram',
+    discord: 'Discord',
+    visitTelegram: 'Visiter le canal Telegram',
+    visitDiscord: 'Visiter le serveur Discord',
 
     // Loading/Empty states
     loading: 'Chargement...',
@@ -728,14 +906,48 @@ export const translations: Record<'en' | 'de' | 'fr', Translations> = {
     statistics: 'Statistiques',
     tokenPrice: 'Prix du Token',
     totalValueLocked: 'Valeur Totale Verrouillée',
+    tvlTooltip: 'Valeur totale des actifs verrouillés dans le pool',
     participants: 'Participants',
     minMax: 'Min/Max',
+    minMaxParticipation: 'Participation Min/Max',
     timeline: 'Calendrier',
     startDate: 'Date de Début',
     endDate: 'Date de Fin',
     distribution: 'Distribution',
     faq: 'FAQ',
     poolNotFound: 'Pool non trouvé',
+    refreshTokenTooltip: 'Actualiser les détails du token',
+    targetAmount: 'Montant cible',
+    currentAmount: 'Montant actuel',
+    currentAmountTooltip: 'Montant levé actuel',
+    targetAmountTooltip: 'Montant de financement cible',
+    tradingActivity: 'Activité de trading',
+    buys: 'Achats',
+    sells: 'Ventes',
+    totalTransactions: 'Transactions totales',
+    volumeSol: 'Volume (SOL)',
+    volumeUsd: 'Volume (USD)',
+    buysTooltip: "Nombre d'opérations d'achat",
+    sellsTooltip: "Nombre d'opérations de vente",
+    totalTransactionsTooltip: 'Nombre total de transactions',
+    tokenEconomics: 'Économie du Token',
+    totalSupply: 'Offre totale',
+    totalSupplyTooltip: 'Offre totale de tokens',
+    decimalsLabel: 'Décimales',
+    decimalsTooltip: 'Nombre de décimales du token',
+    tokenTypeLabel: 'Type de token',
+    tokenTypeTooltip: 'Type de token (ex. SPL Token)',
+    poolAndCreator: 'Pool & Créateur',
+    poolAddress: 'Adresse du pool',
+    poolAddressTooltip: 'Adresse du contrat du pool',
+    creator: 'Créateur',
+    creatorTooltip: 'Adresse du portefeuille du créateur',
+    holdersClickHint: 'Cliquez pour voir sur Solscan',
+    totalLabel: 'Total :',
+    viewOnSolscanHint: 'Voir sur Solscan',
+    tokenUnit: 'tokens',
+    minimumLabel: 'Minimum',
+    maximumLabel: 'Maximum',
 
     // Time
     justNow: "À l'instant",
