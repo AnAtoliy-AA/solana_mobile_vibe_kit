@@ -1,10 +1,54 @@
 /* Modern Launchpad Dashboard Styles */
 
+/* Animated gradient background for header */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 /* Navbar with glassmorphism */
 .launchpad-header {
   --background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-tertiary) 100%);
+  background: linear-gradient(
+    270deg,
+    var(--theme-primary),
+    var(--theme-tertiary),
+    var(--theme-secondary)
+  );
+  background-size: 600% 600%;
+  animation: gradient-shift 15s ease infinite;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated accent line */
+.launchpad-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  animation: slide-line 3s ease-in-out infinite;
+}
+
+@keyframes slide-line {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .launchpad-navbar {
@@ -17,7 +61,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 24px;
-  max-width: 1400px;
+  max-width: 1700px;
   margin: 0 auto;
   width: 100%;
 }
@@ -96,7 +140,7 @@
 }
 
 .mobile-menu {
-  display: none;
+  display: flex;
   flex-direction: column;
   gap: 4px;
   padding: 12px 16px;
@@ -159,7 +203,7 @@
 }
 
 .search-container {
-  max-width: 1400px;
+  max-width: 1700px;
   margin: 0 auto;
   padding: 0 24px;
 }
@@ -200,7 +244,7 @@
 .tabs-container {
   display: flex;
   gap: 8px;
-  max-width: 1400px;
+  max-width: 1700px;
   margin: 0 auto;
   padding: 0 24px;
   overflow-x: auto;
@@ -264,7 +308,7 @@
 }
 
 .dashboard-container {
-  max-width: 1400px;
+  max-width: 1700px;
   margin: 0 auto;
   padding: 24px;
   min-height: calc(100vh - 300px);
@@ -866,7 +910,7 @@
     rgba(255, 255, 255, 0.1) 50%,
     transparent 100%
   );
-  animation: shimmer 2s infinite;
+  animation: shimmer 20s infinite;
 }
 
 @keyframes shimmer {
@@ -900,7 +944,7 @@
     rgba(255, 255, 255, 0.3) 50%,
     transparent 100%
   );
-  animation: shimmer 2s infinite;
+  animation: shimmer 20s infinite;
 }
 
 .card-footer {
@@ -1050,10 +1094,6 @@
     align-items: flex-start;
   }
 
-  .mobile-menu {
-    display: flex;
-  }
-
   .launchpad-search-toolbar {
     padding: 12px 0;
   }
@@ -1130,5 +1170,351 @@
 
   .card-address {
     padding: 10px;
+  }
+}
+
+/* ============================================
+   MODERN ENHANCEMENTS & MICRO-INTERACTIONS
+   ============================================ */
+
+/* Floating animation for cards on scroll */
+@keyframes float-in {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.launchpad-card {
+  animation: float-in 0.6s ease-out backwards;
+}
+
+.launchpad-card:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.launchpad-card:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.launchpad-card:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.launchpad-card:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.launchpad-card:nth-child(5) {
+  animation-delay: 0.25s;
+}
+
+/* Stagger animation for subsequent cards */
+.launchpad-card:nth-child(n + 6) {
+  animation-delay: 0.3s;
+}
+
+/* Enhanced search bar with focus glow */
+.modern-searchbar.searchbar-has-focus {
+  animation: search-glow 2s ease-in-out infinite;
+}
+
+@keyframes search-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(var(--theme-primary-rgb), 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 16px rgba(var(--theme-primary-rgb), 0.5));
+  }
+}
+
+/* Smooth count-up animation for metrics */
+.metric-value {
+  animation: metric-pop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes metric-pop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Ripple effect on chip clicks */
+@keyframes ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+.chip:active::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: var(--theme-primary);
+  border-radius: 50%;
+  animation: ripple 0.6s ease-out;
+}
+
+/* Badge pulse for new/updated pools */
+@keyframes badge-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--theme-primary-rgb), 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(var(--theme-primary-rgb), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--theme-primary-rgb), 0);
+  }
+}
+
+.status-pill.status-active {
+  animation: badge-pulse 2s infinite;
+}
+
+/* Gradient text animation for brand */
+@keyframes gradient-text {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.navbar-brand {
+  transition: all 0.3s ease;
+}
+
+.navbar-brand:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+/* Loading skeleton for cards */
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.loading-state .skeleton-card {
+  background: linear-gradient(
+    90deg,
+    var(--theme-card-background) 0%,
+    var(--theme-background-secondary) 50%,
+    var(--theme-card-background) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 24px;
+  height: 200px;
+  margin-bottom: 24px;
+}
+
+/* Tab indicator slide animation */
+.tab-btn::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--theme-primary);
+  transform: scaleX(0);
+  transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.tab-btn.active::after {
+  transform: scaleX(1);
+}
+
+/* Smooth color transitions for metrics */
+.metric-block {
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced progress bar animation */
+.card-progress-fill {
+  animation: progress-fill 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes progress-fill {
+  from {
+    width: 0 !important;
+  }
+}
+
+/* Interactive card shadow on scroll */
+.launchpad-card {
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border 0.3s ease;
+}
+
+.launchpad-card:active {
+  transform: translateY(-4px) scale(0.98);
+}
+
+/* Smooth icon rotations */
+.address-icon {
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.address-icon:active {
+  transform: rotate(360deg) scale(1.2);
+}
+
+/* Enhanced tooltip animations */
+[data-tooltip] {
+  position: relative;
+  cursor: help;
+}
+
+/* Empty state animation */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.empty-state {
+  animation: fade-up 0.6s ease-out;
+}
+
+/* Refresh spinner enhancement */
+@keyframes spin-scale {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.2);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+ion-refresher-content ion-spinner {
+  animation: spin-scale 1s linear infinite;
+}
+
+/* Chip selection bounce */
+@keyframes chip-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.chip.active {
+  animation: chip-bounce 0.4s ease;
+}
+
+/* Card avatar zoom on card hover */
+.launchpad-card:hover .card-token-avatar {
+  animation: avatar-zoom 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes avatar-zoom {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+  }
+  100% {
+    transform: scale(1.05);
+  }
+}
+
+/* Smooth scrollbar for tabs */
+.tabs-container {
+  scroll-behavior: smooth;
+}
+
+/* Button press feedback */
+ion-button:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease;
+}
+
+/* Accessibility: Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .launchpad-header {
+    animation: none !important;
+  }
+
+  .status-pill.status-active {
+    animation: none !important;
+  }
+}
+
+/* Focus visible improvements for keyboard navigation */
+.chip:focus-visible,
+.tab-btn:focus-visible,
+.launchpad-card:focus-visible {
+  outline: 3px solid var(--theme-primary);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Modern glass effect for controls */
+.launchpad-controls {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Smooth page transitions */
+.dashboard-container {
+  animation: fade-up 0.5s ease-out;
+}
+
+/* Enhanced mobile tap feedback */
+@media (hover: none) and (pointer: coarse) {
+  .chip:active,
+  .tab-btn:active,
+  .launchpad-card:active {
+    transform: scale(0.96);
+    transition: transform 0.1s ease;
   }
 }

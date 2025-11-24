@@ -1,0 +1,601 @@
+/* ============================================
+   GLOBAL MODERN ENHANCEMENTS & ANIMATIONS
+   ============================================ */
+
+/* Smooth transitions for all Ionic components */
+ion-button,
+ion-card,
+ion-chip,
+ion-item,
+ion-badge {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced ion-button with ripple effect */
+ion-button {
+  position: relative;
+  overflow: hidden;
+}
+
+ion-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s ease,
+    height 0.6s ease;
+  pointer-events: none;
+}
+
+ion-button:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Enhanced ion-card hover effects */
+ion-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+ion-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.15),
+    0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced ion-chip with hover */
+ion-chip {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+ion-chip:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Enhanced ion-item with slide effect */
+ion-item {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+ion-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: var(--theme-primary);
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+
+ion-item:hover::before {
+  transform: scaleY(1);
+}
+
+ion-item:hover {
+  --background: var(--theme-table-row-hover);
+  transform: translateX(4px);
+}
+
+/* Enhanced ion-badge with pulse */
+ion-badge {
+  animation: badge-subtle-pulse 2s ease-in-out infinite;
+}
+
+@keyframes badge-subtle-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Smooth loading spinner */
+ion-spinner {
+  animation: spinner-scale 1s ease-in-out infinite;
+}
+
+@keyframes spinner-scale {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Enhanced modal appearance */
+ion-modal {
+  --backdrop-opacity: 0.6;
+}
+
+ion-modal::part(backdrop) {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Enhanced toast notifications */
+ion-toast {
+  --background: var(--theme-card-background);
+  --color: var(--theme-text-primary);
+  --border-radius: 16px;
+  --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  font-weight: 600;
+}
+
+ion-toast::part(container) {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Enhanced alert */
+ion-alert {
+  --background: var(--theme-card-background);
+  --backdrop-opacity: 0.6;
+}
+
+ion-alert::part(backdrop) {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Enhanced searchbar focus effect */
+ion-searchbar.searchbar-has-focus {
+  animation: searchbar-glow 2s ease-in-out infinite;
+}
+
+@keyframes searchbar-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--theme-primary-rgb), 0);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(var(--theme-primary-rgb), 0.2);
+  }
+}
+
+/* Enhanced segment buttons */
+ion-segment-button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+ion-segment-button:hover {
+  transform: translateY(-2px);
+}
+
+ion-segment-button.segment-button-checked {
+  animation: segment-pop 0.4s ease-out;
+}
+
+@keyframes segment-pop {
+  0% {
+    transform: scale(0.9);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Page transition animation */
+.ion-page {
+  animation: page-enter 0.3s ease-out;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced list animations */
+ion-list {
+  --background: transparent;
+}
+
+ion-list ion-item {
+  --background: transparent;
+}
+
+/* Skeleton loading enhancement */
+ion-skeleton-text {
+  animation: skeleton-wave 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-wave {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+/* Enhanced refresher */
+ion-refresher-content {
+  animation: refresher-bounce 1s ease-in-out infinite;
+}
+
+@keyframes refresher-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Enhanced toggle */
+ion-toggle {
+  --handle-width: 28px;
+  --handle-height: 28px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+ion-toggle:hover {
+  transform: scale(1.05);
+}
+
+/* Enhanced checkbox */
+ion-checkbox {
+  --border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+ion-checkbox:hover {
+  transform: scale(1.1);
+}
+
+ion-checkbox.checkbox-checked {
+  animation: checkbox-pop 0.3s ease-out;
+}
+
+@keyframes checkbox-pop {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Enhanced radio buttons */
+ion-radio {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+ion-radio:hover {
+  transform: scale(1.1);
+}
+
+ion-radio.radio-checked {
+  animation: radio-ping 0.6s ease-out;
+}
+
+@keyframes radio-ping {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--theme-primary-rgb), 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(var(--theme-primary-rgb), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--theme-primary-rgb), 0);
+  }
+}
+
+/* Enhanced input focus */
+ion-input,
+ion-textarea {
+  transition: all 0.3s ease;
+}
+
+ion-input.has-focus,
+ion-textarea.has-focus {
+  transform: scale(1.01);
+}
+
+/* Enhanced fab button */
+ion-fab-button {
+  --box-shadow: 0 6px 20px rgba(var(--theme-primary-rgb), 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+ion-fab-button:hover {
+  transform: translateY(-4px) scale(1.1);
+  --box-shadow: 0 10px 30px rgba(var(--theme-primary-rgb), 0.5);
+}
+
+ion-fab-button:active {
+  transform: translateY(-2px) scale(1.05);
+}
+
+/* Enhanced range slider */
+ion-range {
+  --knob-size: 28px;
+  transition: all 0.3s ease;
+}
+
+ion-range:hover {
+  transform: scaleY(1.2);
+}
+
+/* Loading overlay enhancement */
+ion-loading {
+  --backdrop-opacity: 0.6;
+}
+
+ion-loading::part(backdrop) {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Enhanced action sheet */
+ion-action-sheet {
+  --backdrop-opacity: 0.6;
+}
+
+ion-action-sheet::part(backdrop) {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Enhanced popover */
+ion-popover {
+  --backdrop-opacity: 0.3;
+  --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+ion-popover::part(backdrop) {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+ion-popover::part(content) {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Accessibility: Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus visible for all interactive elements */
+*:focus-visible {
+  outline: 3px solid var(--theme-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Enhanced scroll behavior */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced selection */
+::selection {
+  background: rgba(var(--theme-primary-rgb), 0.3);
+  color: var(--theme-text-primary);
+}
+
+::-moz-selection {
+  background: rgba(var(--theme-primary-rgb), 0.3);
+  color: var(--theme-text-primary);
+}
+
+/* Custom cursor for interactive elements */
+button,
+a,
+ion-button,
+ion-item[button],
+ion-card[button],
+[role='button'] {
+  cursor: pointer;
+}
+
+/* Smooth opacity transitions for disabled elements */
+[disabled],
+[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transition: opacity 0.3s ease;
+}
+
+/* Enhanced hr */
+hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--theme-border-color), transparent);
+  margin: 24px 0;
+  animation: hr-expand 0.6s ease-out;
+}
+
+@keyframes hr-expand {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Enhanced strong/bold text */
+strong,
+b {
+  color: var(--theme-primary);
+  font-weight: 700;
+}
+
+/* Enhanced links */
+a {
+  color: var(--theme-primary);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--theme-primary);
+  transition: width 0.3s ease;
+}
+
+a:hover::after {
+  width: 100%;
+}
+
+a:hover {
+  color: var(--theme-secondary);
+  transform: translateX(2px);
+}
+
+/* Enhanced code blocks */
+code,
+pre {
+  background: rgba(var(--theme-primary-rgb), 0.08);
+  border-radius: 8px;
+  padding: 2px 8px;
+  font-family: 'Courier New', monospace;
+  border: 1px solid rgba(var(--theme-primary-rgb), 0.15);
+  transition: all 0.3s ease;
+}
+
+code:hover,
+pre:hover {
+  background: rgba(var(--theme-primary-rgb), 0.12);
+  transform: scale(1.02);
+}
+
+/* Enhanced blockquote */
+blockquote {
+  border-left: 4px solid var(--theme-primary);
+  padding-left: 20px;
+  margin: 20px 0;
+  font-style: italic;
+  color: var(--theme-text-secondary);
+  animation: quote-slide 0.5s ease-out;
+}
+
+@keyframes quote-slide {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Global utility classes */
+.fade-in {
+  animation: fade-in 0.6s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.slide-up {
+  animation: slide-up 0.6s ease-out;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-right {
+  animation: slide-right 0.6s ease-out;
+}
+
+@keyframes slide-right {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.scale-in {
+  animation: scale-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.rotate-in {
+  animation: rotate-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes rotate-in {
+  from {
+    opacity: 0;
+    transform: rotate(-180deg) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}

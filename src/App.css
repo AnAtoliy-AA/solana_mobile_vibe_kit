@@ -1,0 +1,1157 @@
+/* Modern App Styles with Enhanced Navigation */
+
+/* ============================================
+   BOTTOM TAB BAR - MODERN GLASSMORPHISM
+   ============================================ */
+
+ion-tab-bar {
+  --background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  box-shadow:
+    0 -2px 20px rgba(0, 0, 0, 0.08),
+    0 -1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 10;
+}
+
+/* Dark theme tab bar */
+[data-theme='dark'] ion-tab-bar,
+[data-theme='neon-cyan'] ion-tab-bar,
+[data-theme='neon-purple'] ion-tab-bar,
+[data-theme='neon-green'] ion-tab-bar,
+[data-theme='neon-pink'] ion-tab-bar {
+  --background: rgba(26, 29, 35, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 -2px 20px rgba(0, 0, 0, 0.4),
+    0 -1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   TAB BUTTONS - MODERN INTERACTIVE DESIGN
+   ============================================ */
+
+ion-tab-button {
+  --color: var(--theme-text-tertiary);
+  --color-selected: var(--theme-primary);
+  --ripple-color: var(--theme-primary);
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+}
+
+/* Tab button hover effect */
+ion-tab-button:hover {
+  transform: translateY(-2px);
+}
+
+/* Tab button active state */
+ion-tab-button.tab-selected {
+  --color: var(--theme-primary);
+}
+
+/* ============================================
+   TAB ICONS - MODERN SCALING & EFFECTS
+   ============================================ */
+
+ion-tab-button ion-icon {
+  font-size: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 0 0px transparent);
+}
+
+/* Icon hover effect */
+ion-tab-button:hover ion-icon {
+  transform: scale(1.1);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Selected tab icon with glow */
+ion-tab-button.tab-selected ion-icon {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 8px var(--theme-primary));
+  animation: icon-pulse 2s ease-in-out infinite;
+}
+
+/* Neon themes - enhanced glow */
+[data-theme='neon-cyan'] ion-tab-button.tab-selected ion-icon,
+[data-theme='neon-purple'] ion-tab-button.tab-selected ion-icon,
+[data-theme='neon-green'] ion-tab-button.tab-selected ion-icon,
+[data-theme='neon-pink'] ion-tab-button.tab-selected ion-icon {
+  filter: drop-shadow(0 0 12px var(--theme-primary)) drop-shadow(0 0 24px var(--theme-primary));
+}
+
+/* ============================================
+   TAB LABELS - MODERN TYPOGRAPHY
+   ============================================ */
+
+ion-tab-button ion-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  margin-top: 4px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: capitalize;
+}
+
+/* Selected tab label */
+ion-tab-button.tab-selected ion-label {
+  font-weight: 600;
+  text-shadow: 0 0 8px var(--theme-primary);
+}
+
+/* Neon themes - enhanced text glow */
+[data-theme='neon-cyan'] ion-tab-button.tab-selected ion-label,
+[data-theme='neon-purple'] ion-tab-button.tab-selected ion-label,
+[data-theme='neon-green'] ion-tab-button.tab-selected ion-label,
+[data-theme='neon-pink'] ion-tab-button.tab-selected ion-label {
+  text-shadow:
+    0 0 10px var(--theme-primary),
+    0 0 20px var(--theme-primary),
+    0 0 30px var(--theme-primary);
+}
+
+/* ============================================
+   ACTIVE TAB INDICATOR
+   ============================================ */
+
+/* Modern bottom indicator line */
+ion-tab-button::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 40px;
+  height: 3px;
+  background: var(--theme-primary);
+  border-radius: 3px 3px 0 0;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px var(--theme-primary);
+}
+
+/* Show indicator on selected tab */
+ion-tab-button.tab-selected::after {
+  transform: translateX(-50%) scaleX(1);
+}
+
+/* ============================================
+   FLOATING BADGE EFFECT (SELECTED TAB)
+   ============================================ */
+
+ion-tab-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  background: var(--theme-primary);
+  opacity: 0.1;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
+}
+
+ion-tab-button.tab-selected::before {
+  width: 60px;
+  height: 60px;
+  opacity: 0.15;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes icon-pulse {
+  0%,
+  100% {
+    transform: scale(1.15);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+@keyframes tab-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Animate tab selection */
+ion-tab-button.tab-selected {
+  animation: tab-pop 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   PAGE TRANSITIONS
+   ============================================ */
+
+ion-router-outlet {
+  contain: layout style size;
+}
+
+/* Smooth page transitions */
+.ion-page {
+  animation: page-fade-in 0.3s ease-in-out;
+}
+
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ensure content doesn't get hidden behind tab bar */
+ion-content {
+  --padding-bottom: 80px;
+}
+
+@media (min-width: 1024px) {
+  ion-content {
+    --padding-bottom: 100px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+/* Tablet and larger */
+@media (min-width: 768px) {
+  ion-tab-bar {
+    padding: 12px 0 max(12px, env(safe-area-inset-bottom));
+  }
+
+  ion-tab-button ion-icon {
+    font-size: 28px;
+  }
+
+  ion-tab-button ion-label {
+    font-size: 12px;
+  }
+}
+
+/* ============================================
+   ULTRA-MODERN SIDEBAR NAVIGATION
+   ============================================ */
+
+/* Desktop - Modern Sidebar Navigation */
+@media (min-width: 1024px) {
+  /* Transform tab bar into modern vertical sidebar */
+  ion-tab-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 240px;
+    height: 100vh;
+    flex-direction: column;
+    padding: 24px 16px;
+    gap: 12px;
+    border-right: 1px solid rgba(var(--theme-primary-rgb), 0.1);
+    border-top: none;
+    box-shadow:
+      8px 0 40px rgba(0, 0, 0, 0.04),
+      4px 0 16px rgba(0, 0, 0, 0.02);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* Light theme sidebar with subtle gradient */
+  ion-tab-bar {
+    --background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.98) 0%,
+      rgba(255, 255, 255, 0.95) 100%
+    );
+  }
+
+  /* Dark theme sidebar with depth */
+  [data-theme='dark'] ion-tab-bar,
+  [data-theme='neon-cyan'] ion-tab-bar,
+  [data-theme='neon-purple'] ion-tab-bar,
+  [data-theme='neon-green'] ion-tab-bar,
+  [data-theme='neon-pink'] ion-tab-bar {
+    --background: linear-gradient(180deg, rgba(18, 20, 24, 0.98) 0%, rgba(26, 29, 35, 0.95) 100%);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      8px 0 40px rgba(0, 0, 0, 0.3),
+      4px 0 16px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Modern tab buttons with floating card style */
+  ion-tab-button {
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0 14px;
+    border-radius: 10px;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    height: 50px;
+    min-height: 50px;
+    max-height: 80px;
+    --ripple-color: rgba(var(--theme-primary-rgb), 0.15);
+    position: relative;
+    overflow: visible;
+  }
+
+  /* Icon in sidebar with modern sizing */
+  ion-tab-button ion-icon {
+    font-size: 18px;
+    margin: 0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Label in sidebar with modern typography */
+  ion-tab-button ion-label {
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0;
+    text-align: left;
+    letter-spacing: -0.01em;
+    transition: all 0.3s ease;
+  }
+
+  /* Hover state with modern lift effect */
+  ion-tab-button:hover {
+    background: rgba(var(--theme-primary-rgb), 0.06);
+    transform: translateX(2px);
+  }
+
+  ion-tab-button:hover ion-icon {
+    transform: scale(1.1);
+  }
+
+  /* Active/selected state with modern styling */
+  ion-tab-button.tab-selected {
+    background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-tertiary) 100%);
+    --color-selected: white;
+    box-shadow:
+      0 8px 24px rgba(var(--theme-primary-rgb), 0.35),
+      0 2px 8px rgba(var(--theme-primary-rgb), 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transform: translateX(0);
+  }
+
+  ion-tab-button.tab-selected ion-icon {
+    color: white;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  }
+
+  ion-tab-button.tab-selected ion-label {
+    color: white;
+    font-weight: 700;
+  }
+
+  /* Remove bottom padding since sidebar is on left */
+  ion-content {
+    --padding-bottom: 20px;
+  }
+
+  /* Slight offset so content clears expanded sidebar */
+  ion-router-outlet {
+    margin-left: 80px;
+  }
+
+  /* Modern logo/branding at top of sidebar */
+  ion-tab-bar::before {
+    content: '🚀';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 16px;
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-tertiary));
+    border-radius: 16px;
+    box-shadow:
+      0 6px 20px rgba(var(--theme-primary-rgb), 0.3),
+      0 2px 8px rgba(var(--theme-primary-rgb), 0.2);
+    animation: logo-float 3s ease-in-out infinite;
+    position: relative;
+    order: -1;
+    flex-shrink: 0;
+  }
+
+  @keyframes logo-float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+
+  /* App name below logo */
+  ion-tab-bar::after {
+    content: 'Vibe Kit';
+    display: block;
+    font-size: 16px;
+    font-weight: 800;
+    margin: -8px 0 20px;
+    text-align: center;
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-tertiary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
+    order: 0;
+    flex-shrink: 0;
+  }
+
+  /* Smooth transitions for sidebar */
+  ion-tab-bar,
+  ion-tab-button {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Custom scrollbar for sidebar */
+  ion-tab-bar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  ion-tab-bar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ion-tab-bar::-webkit-scrollbar-thumb {
+    background: rgba(var(--theme-primary-rgb), 0.2);
+    border-radius: 2px;
+  }
+
+  ion-tab-bar::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--theme-primary-rgb), 0.4);
+  }
+
+  /* Subtle gradient overlay at top and bottom */
+  ion-tab-bar::before {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+}
+
+/* Collapsed sidebar for medium screens */
+@media (min-width: 1024px) and (max-width: 1280px) {
+  ion-tab-bar {
+    width: 88px;
+    padding: 32px 16px;
+  }
+
+  ion-tab-button {
+    flex-direction: column;
+    justify-content: center;
+    padding: 14px 8px;
+    gap: 6px;
+    border-radius: 16px;
+  }
+
+  ion-tab-button ion-label {
+    font-size: 11px;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  ion-tab-button ion-icon {
+    font-size: 26px;
+  }
+
+  ion-router-outlet {
+    margin-left: 88px;
+  }
+
+  /* Logo in collapsed mode */
+  ion-tab-bar::before {
+    width: 56px;
+    height: 56px;
+    font-size: 32px;
+    margin: 0 auto 24px;
+  }
+
+  /* Hide app name in collapsed mode */
+  ion-tab-bar::after {
+    display: none;
+  }
+}
+
+/* Add subtle section dividers */
+@media (min-width: 1024px) {
+  /* Divider between navigation items (optional) */
+  ion-tab-button:nth-child(3) {
+    margin-top: 8px;
+  }
+
+  /* Add tooltip on hover for collapsed sidebar */
+  @media (max-width: 1280px) {
+    ion-tab-button {
+      position: relative;
+    }
+
+    ion-tab-button:hover::before {
+      content: attr(tab);
+      position: absolute;
+      left: 100%;
+      margin-left: 12px;
+      background: var(--theme-card-background);
+      color: var(--theme-text-primary);
+      padding: 8px 16px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      white-space: nowrap;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 1000;
+      pointer-events: none;
+      animation: tooltip-appear 0.2s ease-out;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    @keyframes tooltip-appear {
+      from {
+        opacity: 0;
+        transform: translateX(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY IMPROVEMENTS
+   ============================================ */
+
+/* Focus visible for keyboard navigation */
+ion-tab-button:focus-visible {
+  outline: 2px solid var(--theme-primary);
+  outline-offset: -2px;
+  border-radius: 12px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  ion-tab-button,
+  ion-tab-button ion-icon,
+  ion-tab-button ion-label,
+  ion-tab-button::before,
+  ion-tab-button::after,
+  .ion-page {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================
+   GLOBAL APP ENHANCEMENTS
+   ============================================ */
+
+/* Smooth scrolling */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Better text rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Modern scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--theme-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--theme-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-secondary);
+}
+
+/* ============================================
+   LOADING STATES
+   ============================================ */
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton-loading {
+  background: linear-gradient(
+    90deg,
+    var(--theme-background) 0%,
+    var(--theme-background-secondary) 50%,
+    var(--theme-background) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ============================================
+   HAPTIC FEEDBACK INDICATOR
+   ============================================ */
+
+ion-tab-button:active {
+  transform: scale(0.95);
+}
+
+/* ============================================
+   THEME-SPECIFIC ENHANCEMENTS
+   ============================================ */
+
+/* Ocean theme - wave effect */
+[data-theme='ocean'] ion-tab-button.tab-selected::after {
+  background: linear-gradient(90deg, var(--theme-primary) 0%, var(--theme-secondary) 100%);
+  animation: wave 2s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    transform: translateX(-50%) scaleX(1) scaleY(1);
+  }
+  50% {
+    transform: translateX(-50%) scaleX(1.2) scaleY(0.8);
+  }
+}
+
+/* Sunset theme - glow pulse */
+[data-theme='sunset'] ion-tab-button.tab-selected {
+  animation: sunset-glow 2s ease-in-out infinite;
+}
+
+@keyframes sunset-glow {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.2);
+  }
+}
+
+/* ============================================
+   DESKTOP CONTENT LAYOUT WITH SIDEBAR
+   ============================================ */
+
+@media (min-width: 1024px) {
+  /* Main content area styling */
+  ion-router-outlet,
+  .ion-page {
+    max-width: 100%;
+  }
+
+  /* Ensure pages have proper spacing with sidebar */
+  ion-content {
+    --padding-start: 32px;
+    --padding-end: 32px;
+    --padding-top: 32px;
+  }
+
+  /* Dashboard containers should be wider on desktop */
+  .dashboard-container,
+  .wallet-container,
+  .token-container,
+  .trading-container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* Launchpad header should span full width */
+  .launchpad-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+}
+
+@media (min-width: 1280px) {
+  .dashboard-container,
+  .wallet-container,
+  .token-container,
+  .trading-container {
+    max-width: none;
+    width: 100%;
+    margin: 0;
+  }
+}
+
+/* Extra wide screens - more spacious layout */
+@media (min-width: 1920px) {
+  ion-tab-bar {
+    width: 320px;
+  }
+
+  ion-router-outlet {
+    margin-left: 320px;
+  }
+
+  ion-tab-button {
+    padding: 20px 24px;
+    max-height: 80px;
+  }
+
+  ion-tab-bar::before {
+    font-size: 28px;
+  }
+}
+
+/* ============================================
+   MODERN SIDEBAR ENHANCEMENTS
+   ============================================ */
+
+@media (min-width: 1024px) {
+  /* Add spacing between main nav and bottom section */
+  ion-tab-bar {
+    justify-content: flex-start;
+  }
+
+  /* Micro-interaction: Icon rotation on hover */
+  ion-tab-button:not(.tab-selected):hover ion-icon {
+    animation: icon-wiggle 0.5s ease;
+  }
+
+  @keyframes icon-wiggle {
+    0%,
+    100% {
+      transform: rotate(0deg) scale(1.1);
+    }
+    25% {
+      transform: rotate(-5deg) scale(1.1);
+    }
+    75% {
+      transform: rotate(5deg) scale(1.1);
+    }
+  }
+
+  /* Neon theme special effects */
+  [data-theme='neon-cyan'] ion-tab-button.tab-selected,
+  [data-theme='neon-purple'] ion-tab-button.tab-selected,
+  [data-theme='neon-green'] ion-tab-button.tab-selected,
+  [data-theme='neon-pink'] ion-tab-button.tab-selected {
+    animation: neon-glow-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes neon-glow-pulse {
+    0%,
+    100% {
+      box-shadow:
+        0 8px 24px rgba(var(--theme-primary-rgb), 0.5),
+        0 2px 8px rgba(var(--theme-primary-rgb), 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    50% {
+      box-shadow:
+        0 8px 32px rgba(var(--theme-primary-rgb), 0.7),
+        0 4px 16px rgba(var(--theme-primary-rgb), 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  /* Smooth enter animation for sidebar items */
+  ion-tab-button {
+    animation: sidebar-item-enter 0.4s ease-out backwards;
+  }
+
+  ion-tab-button:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+  ion-tab-button:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+  ion-tab-button:nth-child(3) {
+    animation-delay: 0.15s;
+  }
+  ion-tab-button:nth-child(4) {
+    animation-delay: 0.2s;
+  }
+  ion-tab-button:nth-child(5) {
+    animation-delay: 0.25s;
+  }
+  ion-tab-button:nth-child(6) {
+    animation-delay: 0.3s;
+  }
+
+  @keyframes sidebar-item-enter {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Active indicator animation */
+  ion-tab-button.tab-selected {
+    animation:
+      sidebar-item-enter 0.4s ease-out backwards,
+      selected-pop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.4s;
+  }
+
+  @keyframes selected-pop {
+    0% {
+      transform: scale(0.95);
+    }
+    50% {
+      transform: scale(1.02);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  /* Gradient border animation for selected item */
+  ion-tab-button.tab-selected::after {
+    animation: border-rotate 3s linear infinite;
+  }
+
+  @keyframes border-rotate {
+    0% {
+      background: linear-gradient(0deg, var(--theme-primary), var(--theme-secondary));
+    }
+    33% {
+      background: linear-gradient(120deg, var(--theme-primary), var(--theme-secondary));
+    }
+    66% {
+      background: linear-gradient(240deg, var(--theme-primary), var(--theme-secondary));
+    }
+    100% {
+      background: linear-gradient(360deg, var(--theme-primary), var(--theme-secondary));
+    }
+  }
+
+  /* Backdrop blur enhancement for glass effect */
+  ion-tab-bar {
+    background-attachment: fixed;
+  }
+
+  /* Subtle shine effect on sidebar */
+  ion-tab-bar::after {
+    pointer-events: none;
+  }
+}
+
+/* Ultra-wide screens - even more spacious */
+@media (min-width: 2560px) {
+  ion-tab-bar {
+    width: 320px;
+    padding: 48px 32px;
+  }
+
+  ion-router-outlet {
+    margin-left: 320px;
+  }
+
+  ion-tab-button {
+    padding: 18px 20px;
+    min-height: 60px;
+    max-height: 80px;
+  }
+
+  ion-tab-button ion-icon {
+    font-size: 28px;
+  }
+
+  ion-tab-button ion-label {
+    font-size: 16px;
+  }
+
+  ion-tab-bar::before {
+    width: 72px;
+    height: 72px;
+    font-size: 44px;
+  }
+
+  ion-tab-bar::after {
+    font-size: 22px;
+  }
+}
+
+/* ============================================
+   COLLAPSIBLE SIDEBAR & SETTINGS
+   ============================================ */
+
+/* Hide toggle wrapper on mobile - it's only for desktop sidebar */
+.sidebar-controls-wrapper {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  /* Wrapper for Toggle Button - positions it at top of sidebar */
+  .sidebar-controls-wrapper {
+    display: flex;
+    position: fixed;
+    top: 24px; /* Match sidebar padding-top */
+    left: 16px; /* Match sidebar padding-left */
+    width: 208px; /* 240px sidebar width - 32px padding */
+    z-index: 1001;
+    flex-direction: column;
+    pointer-events: none; /* Allow clicks to pass through wrapper */
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .sidebar-controls-wrapper.collapsed {
+    width: 70px; /* Match collapsed sidebar width */
+    left: 0;
+    padding: 0 12px;
+  }
+
+  /* Sidebar Toggle Button */
+  .sidebar-toggle-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(var(--theme-primary-rgb), 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 0;
+    padding: 0;
+    color: var(--theme-text-primary);
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+    pointer-events: auto; /* Enable clicks on button */
+  }
+
+  .sidebar-toggle-btn ion-icon {
+    font-size: 18px;
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar-toggle-btn:hover {
+    background: rgba(var(--theme-primary-rgb), 0.15);
+    transform: scale(1.05);
+  }
+
+  .sidebar-toggle-btn:active {
+    transform: scale(0.95);
+  }
+
+  .sidebar-toggle-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .sidebar-toggle-btn:hover::before {
+    opacity: 0.1;
+  }
+
+  /* Collapsed Sidebar State */
+  ion-tab-bar.sidebar-collapsed {
+    width: 70px;
+  }
+
+  ion-tabs.sidebar-collapsed ion-router-outlet {
+    margin-left: 0;
+  }
+
+  ion-tabs.sidebar-collapsed ion-content {
+    --padding-start: clamp(8px, 2vw, 16px);
+    --padding-end: clamp(8px, 2vw, 16px);
+  }
+
+  /* Hide labels when collapsed */
+  ion-tab-bar.sidebar-collapsed ion-tab-button ion-label {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+  }
+
+  /* Center icons when collapsed */
+  ion-tab-bar.sidebar-collapsed ion-tab-button {
+    justify-content: center;
+    padding: 0 12px;
+    height: 50px;
+    min-height: 50px;
+    max-height: 80px;
+  }
+
+  /* Hide app name when collapsed */
+  ion-tab-bar.sidebar-collapsed::after {
+    opacity: 0;
+    height: 0;
+    margin: 0;
+  }
+
+  /* Center logo when collapsed */
+  ion-tab-bar.sidebar-collapsed::before {
+    width: 44px;
+    height: 44px;
+    font-size: 24px;
+  }
+
+  /* Tooltips for collapsed state */
+  ion-tab-bar.sidebar-collapsed ion-tab-button:hover::before {
+    content: attr(aria-label);
+    position: absolute;
+    left: 100%;
+    margin-left: 12px;
+    background: var(--theme-card-background);
+    color: var(--theme-text-primary);
+    padding: 8px 16px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 1000;
+    pointer-events: none;
+    animation: tooltip-slide 0.2s ease-out;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  @keyframes tooltip-slide {
+    from {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Mobile - hide sidebar controls */
+  @media (max-width: 1023px) {
+    .sidebar-toggle-btn {
+      display: none !important;
+    }
+  }
+
+  /* Ensure proper spacing in sidebar */
+  ion-tab-bar {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Make sure buttons are visible */
+  .sidebar-toggle-btn {
+    z-index: 10;
+  }
+
+  /* Smooth transitions for collapse/expand */
+  ion-tab-bar,
+  ion-tab-bar::before,
+  ion-tab-bar::after,
+  ion-tab-button,
+  ion-tab-button ion-label,
+  ion-router-outlet {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Extra spacing for toggle button and settings */
+@media (min-width: 1024px) {
+  ion-tab-bar {
+    padding-bottom: 24px;
+  }
+
+  /* Add visual feedback when sidebar is expanded */
+  ion-tab-bar:not(.sidebar-collapsed) .sidebar-toggle-btn ion-icon {
+    transform: rotate(0deg);
+  }
+
+  /* Rotate icon when collapsed */
+  ion-tab-bar.sidebar-collapsed .sidebar-toggle-btn ion-icon {
+    transform: rotate(180deg);
+  }
+}
+
+/* Dark theme adjustments for buttons */
+@media (min-width: 1024px) {
+  [data-theme='dark'] .sidebar-toggle-btn,
+  [data-theme='neon-cyan'] .sidebar-toggle-btn,
+  [data-theme='neon-purple'] .sidebar-toggle-btn,
+  [data-theme='neon-green'] .sidebar-toggle-btn,
+  [data-theme='neon-pink'] .sidebar-toggle-btn {
+    background: rgba(var(--theme-primary-rgb), 0.15);
+  }
+
+  [data-theme='dark'] .sidebar-toggle-btn:hover,
+  [data-theme='neon-cyan'] .sidebar-toggle-btn:hover,
+  [data-theme='neon-purple'] .sidebar-toggle-btn:hover,
+  [data-theme='neon-green'] .sidebar-toggle-btn:hover,
+  [data-theme='neon-pink'] .sidebar-toggle-btn:hover {
+    background: rgba(var(--theme-primary-rgb), 0.25);
+    box-shadow: 0 0 20px rgba(var(--theme-primary-rgb), 0.3);
+  }
+}
+
+/* Debug and ensure buttons are visible */
+@media (min-width: 1024px) {
+  /* Force buttons to be visible */
+  .sidebar-toggle-btn {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Add visual distinction to buttons */
+  .sidebar-toggle-btn:hover {
+    background: rgba(var(--theme-primary-rgb), 0.2);
+  }
+
+  /* Ensure buttons have proper pointer events */
+  .sidebar-toggle-btn {
+    pointer-events: auto !important;
+  }
+
+  /* Give nav items proper order */
+  ion-tab-button {
+    order: 1;
+  }
+}

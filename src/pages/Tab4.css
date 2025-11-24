@@ -1,7 +1,33 @@
+/* ============================================
+   MODERN TRADE PAGE STYLING
+   ============================================ */
+
+/* Animated gradient background */
+@keyframes trade-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 /* Trading Content */
 .trading-content {
-  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-tertiary) 100%);
+  background: linear-gradient(
+    270deg,
+    var(--theme-primary),
+    var(--theme-tertiary),
+    var(--theme-secondary),
+    var(--theme-primary)
+  );
+  background-size: 600% 600%;
+  animation: trade-gradient 20s ease infinite;
   --background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-tertiary) 100%);
+  position: relative;
 }
 
 /* Trading Container */
@@ -333,5 +359,375 @@
 
   .large-input {
     font-size: 20px;
+  }
+}
+
+/* ============================================
+   MODERN TRADE PAGE ENHANCEMENTS
+   ============================================ */
+
+/* Enhanced swap card */
+.swap-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 28px;
+  padding: 28px;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  animation: swap-card-appear 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+
+[data-theme='dark'] .swap-card,
+[data-theme='neon-cyan'] .swap-card,
+[data-theme='neon-purple'] .swap-card,
+[data-theme='neon-green'] .swap-card,
+[data-theme='neon-pink'] .swap-card {
+  background: rgba(26, 29, 35, 0.85);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes swap-card-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Token sections with modern styling */
+.from-section,
+.to-section {
+  background: var(--theme-background-secondary);
+  border-radius: 20px;
+  padding: 20px;
+  border: 2px solid var(--theme-border-color);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.from-section:hover,
+.to-section:hover {
+  border-color: rgba(var(--theme-primary-rgb), 0.4);
+  box-shadow: 0 4px 16px rgba(var(--theme-primary-rgb), 0.1);
+  transform: translateY(-2px);
+}
+
+.from-section:focus-within,
+.to-section:focus-within {
+  border-color: var(--theme-primary);
+  box-shadow: 0 0 0 4px rgba(var(--theme-primary-rgb), 0.15);
+}
+
+/* Enhanced input styling */
+.large-input {
+  --color: var(--theme-text-primary);
+  font-size: 32px;
+  font-weight: 700;
+  --placeholder-color: var(--theme-text-tertiary);
+  --background: transparent;
+  --border-style: none;
+  --padding-start: 0;
+  --padding-end: 0;
+  transition: all 0.3s ease;
+}
+
+.large-input:focus {
+  transform: scale(1.02);
+}
+
+/* Swap icon button enhancement */
+.swap-icon-button {
+  --background: linear-gradient(135deg, var(--theme-primary), var(--theme-tertiary));
+  --color: white;
+  width: 48px;
+  height: 48px;
+  --border-radius: 50%;
+  box-shadow:
+    0 4px 12px rgba(var(--theme-primary-rgb), 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 10;
+}
+
+.swap-icon-button:hover {
+  transform: rotate(180deg) scale(1.1);
+  box-shadow: 0 6px 20px rgba(var(--theme-primary-rgb), 0.5);
+}
+
+.swap-icon-button:active {
+  transform: rotate(180deg) scale(0.95);
+}
+
+/* Enhanced select token button */
+.select-token-button,
+.token-button {
+  --background: var(--theme-background-secondary);
+  --background-hover: var(--theme-table-row-hover);
+  --border-radius: 16px;
+  --color: var(--theme-text-primary);
+  height: 48px;
+  font-weight: 600;
+  border: 2px solid var(--theme-border-color);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.select-token-button::before,
+.token-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(var(--theme-primary-rgb), 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.select-token-button:hover::before,
+.token-button:hover::before {
+  left: 100%;
+}
+
+.select-token-button:hover,
+.token-button:hover {
+  --background-hover: var(--theme-table-row-hover);
+  border-color: var(--theme-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(var(--theme-primary-rgb), 0.2);
+}
+
+.select-token-button:active,
+.token-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Enhanced swap button */
+.swap-button,
+.connect-button {
+  height: 56px;
+  --border-radius: 16px;
+  font-size: 18px;
+  font-weight: 700;
+  --background: linear-gradient(135deg, var(--theme-primary), var(--theme-tertiary));
+  --color: white;
+  box-shadow: 0 4px 12px rgba(var(--theme-primary-rgb), 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.swap-button::before,
+.connect-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s ease,
+    height 0.6s ease;
+}
+
+.swap-button:active::before,
+.connect-button:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+.swap-button:hover,
+.connect-button:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(var(--theme-primary-rgb), 0.5);
+}
+
+.swap-button:active,
+.connect-button:active {
+  transform: translateY(-1px) scale(1);
+}
+
+.swap-button:disabled {
+  --background: var(--theme-border-color);
+  --color: var(--theme-text-tertiary);
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Enhanced price info */
+.price-info {
+  background: rgba(var(--theme-primary-rgb), 0.08);
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 16px;
+  border: 1px solid rgba(var(--theme-primary-rgb), 0.15);
+  animation: price-fade-in 0.5s ease-out;
+}
+
+@keyframes price-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  transition: all 0.3s ease;
+}
+
+.price-row:hover {
+  transform: translateX(4px);
+}
+
+.price-label {
+  font-size: 14px;
+  color: var(--theme-text-secondary);
+  font-weight: 500;
+}
+
+.price-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--theme-text-primary);
+}
+
+/* Token avatar in select button */
+.token-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.select-token-button:hover .token-avatar,
+.token-button:hover .token-avatar {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Slippage settings */
+.slippage-container {
+  background: var(--theme-background-secondary);
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 16px;
+  border: 1px solid var(--theme-border-color);
+  animation: slide-down 0.4s ease-out;
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
+}
+
+.slippage-options {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.slippage-option {
+  flex: 1;
+  padding: 10px;
+  border-radius: 12px;
+  border: 2px solid var(--theme-border-color);
+  background: var(--theme-card-background);
+  color: var(--theme-text-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slippage-option:hover {
+  border-color: var(--theme-primary);
+  transform: translateY(-2px);
+}
+
+.slippage-option.active {
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-tertiary));
+  color: white;
+  border-color: var(--theme-primary);
+  box-shadow: 0 4px 12px rgba(var(--theme-primary-rgb), 0.3);
+}
+
+/* Loading spinner in button */
+.swap-button ion-spinner {
+  margin-right: 8px;
+  animation: spin-bounce 1s ease-in-out infinite;
+}
+
+@keyframes spin-bounce {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus visible */
+.swap-button:focus-visible,
+.token-button:focus-visible,
+.select-token-button:focus-visible,
+.swap-icon-button:focus-visible {
+  outline: 3px solid var(--theme-primary);
+  outline-offset: 3px;
+}
+
+/* Mobile enhancements */
+@media (hover: none) and (pointer: coarse) {
+  .swap-button:active,
+  .token-button:active {
+    transform: scale(0.96);
   }
 }

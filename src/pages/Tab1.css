@@ -1,7 +1,76 @@
+/* ============================================
+   MODERN WALLET PAGE STYLING
+   ============================================ */
+
+/* Animated gradient background */
+@keyframes wallet-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 /* Wallet Content */
 .wallet-content {
-  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-tertiary) 100%);
+  background: linear-gradient(
+    270deg,
+    var(--theme-primary),
+    var(--theme-tertiary),
+    var(--theme-secondary),
+    var(--theme-primary)
+  );
+  background-size: 600% 600%;
+  animation: wallet-gradient 20s ease infinite;
   --background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-tertiary) 100%);
+  position: relative;
+}
+
+/* Floating orbs effect */
+.wallet-content::before,
+.wallet-content::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.3;
+  animation: float-orb 20s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.wallet-content::before {
+  width: 300px;
+  height: 300px;
+  background: var(--theme-secondary);
+  top: -100px;
+  left: -100px;
+  animation-delay: 0s;
+}
+
+.wallet-content::after {
+  width: 250px;
+  height: 250px;
+  background: var(--theme-tertiary);
+  bottom: -80px;
+  right: -80px;
+  animation-delay: 5s;
+}
+
+@keyframes float-orb {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
 }
 
 /* Wallet Container */
@@ -37,13 +106,68 @@
 
 /* Wallet Card */
 .wallet-card {
-  background: var(--theme-card-background);
-  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-radius: 24px;
   padding: 24px;
-  box-shadow: var(--theme-shadow-large);
-  border: 1px solid var(--theme-border-color);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: card-slide-up 0.6s ease-out backwards;
+}
+
+/* Dark theme wallet card */
+[data-theme='dark'] .wallet-card,
+[data-theme='neon-cyan'] .wallet-card,
+[data-theme='neon-purple'] .wallet-card,
+[data-theme='neon-green'] .wallet-card,
+[data-theme='neon-pink'] .wallet-card {
+  background: rgba(26, 29, 35, 0.85);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wallet-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.wallet-card:hover::before {
+  left: 100%;
+}
+
+.wallet-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow:
+    0 15px 50px rgba(0, 0, 0, 0.2),
+    0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes card-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Balance Section */
@@ -52,6 +176,19 @@
   padding: 20px 0;
   border-bottom: 1px solid var(--theme-border-color);
   margin-bottom: 24px;
+  position: relative;
+  animation: balance-fade-in 0.8s ease-out 0.2s backwards;
+}
+
+@keyframes balance-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .balance-label {
@@ -59,23 +196,61 @@
   color: var(--theme-text-secondary);
   margin-bottom: 8px;
   font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .balance-amount {
-  font-size: 36px;
-  font-weight: 700;
+  font-size: 48px;
+  font-weight: 800;
   color: var(--theme-text-primary);
-  margin-bottom: 8px;
-  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-tertiary) 100%);
+  margin-bottom: 12px;
+  background: linear-gradient(
+    135deg,
+    var(--theme-primary) 0%,
+    var(--theme-tertiary) 50%,
+    var(--theme-secondary) 100%
+  );
+  background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: shimmer-text 3s linear infinite;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  transition: all 0.3s ease;
+  cursor: default;
+}
+
+.balance-amount:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 4px 8px rgba(var(--theme-primary-rgb), 0.3));
+}
+
+@keyframes shimmer-text {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
 }
 
 .balance-usd {
-  font-size: 16px;
+  font-size: 18px;
   color: var(--theme-text-secondary);
-  font-weight: 500;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: rgba(var(--theme-primary-rgb), 0.1);
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.balance-usd:hover {
+  background: rgba(var(--theme-primary-rgb), 0.15);
+  transform: scale(1.05);
 }
 
 /* Wallet Info */
@@ -138,30 +313,84 @@
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   margin-bottom: 24px;
+  animation: buttons-fade-in 0.6s ease-out 0.4s backwards;
+}
+
+@keyframes buttons-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .action-button {
-  height: 48px;
-  --border-radius: 12px;
+  height: 56px;
+  --border-radius: 16px;
   font-weight: 600;
   font-size: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.action-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s ease,
+    height 0.6s ease;
+}
+
+.action-button:active::before {
+  width: 300px;
+  height: 300px;
 }
 
 .action-button.primary {
   --background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-tertiary) 100%);
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-tertiary) 100%);
   --color: var(--theme-primary-contrast);
-  box-shadow: var(--theme-shadow);
+  box-shadow:
+    0 4px 12px rgba(var(--theme-primary-rgb), 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.action-button.primary:hover {
+  box-shadow:
+    0 6px 20px rgba(var(--theme-primary-rgb), 0.5),
+    0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px) scale(1.02);
 }
 
 .action-button.secondary {
   --background: var(--theme-background-secondary);
   --color: var(--theme-text-primary);
   --border-color: var(--theme-border-color);
-  --border-width: 1px;
+  --border-width: 2px;
+  border: 2px solid var(--theme-border-color);
 }
 
-.action-button:hover {
-  transform: translateY(-1px);
+.action-button.secondary:hover {
+  --border-color: var(--theme-primary);
+  border-color: var(--theme-primary);
+  --color: var(--theme-primary);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(var(--theme-primary-rgb), 0.2);
+}
+
+.action-button:active {
+  transform: translateY(0) scale(0.98);
 }
 
 /* Login Section */
@@ -335,5 +564,240 @@
   }
   100% {
     background-position: 200% 0;
+  }
+}
+
+/* ============================================
+   MODERN WALLET ENHANCEMENTS
+   ============================================ */
+
+/* Enhanced copy button */
+.copy-button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.copy-button:hover {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.copy-button:active {
+  transform: scale(0.95) rotate(0deg);
+}
+
+/* Wallet info with modern styling */
+.wallet-info {
+  transition: all 0.3s ease;
+  animation: info-fade-in 0.6s ease-out 0.3s backwards;
+}
+
+@keyframes info-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.wallet-info:hover {
+  transform: translateX(4px);
+  box-shadow: -4px 0 0 var(--theme-primary);
+}
+
+/* Enhanced network chip */
+.network-chip {
+  animation: chip-pulse 2s ease-in-out infinite;
+}
+
+@keyframes chip-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--theme-primary-rgb), 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(var(--theme-primary-rgb), 0);
+  }
+}
+
+/* Enhanced quick actions */
+.quick-action-item {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.quick-action-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.quick-action-item:hover::before {
+  opacity: 1;
+}
+
+.quick-action-item:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.quick-action-item:active {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.quick-action-icon {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.quick-action-item:hover .quick-action-icon {
+  transform: scale(1.2) rotate(10deg);
+}
+
+/* User avatar enhancement */
+.user-avatar {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(var(--theme-primary-rgb), 0.3);
+}
+
+.user-info-card:hover .user-avatar {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 6px 20px rgba(var(--theme-primary-rgb), 0.5);
+}
+
+/* User info card enhancement */
+.user-info-card {
+  animation: card-slide-up 0.6s ease-out 0.1s backwards;
+}
+
+/* Connection banner enhancement */
+.connection-banner {
+  animation: banner-fade-in 0.8s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes banner-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.connection-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: banner-shine 3s ease-in-out infinite;
+}
+
+@keyframes banner-shine {
+  0% {
+    transform: rotate(0deg) translate(-50%, -50%);
+  }
+  100% {
+    transform: rotate(360deg) translate(-50%, -50%);
+  }
+}
+
+/* Login button enhancement */
+.login-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.login-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(var(--theme-primary-rgb), 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.login-button:hover::before {
+  left: 100%;
+}
+
+.login-button:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.login-button:active {
+  transform: translateY(-1px) scale(1.02);
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .wallet-content,
+  .balance-amount,
+  .network-chip {
+    animation: none !important;
+  }
+}
+
+/* Focus visible for keyboard navigation */
+.action-button:focus-visible,
+.copy-button:focus-visible,
+.quick-action-item:focus-visible,
+.login-button:focus-visible {
+  outline: 3px solid var(--theme-primary);
+  outline-offset: 3px;
+}
+
+/* Staggered animation for wallet container children */
+.wallet-container > * {
+  animation: stagger-fade-in 0.5s ease-out backwards;
+}
+
+.wallet-container > *:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.wallet-container > *:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.wallet-container > *:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.wallet-container > *:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+@keyframes stagger-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

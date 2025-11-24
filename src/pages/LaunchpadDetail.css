@@ -682,3 +682,248 @@
     font-size: 0.8rem;
   }
 }
+
+/* ============================================
+   MODERN LAUNCHPADDETAIL PAGE ENHANCEMENTS
+   ============================================ */
+
+/* Enhanced pool detail animations */
+.pool-detail-container {
+  animation: detail-fade-in 0.6s ease-out;
+}
+
+@keyframes detail-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced stat cards */
+.detail-stat-card {
+  background: var(--theme-card-background);
+  border-radius: 20px;
+  padding: 24px;
+  border: 2px solid var(--theme-border-color);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.detail-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--theme-primary), var(--theme-secondary));
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.detail-stat-card:hover::before {
+  transform: scaleX(1);
+}
+
+.detail-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  border-color: rgba(var(--theme-primary-rgb), 0.4);
+}
+
+/* Animated progress bars */
+.pool-progress-bar {
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(var(--theme-primary-rgb), 0.1);
+  overflow: hidden;
+  position: relative;
+}
+
+.pool-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--theme-primary), var(--theme-secondary));
+  border-radius: 999px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  box-shadow: 0 0 20px rgba(var(--theme-primary-rgb), 0.5);
+  animation: progress-glow 2s ease-in-out infinite;
+}
+
+@keyframes progress-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(var(--theme-primary-rgb), 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(var(--theme-primary-rgb), 0.8);
+  }
+}
+
+.pool-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: progress-shine 2s linear infinite;
+}
+
+@keyframes progress-shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Enhanced participate button */
+.participate-button {
+  height: 64px;
+  --border-radius: 20px;
+  font-size: 20px;
+  font-weight: 800;
+  --background: linear-gradient(135deg, var(--theme-primary), var(--theme-tertiary));
+  --color: white;
+  box-shadow: 0 6px 20px rgba(var(--theme-primary-rgb), 0.5);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.participate-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: button-shine 3s ease-in-out infinite;
+}
+
+@keyframes button-shine {
+  0% {
+    left: -100%;
+  }
+  50%,
+  100% {
+    left: 100%;
+  }
+}
+
+.participate-button:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(var(--theme-primary-rgb), 0.6);
+}
+
+.participate-button:active {
+  transform: translateY(-2px) scale(1);
+}
+
+/* Enhanced chart container */
+.chart-container {
+  background: var(--theme-card-background);
+  border-radius: 24px;
+  padding: 24px;
+  border: 2px solid var(--theme-border-color);
+  margin: 20px 0;
+  transition: all 0.3s ease;
+  animation: chart-appear 0.8s ease-out 0.2s backwards;
+}
+
+@keyframes chart-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.chart-container:hover {
+  border-color: rgba(var(--theme-primary-rgb), 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* Token info header enhancement */
+.token-header {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--theme-primary-rgb), 0.1),
+    rgba(var(--theme-secondary-rgb), 0.1)
+  );
+  border-radius: 24px;
+  padding: 32px;
+  margin-bottom: 24px;
+  border: 2px solid rgba(var(--theme-primary-rgb), 0.2);
+  animation: header-slide-in 0.6s ease-out;
+}
+
+@keyframes header-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.token-header-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.token-header:hover .token-header-avatar {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 12px 32px rgba(var(--theme-primary-rgb), 0.4);
+}
+
+/* Staggered animation for detail cards */
+.detail-grid > * {
+  animation: card-stagger 0.5s ease-out backwards;
+}
+
+.detail-grid > *:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.detail-grid > *:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.detail-grid > *:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.detail-grid > *:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+@keyframes card-stagger {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -421,3 +421,244 @@
     padding: 16px;
   }
 }
+
+/* ============================================
+   MODERN HISTORY PAGE ENHANCEMENTS
+   ============================================ */
+
+/* Enhanced history items with timeline */
+.history-item {
+  position: relative;
+  padding-left: 56px;
+  margin-bottom: 20px;
+  animation: history-slide-in 0.5s ease-out backwards;
+}
+
+.history-item:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.history-item:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.history-item:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.history-item:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.history-item:nth-child(5) {
+  animation-delay: 0.25s;
+}
+.history-item:nth-child(n + 6) {
+  animation-delay: 0.3s;
+}
+
+@keyframes history-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Timeline line */
+.history-item::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 40px;
+  bottom: -20px;
+  width: 2px;
+  background: linear-gradient(180deg, var(--theme-primary), var(--theme-border-color));
+}
+
+.history-item:last-child::before {
+  display: none;
+}
+
+/* Timeline dot */
+.history-item::after {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 20px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--theme-primary);
+  border: 3px solid var(--theme-card-background);
+  box-shadow: 0 0 0 3px rgba(var(--theme-primary-rgb), 0.2);
+  animation: dot-pulse 2s ease-in-out infinite;
+}
+
+@keyframes dot-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(var(--theme-primary-rgb), 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(var(--theme-primary-rgb), 0);
+  }
+}
+
+/* Enhanced history card */
+.history-card {
+  background: var(--theme-card-background);
+  border-radius: 20px;
+  padding: 20px;
+  border: 2px solid var(--theme-border-color);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.history-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background: linear-gradient(180deg, var(--theme-primary), var(--theme-secondary));
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+
+.history-card:hover::before {
+  transform: scaleY(1);
+}
+
+.history-card:hover {
+  transform: translateX(8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: rgba(var(--theme-primary-rgb), 0.4);
+}
+
+/* Transaction status badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  animation: badge-appear 0.4s ease-out;
+}
+
+@keyframes badge-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.status-badge.success {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--ion-color-success-rgb), 0.2),
+    rgba(var(--ion-color-success-rgb), 0.1)
+  );
+  color: var(--ion-color-success);
+  border: 2px solid rgba(var(--ion-color-success-rgb), 0.3);
+}
+
+.status-badge.pending {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--ion-color-warning-rgb), 0.2),
+    rgba(var(--ion-color-warning-rgb), 0.1)
+  );
+  color: var(--ion-color-warning);
+  border: 2px solid rgba(var(--ion-color-warning-rgb), 0.3);
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+.status-badge.failed {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--ion-color-danger-rgb), 0.2),
+    rgba(var(--ion-color-danger-rgb), 0.1)
+  );
+  color: var(--ion-color-danger);
+  border: 2px solid rgba(var(--ion-color-danger-rgb), 0.3);
+}
+
+@keyframes badge-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--ion-color-warning-rgb), 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(var(--ion-color-warning-rgb), 0);
+  }
+}
+
+/* Transaction amount highlighting */
+.transaction-amount {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 8px 0;
+  transition: all 0.3s ease;
+}
+
+.transaction-amount.positive {
+  color: var(--ion-color-success);
+  text-shadow: 0 0 10px rgba(var(--ion-color-success-rgb), 0.3);
+}
+
+.transaction-amount.negative {
+  color: var(--ion-color-danger);
+}
+
+.history-card:hover .transaction-amount {
+  transform: scale(1.05);
+}
+
+/* Enhanced filters */
+.history-filter-chips {
+  display: flex;
+  gap: 8px;
+  padding: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.history-filter-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-chip {
+  flex-shrink: 0;
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: 2px solid var(--theme-border-color);
+  background: var(--theme-card-background);
+  color: var(--theme-text-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.filter-chip:hover {
+  border-color: var(--theme-primary);
+  transform: translateY(-2px);
+}
+
+.filter-chip.active {
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-tertiary));
+  color: white;
+  border-color: var(--theme-primary);
+  box-shadow: 0 4px 12px rgba(var(--theme-primary-rgb), 0.4);
+}
